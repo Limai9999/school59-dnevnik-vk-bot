@@ -29,14 +29,16 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, commands}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, commands, statistics, events}: CommandInputData) {
   const {text, peerId, messagePayload} = message;
 
-  console.log(`Новое сообщение в беседе ${peerId}: ${text}`);
+  console.log(`Новое сообщение в беседе ${peerId}: ${text || '<без текста>'}`);
 
   const classData = await classes.getClass(peerId);
   const isMessagesHandling = classData.handleMessages;
   if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${message.peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`);
+
+  events.executeRandomEvent(message);
 
   let foundCommandAlias = '';
 
@@ -68,15 +70,35 @@ export default async function handleMessage({message, classes, vk, commands}: Co
 
     return isFound;
   });
+
+  let args: string[] = [];
+
+  if (text) {
+    args = text
+        .replace(foundCommandAlias, '')
+        .trim()
+        .split(' ')
+        .filter((arg) => arg.length);
+  }
+
+  // @ts-ignore
+  const attachments = message.message.attachments;
+
+  statistics.saveMessage({
+    peerId,
+    messageId: message.conversationMessageId!,
+    text: message.text,
+    attachments,
+    args,
+    commandName: command?.name,
+    date: message.createdAt! * 1000,
+    userId: message.senderId!,
+    payload: messagePayload,
+  });
+
   if (!command) return;
 
   const isAdminChat = peerId === vk.config.adminChatID;
-
-  const args = text!
-      .replace(foundCommandAlias, '')
-      .trim()
-      .split(' ')
-      .filter((arg) => arg.length);
 
   const {status, errorMessage} = checkCommand({command, data: {isAdminChat, args}});
 
@@ -90,5 +112,5 @@ export default async function handleMessage({message, classes, vk, commands}: Co
     });
   }
 
-  command.execute({message, vk, classes, args, commands, payload: messagePayload});
+  command.execute({message, vk, classes, args, commands, payload: messagePayload, statistics, events});
 };

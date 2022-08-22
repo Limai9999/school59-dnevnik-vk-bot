@@ -18,6 +18,7 @@
       "linebreak-style": "off",
       "require-jsdoc": "off",
       "max-len": "off",
-      "semi-spacing": "warn"
+      "semi-spacing": "warn",
+      "camelcase": "off"
     }
 }

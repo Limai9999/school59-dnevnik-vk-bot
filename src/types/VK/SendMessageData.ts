@@ -1,10 +1,10 @@
-import {KeyboardBuilder} from 'vk-io';
+import {Attachment, KeyboardBuilder} from 'vk-io';
 
 export type SendMessageData = {
   message: string;
   peerId: number;
   keyboard?: KeyboardBuilder;
-  attachment?: string;
+  attachment?: Attachment;
   skipLastSentCheck?: boolean;
   priority: 'none' | 'low' | 'medium' | 'high';
 };

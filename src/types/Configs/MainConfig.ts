@@ -1,3 +1,3 @@
 export type MainConfig = {
-  passwordSecretKey: string;
+  secretKey: string;
 };

@@ -6,12 +6,12 @@ import {getMainConfig} from '../utils/getConfig';
 export default class Password {
   password: string;
   isEncrypted: boolean;
-  secretKey: MainConfig['passwordSecretKey'];
+  secretKey: MainConfig['secretKey'];
 
   constructor(password: string, isEncrypted: boolean) {
     this.isEncrypted = isEncrypted;
     this.password = password;
-    this.secretKey = getMainConfig().passwordSecretKey;
+    this.secretKey = getMainConfig().secretKey;
   }
 
   encrypt() {

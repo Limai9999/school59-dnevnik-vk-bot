@@ -4,6 +4,8 @@ import handleMessage from './handlers/handleMessage';
 
 import Classes from './modules/Classes';
 import VK from './modules/VK';
+import MessageStatistics from './modules/MessageStatistics';
+import Event from './modules/Event';
 
 import {getVKConfig, getMongoDBConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
@@ -19,6 +21,7 @@ mongoose.connect(url, {}, (err) => {
 });
 
 const classes = new Classes();
+const statistics = new MessageStatistics();
 
 const vkConfig = getVKConfig();
 const vk = new VK({
@@ -31,8 +34,16 @@ async function start() {
 
   const commands = await getCommands();
 
+  const events = new Event({
+    vk,
+    classes,
+    commands,
+    statistics,
+  });
+  await events.init();
+
   bot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: bot, classes, args: [], commands});
+    handleMessage({message, vk, classes, args: [], commands, statistics, events});
   });
 }
 

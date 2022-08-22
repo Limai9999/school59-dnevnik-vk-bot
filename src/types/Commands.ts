@@ -4,6 +4,8 @@ import VK from '../modules/VK';
 import Classes from '../modules/Classes';
 
 import {Payload} from './VK/Payloads/Payload';
+import MessageStatisticsService from '../modules/MessageStatistics';
+import Event from '../modules/Event';
 
 export type CommandInputData = {
   vk: VK;
@@ -11,7 +13,9 @@ export type CommandInputData = {
   message: MessageContext<ContextDefaultState>;
   commands: CommandOutputData[];
   args: string[];
-  payload?: Payload
+  payload?: Payload;
+  statistics: MessageStatisticsService;
+  events: Event;
 };
 
 export type CommandOutputData = {

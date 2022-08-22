@@ -1,10 +1,17 @@
 import {VK, KeyboardBuilder} from 'vk-io';
+import FormData from 'form-data';
+import fs from 'fs';
+import axios from 'axios';
+
+import Classes from './Classes';
 
 import {Settings} from '../types/VK/Settings';
 import {SendMessageData} from '../types/VK/SendMessageData';
 import {VKConfig} from '../types/Configs/VKConfig';
-import Classes from './Classes';
+
 import {MessagesSendResponse} from '../types/VK/Responses/MessagesSendResponse';
+import {GetUserResponse} from '../types/VK/Responses/GetUserResponse';
+import {PhotoUploadResponse} from '../types/Responses/PhotoUploadResponse';
 
 import {MainKeyboard} from '../keyboards/MainKeyboard';
 
@@ -68,7 +75,7 @@ class VkService extends VK {
       });
       return response;
     } catch (error) {
-      console.log('VK REMOVE MESSAGE ERROR:', error);
+      console.log('Произошла ошибка при удалении сообщения:', error);
       return false;
     }
   };
@@ -138,19 +145,65 @@ class VkService extends VK {
       usingKeyboard = MainKeyboard;
     }
 
-    const response = await this.api.messages.send({
-      message,
-      peer_ids: peerId,
-      random_id: Math.floor(Math.random() * 10000) * Date.now(),
-      attachment,
-      dont_parse_links: true,
-      keyboard: usingKeyboard,
-    }) as unknown as MessagesSendResponse;
+    try {
+      const response = await this.api.messages.send({
+        message,
+        peer_ids: peerId,
+        random_id: Math.floor(Math.random() * 10000) * Date.now(),
+        attachment,
+        dont_parse_links: true,
+        keyboard: usingKeyboard,
+      }) as unknown as MessagesSendResponse;
 
-    const messageId = response[0].conversation_message_id;
+      const messageId = response[0].conversation_message_id;
 
-    if (!skipLastSentCheck) this.classes.addLastSentMessage(peerId, messageId);
-    if (!isPrivateMessages) this.setTimeoutForMessageRemove(messageId, peerId, priority);
+      if (!skipLastSentCheck) this.classes.addLastSentMessage(peerId, messageId);
+      if (!isPrivateMessages) this.setTimeoutForMessageRemove(messageId, peerId, priority);
+    } catch (error) {
+      console.log('Произошла ошибка при отправке сообщения:', error);
+    }
+  }
+
+  async getUser(userId: number): Promise<GetUserResponse | null> {
+    const response = await this.api.users.get({
+      user_ids: [userId],
+      fields: ['bdate', 'screen_name', 'city'],
+    });
+    if (!response.length) return null;
+
+    return response[0];
+  }
+
+  async uploadAndGetPhoto({photoPath, peerId, stream}: {photoPath?: string, peerId: number, stream?: any}) {
+    const {upload_url} = await this.api.photos.getMessagesUploadServer({
+      peer_id: peerId,
+    });
+
+    const formData = new FormData();
+
+    if (stream) {
+      formData.append('photo', stream);
+    } else {
+      if (!photoPath) return console.log('no photo path');
+      formData.append('photo', fs.createReadStream(photoPath));
+    }
+
+    const uploadResponse = await axios({
+      method: 'post',
+      url: upload_url,
+      data: formData,
+      headers: formData.getHeaders(),
+    });
+
+    const {server, hash, photo}: PhotoUploadResponse = uploadResponse.data;
+
+    const saved = await this.api.photos.saveMessagesPhoto({
+      photo,
+      server,
+      hash,
+    });
+
+    return saved[0];
   }
 }
 

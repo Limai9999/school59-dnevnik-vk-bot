@@ -20,6 +20,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "crypto-js": "^4.1.1",
     "mongoose": "^6.5.2",
     "vk-io": "^4.6.0"
