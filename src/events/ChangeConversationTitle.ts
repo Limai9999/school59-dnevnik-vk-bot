@@ -64,7 +64,7 @@ async function executeEvent({vk, statistics, message}: EventInputData) {
 
 const evt: EventOutputData = {
   name: 'changeConversationTitle',
-  executeProbability: 0.1,
+  executeProbability: 0.05,
   execute: executeEvent,
 };
 

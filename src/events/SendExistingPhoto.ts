@@ -51,7 +51,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
 
 const evt: EventOutputData = {
   name: 'sendExistingPhoto',
-  executeProbability: 0.4,
+  executeProbability: 0.3,
   execute: executeEvent,
 };
 
