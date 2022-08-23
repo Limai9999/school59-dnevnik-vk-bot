@@ -40,7 +40,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
 }
 
 const evt: EventOutputData = {
-  name: 'existingWordsSentence',
+  name: 'sendExistingWordsSentence',
   executeProbability: 0.5,
   execute: executeEvent,
 };
