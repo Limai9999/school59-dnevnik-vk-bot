@@ -32,6 +32,11 @@ const vk = new VK({
 async function start() {
   const bot = await vk.init();
 
+  const allClasses = await classes.getAllClasses();
+  allClasses.map(({id}) => {
+    vk.addChatToState(id);
+  });
+
   const commands = await getCommands();
 
   const events = new Event({

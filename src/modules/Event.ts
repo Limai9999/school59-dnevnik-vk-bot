@@ -42,13 +42,17 @@ class Event {
 
     const event = passedEvents[Math.floor(Math.random() * passedEvents.length)];
 
-    event.execute({
-      vk: this.vk,
-      classes: this.classes,
-      commands: this.commands,
-      statistics: this.statistics,
-      message,
-    });
+    try {
+      event.execute({
+        vk: this.vk,
+        classes: this.classes,
+        commands: this.commands,
+        statistics: this.statistics,
+        message,
+      });
+    } catch (error) {
+      console.log(`Произошла ошибка при выполнении ивента ${event.name}`, error);
+    }
   }
 
   executeRoulette(): boolean {

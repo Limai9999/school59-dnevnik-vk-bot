@@ -12,6 +12,11 @@ export default class Classes {
     return data;
   }
 
+  async getAllClasses() {
+    const classes = await Class.find();
+    return Array.from(classes);
+  }
+
   async addLastSentMessage(peerId: number, messageId: number) {
     const classData = await this.getClass(peerId);
     await classData.updateOne({

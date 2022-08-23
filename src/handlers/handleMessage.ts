@@ -108,9 +108,11 @@ export default async function handleMessage({message, classes, vk, commands, sta
     return vk.sendMessage({
       message: errorMessage,
       peerId: message.peerId,
-      priority: 'low',
+      priority: 'medium',
     });
   }
+
+  vk.setTypingStatus(message.peerId);
 
   command.execute({message, vk, classes, args, commands, payload: messagePayload, statistics, events});
 };

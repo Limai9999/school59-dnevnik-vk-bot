@@ -8,9 +8,11 @@ import Classes from './Classes';
 import {Settings} from '../types/VK/Settings';
 import {SendMessageData} from '../types/VK/SendMessageData';
 import {VKConfig} from '../types/Configs/VKConfig';
+import {State} from '../types/VK/State';
 
 import {MessagesSendResponse} from '../types/VK/Responses/MessagesSendResponse';
 import {GetUserResponse} from '../types/VK/Responses/GetUserResponse';
+import {GetChatResponse} from '../types/VK/Responses/GetChatResponse';
 import {PhotoUploadResponse} from '../types/Responses/PhotoUploadResponse';
 
 import {MainKeyboard} from '../keyboards/MainKeyboard';
@@ -22,6 +24,12 @@ class VkService extends VK {
   savedKeyboards: {
     [peerId: number]: KeyboardBuilder;
   };
+
+  me: {
+    name: string;
+    id: number;
+  };
+  state: State;
 
   constructor({config, classes}: Settings) {
     const {token, id} = config;
@@ -35,12 +43,16 @@ class VkService extends VK {
     this.classes = classes;
     this.config = config;
     this.savedKeyboards = {};
+
+    this.me = {name: '', id: 0};
+    this.state = {chats: {}};
   }
 
   async init() {
     await this.updates.start();
 
     const {id, name} = await this.getMe();
+    this.me = {name: name!, id: id!};
 
     console.log(`VK бот успешно запущен как ${name} - ${id}.`);
 
@@ -120,6 +132,8 @@ class VkService extends VK {
         skipLastSentCheck: true,
       });
 
+      this.setTypingStatus(peerId);
+
       await this.classes.setMessagesHandlingStatus(peerId, false);
       await this.removeAllLastSentMessages(peerId);
       await this.classes.setMessagesHandlingStatus(peerId, true);
@@ -162,6 +176,33 @@ class VkService extends VK {
     } catch (error) {
       console.log('Произошла ошибка при отправке сообщения:', error);
     }
+  }
+
+  addChatToState(peerId: number) {
+    this.state.chats[peerId] = {
+      events: {
+        pendingOriginalPhoto: false,
+        pendingOriginalTitle: false,
+        originalTitle: 'none',
+      },
+    };
+  };
+
+  async setTypingStatus(peerId: number) {
+    return await this.api.messages.setActivity({
+      peer_id: peerId,
+      type: 'typing',
+      group_id: this.me.id,
+    });
+  };
+
+  async getChat(peerId: number): Promise<GetChatResponse | null> {
+    const response = await this.api.messages.getConversationsById({
+      peer_ids: peerId,
+    });
+    if (!response || !response.items || !response.items.length) return null;
+
+    return response.items[0] as unknown as GetChatResponse;
   }
 
   async getUser(userId: number): Promise<GetUserResponse | null> {

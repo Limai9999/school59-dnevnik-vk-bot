@@ -16,6 +16,8 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
   });
   if (!usingMessages.length) return console.log('existingWordsSentence - no usingMessages');
 
+  await vk.setTypingStatus(peerId);
+
   const randomMessage = usingMessages[Math.floor(Math.random() * usingMessages.length)];
 
   const words = randomMessage.text!.split(' ');
@@ -41,7 +43,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
 
 const evt: EventOutputData = {
   name: 'sendExistingWordsSentence',
-  executeProbability: 0.5,
+  executeProbability: 0.4,
   execute: executeEvent,
 };
 
