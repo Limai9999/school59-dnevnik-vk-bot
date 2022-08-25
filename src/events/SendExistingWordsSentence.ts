@@ -6,7 +6,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
   const messages = await statistics.getTextMessagesWithoutPayload(peerId);
   const senderMessages = messages.filter((message) => message.userId === senderId);
 
-  const useSenderMessages = Math.random() < 0.2 && senderMessages.length;
+  const useSenderMessages = Math.random() < 0.3 && senderMessages.length;
 
   let usingMessages = useSenderMessages ? senderMessages : messages;
   usingMessages = usingMessages.filter((message) => {
@@ -43,7 +43,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
 
 const evt: EventOutputData = {
   name: 'sendExistingWordsSentence',
-  executeProbability: 0.4,
+  executeProbability: 0.3,
   execute: executeEvent,
 };
 
