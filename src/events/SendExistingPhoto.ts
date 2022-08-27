@@ -44,7 +44,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
     peerId,
     attachment,
     message: '',
-    priority: 'high',
+    priority: 'none',
     skipLastSentCheck: true,
   });
 }

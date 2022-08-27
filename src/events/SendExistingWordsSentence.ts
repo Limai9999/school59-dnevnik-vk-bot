@@ -36,14 +36,14 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
   vk.sendMessage({
     peerId,
     message: sendingMessage,
-    priority: 'high',
+    priority: 'none',
     skipLastSentCheck: true,
   });
 }
 
 const evt: EventOutputData = {
   name: 'sendExistingWordsSentence',
-  executeProbability: 0.3,
+  executeProbability: 0.25,
   execute: executeEvent,
 };
 

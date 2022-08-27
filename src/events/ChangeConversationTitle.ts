@@ -49,7 +49,7 @@ async function executeEvent({vk, statistics, message}: EventInputData) {
       await vk.sendMessage({
         message: jokeMessage,
         peerId,
-        priority: 'high',
+        priority: 'none',
         skipLastSentCheck: true,
       });
     }
