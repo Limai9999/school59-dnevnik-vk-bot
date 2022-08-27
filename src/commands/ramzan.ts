@@ -4,7 +4,6 @@ async function command({message, vk}: CommandInputData) {
   const awards = [
     'плитка говна',
     'стакан чечни',
-    'Украина',
     'Чечня',
     'Чеченская Республика',
     'приложение Чечня на ваш гандондройд',
