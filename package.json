@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rm build/ -r -f && tsc",
+    "build": "rimraf build/ && tsc",
     "start": "npm run build && node build/index.js"
   },
   "author": "",
