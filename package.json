@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rm build/ -r tsc",
+    "build": "rm build/ -r && tsc",
     "start": "npm run build && node build/index.js"
   },
   "author": "",
