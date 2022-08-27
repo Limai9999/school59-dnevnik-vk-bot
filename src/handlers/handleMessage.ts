@@ -30,13 +30,13 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
 }
 
 export default async function handleMessage({message, classes, vk, commands, statistics, events}: CommandInputData) {
-  const {text, peerId, messagePayload} = message;
+  const {text, peerId, messagePayload, id} = message;
 
   console.log(`Новое сообщение в беседе ${peerId}: ${text || '<без текста>'}`);
 
   const classData = await classes.getClass(peerId);
   const isMessagesHandling = classData.handleMessages;
-  if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${message.peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`);
+  if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`);
 
   events.executeRandomEvent(message);
 
@@ -107,12 +107,14 @@ export default async function handleMessage({message, classes, vk, commands, sta
 
     return vk.sendMessage({
       message: errorMessage,
-      peerId: message.peerId,
+      peerId,
       priority: 'medium',
     });
   }
 
-  vk.setTypingStatus(message.peerId);
+  vk.setTypingStatus(peerId);
+
+  vk.setTimeoutForMessageRemove(id, peerId, 'high');
 
   command.execute({message, vk, classes, args, commands, payload: messagePayload, statistics, events});
 };
