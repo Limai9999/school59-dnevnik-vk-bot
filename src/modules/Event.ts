@@ -42,7 +42,8 @@ class Event {
     const passedEvents = this.events.filter((event) => random < event.executeProbability);
     if (!passedEvents.length) return console.log('no passed events');
 
-    const event = passedEvents[Math.floor(Math.random() * passedEvents.length)];
+    const shuffledPassedEvents: EventOutputData[] = this.shuffle(passedEvents);
+    const event = shuffledPassedEvents[Math.floor(Math.random() * shuffledPassedEvents.length)];
 
     try {
       console.log(`executing ${event.name} event`);
@@ -65,6 +66,20 @@ class Event {
     if (!enabled) return false;
 
     return Math.random() < generalRandom;
+  }
+
+  shuffle(array: any[]) {
+    let currentIndex = array.length;
+    let randomIndex = 0;
+    while (currentIndex != 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
   }
 }
 
