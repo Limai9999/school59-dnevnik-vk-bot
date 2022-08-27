@@ -36,13 +36,17 @@ class Event {
   async executeRandomEvent(message: MessageContext<ContextDefaultState>) {
     if (!this.executeRoulette() || message.isDM) return;
 
+    console.log('general event');
+
     const random = Math.random();
     const passedEvents = this.events.filter((event) => random < event.executeProbability);
-    if (!passedEvents.length) return;
+    if (!passedEvents.length) return console.log('no passed events');
 
     const event = passedEvents[Math.floor(Math.random() * passedEvents.length)];
 
     try {
+      console.log(`executing ${event.name} event`);
+
       event.execute({
         vk: this.vk,
         classes: this.classes,
