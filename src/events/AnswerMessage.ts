@@ -64,7 +64,7 @@ async function executeEvent({statistics, vk, message, classes}: EventInputData) 
 
 const evt: EventOutputData = {
   name: 'answerMessage',
-  executeProbability: 0.4,
+  executeProbability: 0.3,
   execute: executeEvent,
 };
 
