@@ -14,6 +14,7 @@ export type EventInputData = {
 
 export type EventOutputData = {
   name: string;
+  disabled: boolean;
   executeProbability: number;
   execute: ({}: EventInputData) => Promise<void>;
 };

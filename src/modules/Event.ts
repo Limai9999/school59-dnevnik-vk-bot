@@ -39,7 +39,7 @@ class Event {
     console.log('general event');
 
     const random = Math.random();
-    const passedEvents = this.events.filter((event) => random < event.executeProbability);
+    const passedEvents = this.events.filter((event) => random < event.executeProbability && !event.disabled);
     if (!passedEvents.length) return console.log('no passed events');
 
     const shuffledPassedEvents: EventOutputData[] = this.shuffle(passedEvents);
