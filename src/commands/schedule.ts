@@ -15,7 +15,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
 const cmd: CommandOutputData = {
   name: 'расписание',
   aliases: ['получить расписание', 'get schedule'],
-  description: 'получить расписания уроков',
+  description: 'получить расписание уроков',
   payload: 'schedule',
   requirements: {
     admin: false,
