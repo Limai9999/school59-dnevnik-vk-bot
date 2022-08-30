@@ -4,6 +4,7 @@ import {VKConfig} from '../types/Configs/VKConfig';
 import {MongoConfig} from '../types/Configs/MongoConfig';
 import {MainConfig} from '../types/Configs/MainConfig';
 import {EventConfig} from '../types/Configs/EventConfig';
+import {TikTokConfig} from '../types/Configs/TikTokConfig';
 
 export function getVKConfig(): VKConfig {
   return new Config('vk.json').getData();
@@ -19,4 +20,8 @@ export function getMainConfig(): MainConfig {
 
 export function getEventConfig(): EventConfig {
   return new Config('event.json').getData();
+};
+
+export function getTikTokConfig(): TikTokConfig {
+  return new Config('tiktok.json').getData();
 };

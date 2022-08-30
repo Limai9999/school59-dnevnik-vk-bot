@@ -1,3 +1,4 @@
 export type MainConfig = {
-  secretKey: string;
+  secretKey: string
+  rapidApiKey: string
 };
