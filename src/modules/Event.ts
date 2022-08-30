@@ -15,15 +15,17 @@ class Event {
   events: EventOutputData[];
 
   vk: VkService;
+  vkUser: VkService;
   classes: Classes;
   commands: CommandOutputData[];
   statistics: MessageStatistics;
 
-  constructor({vk, classes, commands, statistics}: EventInputData) {
+  constructor({vk, vkUser, classes, commands, statistics}: EventInputData) {
     this.config = getEventConfig();
     this.events = [];
 
     this.vk = vk;
+    this.vkUser = vkUser;
     this.classes = classes;
     this.commands = commands;
     this.statistics = statistics;
@@ -36,25 +38,26 @@ class Event {
   async executeRandomEvent(message: MessageContext<ContextDefaultState>) {
     if (!this.executeRoulette() || message.isDM) return;
 
-    console.log('general event');
-
     const random = Math.random();
     const passedEvents = this.events.filter((event) => random < event.executeProbability && !event.disabled);
-    if (!passedEvents.length) return console.log('no passed events');
+    if (!passedEvents.length) return;
 
     const shuffledPassedEvents: EventOutputData[] = this.shuffle(passedEvents);
     const event = shuffledPassedEvents[Math.floor(Math.random() * shuffledPassedEvents.length)];
 
     try {
-      console.log(`executing ${event.name} event`);
+      console.log(`Выполняется ивент ${event.name}`);
 
-      event.execute({
+      await event.execute({
         vk: this.vk,
+        vkUser: this.vkUser,
         classes: this.classes,
         commands: this.commands,
         statistics: this.statistics,
         message,
       });
+
+      console.log(`Ивент ${event.name} успешно выполнился.`);
     } catch (error) {
       console.log(`Произошла ошибка при выполнении ивента ${event.name}`, error);
     }
