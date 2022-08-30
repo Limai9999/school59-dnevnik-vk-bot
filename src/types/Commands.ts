@@ -1,6 +1,6 @@
 import {MessageContext, ContextDefaultState} from 'vk-io';
 
-import VK from '../modules/VK';
+import VKService from '../modules/VK';
 import Classes from '../modules/Classes';
 
 import {Payload} from './VK/Payloads/Payload';
@@ -8,7 +8,8 @@ import MessageStatisticsService from '../modules/MessageStatistics';
 import Event from '../modules/Event';
 
 export type CommandInputData = {
-  vk: VK;
+  vk: VKService;
+  vkUser: VKService;
   classes: Classes;
   message: MessageContext<ContextDefaultState>;
   commands: CommandOutputData[];

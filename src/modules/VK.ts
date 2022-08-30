@@ -18,7 +18,6 @@ import {PhotoUploadResponse} from '../types/Responses/PhotoUploadResponse';
 import {MainKeyboard} from '../keyboards/MainKeyboard';
 
 class VkService extends VK {
-  id: number;
   classes: Classes;
   config: VKConfig;
   savedKeyboards: {
@@ -28,43 +27,52 @@ class VkService extends VK {
   me: {
     name: string;
     id: number;
+    isUser: boolean;
   };
   state: State;
 
-  constructor({config, classes}: Settings) {
-    const {token, id} = config;
-
+  constructor({config, classes, token, isUser}: Settings) {
     super({
       token,
       language: 'ru',
     });
 
-    this.id = id;
     this.classes = classes;
     this.config = config;
     this.savedKeyboards = {};
 
-    this.me = {name: '', id: 0};
+    this.me = {name: '', id: 0, isUser};
     this.state = {chats: {}};
   }
 
   async init() {
-    await this.updates.start();
+    if (!this.me.isUser) await this.updates.start();
 
     const {id, name} = await this.getMe();
-    this.me = {name: name!, id: id!};
+    this.me = {name: name!, id: id!, isUser: this.me.isUser};
 
-    console.log(`VK бот успешно запущен как ${name} - ${id}.`);
+    console.log(`VK успешно запущено как ${name} - ${id}.`);
 
     return this;
   }
 
   async getMe() {
-    const response = await this.api.groups.getById({
-      group_id: this.id,
-    });
+    if (this.me.isUser) {
+      const response = await this.api.users.get({});
 
-    return response[0];
+      const {first_name, last_name, id}: GetUserResponse = response[0];
+
+      return {
+        name: `${first_name} ${last_name}`,
+        id,
+      };
+    } else {
+      const response = await this.api.groups.getById({
+        group_id: this.config.id,
+      });
+
+      return response[0];
+    }
   }
 
   async removeAllLastSentMessages(peerId: number) {

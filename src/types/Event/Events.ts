@@ -6,6 +6,7 @@ import {CommandOutputData} from '../Commands';
 
 export type EventInputData = {
   vk: VkService;
+  vkUser: VkService;
   classes: Classes;
   commands: CommandOutputData[];
   statistics: MessageStatistics;

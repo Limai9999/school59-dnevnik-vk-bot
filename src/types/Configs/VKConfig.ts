@@ -1,5 +1,6 @@
 export type VKConfig = {
-  token: string;
+  bot_token: string;
+  user_token: string;
   id: number;
   adminUserID: number;
   adminChatID: number;

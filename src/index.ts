@@ -23,24 +23,35 @@ mongoose.connect(url, {}, (err) => {
 const classes = new Classes();
 const statistics = new MessageStatistics();
 
-const vkConfig = getVKConfig();
-const vk = new VK({
-  config: vkConfig,
+const VKConfig = getVKConfig();
+
+const vkBot = new VK({
+  token: VKConfig.bot_token,
+  config: VKConfig,
   classes,
+  isUser: false,
+});
+const vkUser = new VK({
+  token: VKConfig.user_token,
+  config: VKConfig,
+  classes,
+  isUser: true,
 });
 
 async function start() {
-  const bot = await vk.init();
+  const bot = await vkBot.init();
+  await vkUser.init();
 
   const allClasses = await classes.getAllClasses();
   allClasses.map(({id}) => {
-    vk.addChatToState(id);
+    vkBot.addChatToState(id);
   });
 
   const commands = await getCommands();
 
   const events = new Event({
-    vk,
+    vk: vkBot,
+    vkUser,
     classes,
     commands,
     statistics,
@@ -48,7 +59,7 @@ async function start() {
   await events.init();
 
   bot.updates.on('message_new', (message) => {
-    handleMessage({message, vk, classes, args: [], commands, statistics, events});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events});
   });
 }
 

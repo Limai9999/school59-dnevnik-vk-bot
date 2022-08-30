@@ -29,7 +29,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, commands, statistics, events}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events}: CommandInputData) {
   const {text, peerId, messagePayload, id} = message;
 
   console.log(`Новое сообщение в беседе ${peerId}: ${text || '<без текста>'}`);
@@ -116,5 +116,5 @@ export default async function handleMessage({message, classes, vk, commands, sta
 
   vk.setTimeoutForMessageRemove(id, peerId, 'high');
 
-  command.execute({message, vk, classes, args, commands, payload: messagePayload, statistics, events});
+  command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events});
 };
