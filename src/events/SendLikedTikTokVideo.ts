@@ -5,6 +5,7 @@ import axios from 'axios';
 import request from 'request-promise';
 
 import {getTikTokConfig, getMainConfig} from '../utils/getConfig';
+import waitMs from '../utils/waitMs';
 
 import {TikTokVideoDataResponse} from '../types/Responses/TikTokVideoDataResponse';
 import {UploadVideoResponse} from '../types/Responses/UploadVideoResponse';
@@ -35,6 +36,12 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
 
     // waiting for liked videos list
     await page.waitForSelector('[data-e2e="user-liked-item-list"]');
+
+    await page.evaluate(() => {
+      window.scrollBy(0, window.innerHeight);
+    });
+
+    await waitMs(2000, 3000, false, '');
 
     const videoLinks: string[] = await page.evaluate(() => {
       const videos = document.querySelector('[data-e2e="user-liked-item-list"]')?.children!;
@@ -70,7 +77,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
 
     const videoUrl = videoData.video.wihout_watermark.url_list[0];
 
-    const description = videoData.desc.length ? 'видево прикол' : videoData.desc;
+    const description = videoData.desc.length ? videoData.desc : 'видево прикол';
 
     const saveVideoResponse = await vkUser.api.video.save({
       name: description,
