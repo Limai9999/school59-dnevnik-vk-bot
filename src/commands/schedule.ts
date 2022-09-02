@@ -6,7 +6,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
   const schedulePayload = payload as SchedulePayload;
 
   vk.sendMessage({
-    message: `Извини, получить расписание сейчас не получится. ${schedulePayload.data.action}`,
+    message: `Извини, получить расписание не получится, пока системо-счислитель не выдаст логин и пароль к Сетевому Городу.`,
     peerId: message.peerId,
     priority: 'low',
   });
