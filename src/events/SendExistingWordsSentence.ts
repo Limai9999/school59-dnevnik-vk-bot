@@ -33,6 +33,8 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
     sendingMessage = randomWords.join(' ');
   }
 
+  sendingMessage = sendingMessage.replaceAll('@all', '');
+
   vk.sendMessage({
     peerId,
     message: sendingMessage,
