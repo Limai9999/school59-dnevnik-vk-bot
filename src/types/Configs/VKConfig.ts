@@ -1,4 +1,5 @@
 export type VKConfig = {
+  APIUrl: string;
   bot_token: string;
   user_token: string;
   id: number;
