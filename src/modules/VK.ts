@@ -159,7 +159,7 @@ class VkService extends VK {
 
     if (keyboard) {
       usingKeyboard = keyboard;
-      this.savedKeyboards[peerId] = keyboard;
+      if (!keyboard.isInline) this.savedKeyboards[peerId] = keyboard;
     } else if (savedKeyboard) {
       usingKeyboard = savedKeyboard;
     } else {
