@@ -35,6 +35,7 @@ const cmd: CommandOutputData = {
   payload: 'cipher',
   requirements: {
     admin: false,
+    dmOnly: true,
     args: 1,
   },
   showInAdditionalMenu: false,

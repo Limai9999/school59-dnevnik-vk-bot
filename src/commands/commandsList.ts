@@ -29,6 +29,7 @@ const cmd: CommandOutputData = {
   payload: 'commands',
   requirements: {
     admin: false,
+    dmOnly: false,
     args: 0,
   },
   showInAdditionalMenu: true,

@@ -57,6 +57,7 @@ const cmd: CommandOutputData = {
   payload: 'additional',
   requirements: {
     admin: false,
+    dmOnly: false,
     args: 0,
   },
   showInCommandsList: false,

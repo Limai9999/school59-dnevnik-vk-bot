@@ -36,6 +36,7 @@ const cmd: CommandOutputData = {
   payload: 'ramzan',
   requirements: {
     admin: false,
+    dmOnly: false,
     args: 0,
   },
   showInAdditionalMenu: true,
