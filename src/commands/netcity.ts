@@ -3,9 +3,9 @@ import {CommandInputData, CommandOutputData} from '../types/Commands';
 async function command({message, args, vk, classes}: CommandInputData) {
   const [login, password, className] = args;
 
-  if (login.length < 6 || password.length < 35) {
+  if (login.length < 4 || password.length < 35) {
     return vk.sendMessage({
-      message: 'Введите корректные данные.\nЛогин должен быть больше 6 символов, а пароль зашифрован командой "шифр".',
+      message: 'Введите корректные данные.\nЛогин должен быть больше 4 символов, а пароль зашифрован командой "шифр".',
       peerId: message.peerId,
       priority: 'low',
     });
@@ -14,7 +14,7 @@ async function command({message, args, vk, classes}: CommandInputData) {
   const [classNumber, classLetter] = className.split('');
   if (!parseInt(classNumber) || parseInt(classLetter) || !classLetter) {
     return vk.sendMessage({
-      message: 'Класс введён некорректно. Пример: 9Б',
+      message: 'Класс введён некорректно. Пример: 9б',
       peerId: message.peerId,
       priority: 'low',
     });
@@ -40,6 +40,7 @@ const cmd: CommandOutputData = {
   payload: 'netcity',
   requirements: {
     admin: false,
+    dmOnly: false,
     args: 3,
   },
   showInAdditionalMenu: false,
