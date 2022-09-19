@@ -15,6 +15,25 @@ const classSchema = new Schema({
       password: String,
     },
   },
+  schedule: {
+    type: [{
+      status: Boolean,
+      message: {
+        date: String,
+        distant: Boolean,
+        filename: String,
+        objectedSchedule: [{
+          time: String,
+          lesson: String,
+          room: String,
+        }],
+        room: Number,
+        schedule: [String],
+        startTime: String,
+        totalLessons: Number,
+      },
+    }],
+  },
   lastSentMessages: {
     type: [Number],
   },

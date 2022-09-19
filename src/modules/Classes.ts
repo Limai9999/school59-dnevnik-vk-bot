@@ -1,5 +1,7 @@
 import Class from '../models/Class';
 
+import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
+
 export default class Classes {
   async getClass(peerId: number) {
     let data = await Class.findOne({id: peerId});
@@ -49,6 +51,13 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $set: {className},
+    });
+  }
+
+  async setSchedule(peerId: number, schedule: ParseScheduleResponse[]) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {schedule},
     });
   }
 };
