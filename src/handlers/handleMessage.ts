@@ -4,10 +4,18 @@ import {Payload} from '../types/VK/Payloads/Payload';
 
 function checkCommand({command, data}: {command: CommandOutputData, data: {
   isAdminChat: boolean,
+  isDMChat: boolean,
   args: string[],
 }}) {
-  const {isAdminChat, args} = data;
+  const {isAdminChat, isDMChat, args} = data;
   const {requirements, name, howToUse} = command;
+
+  if (requirements.dmOnly && !isDMChat) {
+    return {
+      status: false,
+      errorMessage: 'Эта команда работает только в личных сообщениях.',
+    };
+  }
 
   if (requirements.admin && !isAdminChat) {
     return {
@@ -55,11 +63,6 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
     if (!text || !text.length || isFound) return isFound;
 
-    if (text.startsWith(name)) {
-      isFound = true;
-      foundCommandAlias = name;
-    }
-
     aliases.some((alias) => {
       if (text.startsWith(alias)) {
         isFound = true;
@@ -67,6 +70,11 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
         return true;
       }
     });
+
+    if (text.startsWith(name)) {
+      isFound = true;
+      foundCommandAlias = name;
+    }
 
     return isFound;
   });
@@ -99,8 +107,9 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   if (!command) return;
 
   const isAdminChat = peerId === vk.config.adminChatID;
+  const isDMChat = message.isDM;
 
-  const {status, errorMessage} = checkCommand({command, data: {isAdminChat, args}});
+  const {status, errorMessage} = checkCommand({command, data: {isAdminChat, isDMChat, args}});
 
   if (!status) {
     if (!errorMessage) return;
