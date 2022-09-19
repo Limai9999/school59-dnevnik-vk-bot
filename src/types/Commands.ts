@@ -26,6 +26,7 @@ export type CommandOutputData = {
   description: string | null;
   requirements: {
     admin: boolean;
+    dmOnly: boolean;
     args: number;
   };
   showInAdditionalMenu: boolean;
