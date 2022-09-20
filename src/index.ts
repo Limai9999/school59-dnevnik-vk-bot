@@ -6,6 +6,7 @@ import Classes from './modules/Classes';
 import VK from './modules/VK';
 import MessageStatistics from './modules/MessageStatistics';
 import Event from './modules/Event';
+import Schedule from './modules/Schedule';
 
 import {getVKConfig, getMongoDBConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
@@ -38,6 +39,8 @@ const vkUser = new VK({
   isUser: true,
 });
 
+const schedule = new Schedule(vkBot, classes);
+
 async function start() {
   const bot = await vkBot.init();
   await vkUser.init();
@@ -55,11 +58,12 @@ async function start() {
     classes,
     commands,
     statistics,
+    schedule,
   });
   await events.init();
 
   bot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule});
   });
 }
 

@@ -6,9 +6,11 @@ import {MessageContext, ContextDefaultState} from 'vk-io';
 import {EventConfig} from '../types/Configs/EventConfig';
 import {CommandOutputData} from '../types/Commands';
 import {EventInputData, EventOutputData} from '../types/Event/Events';
+
 import VkService from './VK';
 import Classes from './Classes';
 import MessageStatistics from './MessageStatistics';
+import Schedule from './Schedule';
 
 class Event {
   config: EventConfig;
@@ -19,8 +21,9 @@ class Event {
   classes: Classes;
   commands: CommandOutputData[];
   statistics: MessageStatistics;
+  schedule: Schedule;
 
-  constructor({vk, vkUser, classes, commands, statistics}: EventInputData) {
+  constructor({vk, vkUser, classes, commands, statistics, schedule}: EventInputData) {
     this.config = getEventConfig();
     this.events = [];
 
@@ -29,6 +32,7 @@ class Event {
     this.classes = classes;
     this.commands = commands;
     this.statistics = statistics;
+    this.schedule = schedule;
   }
 
   async init() {
@@ -54,6 +58,7 @@ class Event {
         classes: this.classes,
         commands: this.commands,
         statistics: this.statistics,
+        schedule: this.schedule,
         message,
       });
 
