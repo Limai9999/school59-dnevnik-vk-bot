@@ -2,10 +2,11 @@ import {MessageContext, ContextDefaultState} from 'vk-io';
 
 import VKService from '../modules/VK';
 import Classes from '../modules/Classes';
-
-import {Payload} from './VK/Payloads/Payload';
 import MessageStatisticsService from '../modules/MessageStatistics';
 import Event from '../modules/Event';
+import Schedule from '../modules/Schedule';
+
+import {Payload} from './VK/Payloads/Payload';
 
 export type CommandInputData = {
   vk: VKService;
@@ -17,6 +18,7 @@ export type CommandInputData = {
   payload?: Payload;
   statistics: MessageStatisticsService;
   events: Event;
+  schedule: Schedule
 };
 
 export type CommandOutputData = {
@@ -32,5 +34,5 @@ export type CommandOutputData = {
   showInAdditionalMenu: boolean;
   showInCommandsList: boolean;
   howToUse: string | null;
-  execute: ({}: CommandInputData) => Promise<void>;
+  execute: ({}: CommandInputData) => Promise<any>;
 };
