@@ -34,6 +34,9 @@ const classSchema = new Schema({
       },
     }],
   },
+  lastUpdatedScheduleDate: {
+    type: Number,
+  },
   lastSentMessages: {
     type: [Number],
   },

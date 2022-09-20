@@ -60,4 +60,11 @@ export default class Classes {
       $set: {schedule},
     });
   }
+
+  async setLastUpdatedScheduleDate(peerId: number, lastUpdatedScheduleDate: number) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {lastUpdatedScheduleDate},
+    });
+  }
 };
