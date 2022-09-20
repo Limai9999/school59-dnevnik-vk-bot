@@ -123,6 +123,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
       peerId: message.peerId,
       attachment: videoAttachment,
       priority: 'none',
+      skipLastSentCheck: true,
     });
   } catch (error) {
     console.log('error in sendLikedTikTokVideo event', error);
