@@ -1,17 +1,21 @@
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
-import axios from 'axios';
-
 import {Keyboard} from 'vk-io';
 
-import PasswordService from '../modules/Password';
-
 import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
-import {GetScheduleResponse} from '../types/Responses/API/schedule/GetScheduleResponse';
+
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
 
-export async function command({message, vk, classes, payload}: CommandInputData) {
+export async function command({message, vk, classes, payload, schedule}: CommandInputData) {
+  let loadingMessageID = 0;
+
+  const removeLoadingMessage = () => {
+    if (!loadingMessageID) return;
+    return vk.removeMessage(loadingMessageID, message.peerId);
+  };
+
   const sendError = (errorMessage: string) => {
+    removeLoadingMessage();
     return vk.sendMessage({
       message: errorMessage,
       peerId: message.peerId,
@@ -19,101 +23,70 @@ export async function command({message, vk, classes, payload}: CommandInputData)
     });
   };
 
-  const APIUrl = vk.config.APIUrl;
-
   try {
     const schedulePayload = payload as SchedulePayload;
 
-    switch (schedulePayload.data.action) {
-      case 'get':
-        const {netCityData, className} = await classes.getClass(message.peerId);
-        if (!netCityData || !className) {
-          return sendError('Не введены данные для Сетевого Города или название класса.');
-        }
+    if (schedulePayload.data.action === 'get') {
+      loadingMessageID = await vk.sendMessage({
+        message: 'Поиск расписания начат, подождите...',
+        peerId: message.peerId,
+        priority: 'low',
+      });
 
-        const password = new PasswordService(netCityData.password!, true);
+      const scheduleData = await schedule.get(message.peerId);
+      if (!scheduleData.status) {
+        return sendError(scheduleData.message! as string);
+      }
 
-        const getScheduleResponse = await axios({
-          url: `${APIUrl}/api/netcity/schedule/get`,
-          data: {
-            login: netCityData.login,
-            password: password.decrypt(),
-          },
+      const parsedSchedule = scheduleData.message! as ParseScheduleResponse[];
+
+      const totalFiles = parsedSchedule.length;
+
+      const keyboard = Keyboard.builder()
+          .inline();
+
+      const filesString = parsedSchedule.map((schedule, index) => {
+        const {filename, date} = schedule.message;
+
+        keyboard.textButton({
+          label: date,
+          color: 'primary',
+          payload: {
+            command: 'schedule',
+            data: {action: 'choose', scheduleIndex: index},
+          } as SchedulePayload,
         });
 
-        const getScheduleData: GetScheduleResponse = getScheduleResponse.data;
-        if (!getScheduleData.status) {
-          return sendError(`При получении расписания произошла ошибка:\n${getScheduleData.message}`);
-        }
+        return `${index + 1} - ${filename}`;
+      });
 
-        if (!getScheduleData.files.length) {
-          return sendError('В Сетевом Городе нет файлов с расписанием.');
-        }
+      removeLoadingMessage();
+      vk.sendMessage({
+        message: `Получено ${totalFiles} файлов с расписанием.\n\n${filesString.join('\n')}`,
+        peerId: message.peerId,
+        priority: 'low',
+        keyboard,
+      });
+    } else if (schedulePayload.data.action === 'choose') {
+      const index = schedulePayload.data.scheduleIndex!;
 
-        const parsedSchedule = await Promise.all(getScheduleData.files.map(async (file) => {
-          const parseScheduleResponse = await axios({
-            url: `${APIUrl}/api/netcity/schedule/parse`,
-            data: {
-              filename: file.filename,
-              className,
-            },
-          });
-          const parseScheduleData: ParseScheduleResponse = parseScheduleResponse.data;
+      const classData = await classes.getClass(message.peerId);
+      const scheduleData: ParseScheduleResponse = classData.schedule[index] as ParseScheduleResponse;
 
-          return parseScheduleData;
-        }));
+      if (!scheduleData) {
+        return sendError('Произошла неизвестная ошибка, либо выбранного расписания нет.');
+      }
 
-        await classes.setSchedule(message.peerId, parsedSchedule);
+      const {date, schedule, totalLessons, startTime, filename} = scheduleData.message;
 
-        console.log(parsedSchedule);
-
-        const totalFiles = parsedSchedule.length;
-
-        const keyboard = Keyboard.builder()
-            .inline();
-
-        const filesString = parsedSchedule.map((schedule, index) => {
-          const {filename, date} = schedule.message;
-
-          keyboard.textButton({
-            label: date,
-            color: 'primary',
-            payload: {
-              command: 'schedule',
-              data: {action: 'choose', scheduleIndex: index},
-            } as SchedulePayload,
-          });
-
-          return `${index + 1} - ${filename}`;
-        });
-
-        vk.sendMessage({
-          message: `Получено ${totalFiles} файлов с расписанием.\n\n${filesString.join('\n')}`,
-          peerId: message.peerId,
-          priority: 'low',
-          keyboard,
-        });
-        break;
-      case 'choose':
-        const index = schedulePayload.data.scheduleIndex!;
-
-        const classData = await classes.getClass(message.peerId);
-        const scheduleData: ParseScheduleResponse = classData.schedule[index] as ParseScheduleResponse;
-
-        if (!scheduleData) {
-          return sendError('Произошла неизвестная ошибка, либо выбранного расписания нет.');
-        }
-
-        const {date, schedule, totalLessons, startTime, filename} = scheduleData.message;
-
-        vk.sendMessage({
-          message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}`,
-          peerId: message.peerId,
-          priority: 'medium',
-        });
-        break;
+      vk.sendMessage({
+        message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}`,
+        peerId: message.peerId,
+        priority: 'medium',
+      });
     }
   } catch (error) {
+    console.log('Ошибка при отправке расписания', error);
     sendError(`При получении расписания произошла ошибка:\n${error}`);
   }
 };
