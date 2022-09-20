@@ -124,7 +124,7 @@ class VkService extends VK {
     }, timeoutMs);
   }
 
-  async sendMessage({message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false}: SendMessageData) {
+  async sendMessage({message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false}: SendMessageData): Promise<number> {
     const isPrivateMessages = peerId <= 2000000000;
 
     const classData = await this.classes.getClass(peerId);
@@ -181,8 +181,11 @@ class VkService extends VK {
 
       if (!skipLastSentCheck) this.classes.addLastSentMessage(peerId, messageId);
       if (!isPrivateMessages) this.setTimeoutForMessageRemove(messageId, peerId, priority);
+
+      return messageId;
     } catch (error) {
       console.log('Произошла ошибка при отправке сообщения:', error);
+      return 0;
     }
   }
 
