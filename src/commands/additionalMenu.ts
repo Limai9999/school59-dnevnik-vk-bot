@@ -33,7 +33,7 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
       if (dmOnly && !isDMChat) return;
       if (admin && !isAdminChat) return;
 
-      if (currentButtonsInRowCount >= 3) {
+      if (currentButtonsInRowCount >= 2) {
         keyboard!.row();
         currentButtonsInRowCount = 0;
       }
