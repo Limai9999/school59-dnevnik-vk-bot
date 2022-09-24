@@ -5,6 +5,7 @@ import Classes from '../modules/Classes';
 import MessageStatisticsService from '../modules/MessageStatistics';
 import Event from '../modules/Event';
 import Schedule from '../modules/Schedule';
+import Utils from '../modules/Utils';
 
 import {Payload} from './VK/Payloads/Payload';
 
@@ -19,12 +20,13 @@ export type CommandInputData = {
   statistics: MessageStatisticsService;
   events: Event;
   schedule: Schedule
+  utils: Utils
 };
 
 export type CommandOutputData = {
   name: string;
   aliases: string[];
-  payload: string,
+  payload: Payload,
   description: string | null;
   requirements: {
     admin: boolean;
