@@ -67,4 +67,25 @@ export default class Classes {
       $set: {lastUpdatedScheduleDate},
     });
   }
+
+  async setLoading(peerId: number, isLoading: boolean) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {isLoading},
+    });
+  }
+
+  async setConnectedProfiles(peerId: number, connectedProfiles: number[]) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {connectedProfiles},
+    });
+  }
+
+  async setManualSchedule(peerId: number, manualSchedule: ParseScheduleResponse[]) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {manualSchedule},
+    });
+  }
 };
