@@ -17,6 +17,13 @@ import {PhotoUploadResponse} from '../types/Responses/PhotoUploadResponse';
 
 import {MainKeyboard} from '../keyboards/MainKeyboard';
 
+import {CommandInputData} from '../types/Commands';
+
+type TempMessage = {
+  date: number
+  message: CommandInputData['message']
+}
+
 class VkService extends VK {
   classes: Classes;
   config: VKConfig;
@@ -31,6 +38,8 @@ class VkService extends VK {
   };
   state: State;
 
+  messages: TempMessage[];
+
   constructor({config, classes, token, isUser}: Settings) {
     super({
       token,
@@ -43,6 +52,8 @@ class VkService extends VK {
 
     this.me = {name: '', id: 0, isUser};
     this.state = {chats: {}};
+
+    this.messages = [];
   }
 
   async init() {
@@ -54,6 +65,33 @@ class VkService extends VK {
     console.log(`VK успешно запущено как ${name} - ${id}.`);
 
     return this;
+  }
+
+  async handleMessage({message}: CommandInputData) {
+    this.messages.push({message, date: Date.now()});
+  }
+
+  async waitForMessage(fromPeerId: number, fromSenderId: number, searchFromMessageId: number): Promise<CommandInputData['message'] | null> {
+    return new Promise((resolve) => {
+      // eslint-disable-next-line prefer-const
+      let stopTimeout: NodeJS.Timer;
+
+      const findInterval = setInterval(() => {
+        const newMessages = this.messages.filter((message) => Date.now() - message.date < 5500 && message.message.conversationMessageId! > searchFromMessageId);
+        const message = newMessages.find(({date, message}) => message.peerId === fromPeerId && message.senderId === fromSenderId);
+
+        if (message) {
+          resolve(message.message);
+          clearInterval(findInterval);
+          clearTimeout(stopTimeout);
+        }
+      }, 2500);
+
+      stopTimeout = setTimeout(() => {
+        clearInterval(findInterval);
+        resolve(null);
+      }, 1000 * 60 * 3);
+    });
   }
 
   async getMe() {
@@ -199,6 +237,27 @@ class VkService extends VK {
     };
   };
 
+  async getChatsAdmins() {
+    const chats = await this.classes.getAllClasses();
+
+    type GroupAdmins = {
+      id: number
+      title: string
+      admins: number[]
+    }
+
+    const admins: GroupAdmins[] = await Promise.all(chats.map(async ({id}) => {
+      const chatData = await this.getChat(id);
+      if (!chatData || !chatData.chat_settings) return {id, title: 'Неизвестно', admins: []};
+
+      const {chat_settings: {admin_ids, owner_id, title}} = chatData;
+
+      return {id, title, admins: [...admin_ids, owner_id]};
+    }));
+
+    return admins;
+  }
+
   async setTypingStatus(peerId: number) {
     return await this.api.messages.setActivity({
       peer_id: peerId,
@@ -219,9 +278,11 @@ class VkService extends VK {
   async getUser(userId: number): Promise<GetUserResponse | null> {
     const response = await this.api.users.get({
       user_ids: [userId],
-      fields: ['bdate', 'screen_name', 'city'],
+      fields: ['bdate', 'screen_name', 'city', 'sex'],
     });
     if (!response.length) return null;
+
+    console.log(response);
 
     return response[0];
   }
