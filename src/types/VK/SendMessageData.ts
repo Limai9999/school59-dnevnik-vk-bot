@@ -6,5 +6,5 @@ export type SendMessageData = {
   keyboard?: KeyboardBuilder;
   attachment?: Attachment;
   skipLastSentCheck?: boolean;
-  priority: 'none' | 'low' | 'medium' | 'high';
+  priority?: 'none' | 'low' | 'medium' | 'high';
 };
