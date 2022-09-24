@@ -13,5 +13,6 @@ export type ParseScheduleResponse = {
     date: string
     filename: string
     room?: number
+    creationTime: number
   }
 };
