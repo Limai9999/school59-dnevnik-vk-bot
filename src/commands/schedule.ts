@@ -35,7 +35,7 @@ export async function command({message, vk, classes, payload, schedule}: Command
   try {
     const schedulePayload = payload as SchedulePayload;
 
-    const maxFileLifeTime = 1000 * 60 * 60 * 24 * 3;
+    const maxFileLifeTime = 1000 * 60 * 60 * 24 * 2;
 
     if (schedulePayload.data.action === 'get') {
       loadingMessageID = await vk.sendMessage({
@@ -52,13 +52,12 @@ export async function command({message, vk, classes, payload, schedule}: Command
         return sendError(netcitySchedule.message! as string);
       }
 
-      const parsedSchedule = netcitySchedule.message! as ParseScheduleResponse[];
-      const newestNetcityFiles = parsedSchedule.filter((schedule) => Date.now() - schedule.message.creationTime < maxFileLifeTime);
+      const netcityFiles = netcitySchedule.message! as ParseScheduleResponse[];
 
       const keyboard = Keyboard.builder()
           .inline();
 
-      const netcityFilesStrings = newestNetcityFiles.map((schedule, index) => {
+      const netcityFilesStrings = netcityFiles.map((schedule, index) => {
         const {filename, date} = schedule.message;
 
         keyboard.textButton({
@@ -94,11 +93,11 @@ export async function command({message, vk, classes, payload, schedule}: Command
 
       const classData = await classes.getClass(message.peerId);
 
-      const totalNetcityFiles = newestNetcityFiles.length;
+      const totalNetcityFiles = netcityFiles.length;
       const totalManualFiles = newestManualFiles.length;
 
       if (!totalNetcityFiles && !totalManualFiles) {
-        return sendError('Расписания в Сетевом Городе нет, но вы можете попросить одного из админов этой беседы, чтобы он самостоятельно добавил файл с расписанием через личные сообщения бота.');
+        return sendError('Расписания в Сетевом Городе нет, но вы можете попросить одного из админов этой беседы, чтобы он добавил файл с расписанием через личные сообщения бота.');
       }
 
       const manualFilesString = manualFilesStrings.length ? `\n\nФайлы, добавленные вручную:\n\n${manualFilesStrings.join('\n')}` : '';
