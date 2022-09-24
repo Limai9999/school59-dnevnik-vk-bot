@@ -6,13 +6,14 @@ import Password from './Password';
 
 import {GetScheduleResponse} from '../types/Responses/API/schedule/GetScheduleResponse';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
+import {SaveFileResponse} from '../types/Responses/API/schedule/SaveFileResponse';
 
 type UpdateSchedule = {
   status: boolean
   message: string | ParseScheduleResponse[]
 }
 
-class Schedule {
+export default class Schedule {
   vk: VK;
   classes: Classes;
 
@@ -60,16 +61,8 @@ class Schedule {
     }
 
     const parsedSchedule = await Promise.all(getScheduleData.files.map(async (file) => {
-      const parseScheduleResponse = await axios({
-        url: `${this.vk.config.APIUrl}/api/netcity/schedule/parse`,
-        data: {
-          filename: file.filename,
-          className,
-        },
-      });
-      const parseScheduleData: ParseScheduleResponse = parseScheduleResponse.data;
-
-      return parseScheduleData;
+      const parseSchedule = await this.parse(file.filename, className);
+      return parseSchedule;
     }));
 
     await this.classes.setSchedule(peerId, parsedSchedule);
@@ -80,20 +73,54 @@ class Schedule {
     };
   }
 
+  async parse(filename: string, className: string) {
+    const parseScheduleResponse = await axios({
+      url: `${this.vk.config.APIUrl}/api/netcity/schedule/parse`,
+      data: {
+        filename,
+        className,
+      },
+    });
+    const parseScheduleData: ParseScheduleResponse = parseScheduleResponse.data;
+
+    return parseScheduleData;
+  }
+
   async get(peerId: number) {
     const classData = await this.classes.getClass(peerId);
     const lastUpdatedScheduleDate = classData.lastUpdatedScheduleDate!;
 
-    const maxDifference = 1000 * 60 * 30;
-    const difference = Date.now() - lastUpdatedScheduleDate;
-    if (difference > maxDifference) {
+    const maxLastUpdateDifference = 1000 * 60 * 30;
+
+    const lastUpdateDifference = Date.now() - lastUpdatedScheduleDate;
+
+    if (lastUpdateDifference > maxLastUpdateDifference) {
       const schedule = await this.update(peerId);
-      return schedule;
+      return {
+        netcitySchedule: schedule,
+        manualSchedule: classData.manualSchedule as ParseScheduleResponse[],
+      };
     } else {
-      const schedule: UpdateSchedule = await this.update(peerId) as UpdateSchedule;
-      return schedule;
+      const schedule: UpdateSchedule = {
+        status: true,
+        message: classData.schedule as ParseScheduleResponse[],
+      };
+
+      return {
+        netcitySchedule: schedule,
+        manualSchedule: classData.manualSchedule as ParseScheduleResponse[],
+      };
     }
   }
-}
 
-export default Schedule;
+  async saveFile(url: string, filename: string): Promise<boolean> {
+    const response = await axios({
+      method: 'post',
+      url: `${this.vk.config.APIUrl}/api/netcity/schedule/saveFile`,
+      data: {filename, url},
+    });
+    const saveFileResponse: SaveFileResponse = response.data;
+
+    return saveFileResponse.status;
+  }
+}
