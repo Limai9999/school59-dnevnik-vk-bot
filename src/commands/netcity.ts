@@ -37,7 +37,10 @@ const cmd: CommandOutputData = {
   name: 'сетевой город',
   aliases: ['сетевой', 'netcity', 'дневник'],
   description: 'изменить данные для входа в Сетевой Город',
-  payload: 'netcity',
+  payload: {
+    command: 'netcity',
+    data: {action: 'netcity'},
+  },
   requirements: {
     admin: false,
     dmOnly: false,

@@ -32,14 +32,17 @@ async function command({message, vk}: CommandInputData) {
 const cmd: CommandOutputData = {
   name: 'рамзан',
   aliases: ['ramzan'],
-  description: 'рамзановская хуита',
-  payload: 'ramzan',
+  description: 'тестовая команда',
+  payload: {
+    command: 'ramzan',
+    data: {action: 'ramzan'},
+  },
   requirements: {
     admin: false,
     dmOnly: false,
     args: 0,
   },
-  showInAdditionalMenu: true,
+  showInAdditionalMenu: false,
   showInCommandsList: true,
   howToUse: null,
   execute: command,

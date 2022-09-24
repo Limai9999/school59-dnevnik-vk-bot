@@ -32,7 +32,10 @@ const cmd: CommandOutputData = {
   name: 'зашифровать пароль',
   aliases: ['шифр', 'cipher'],
   description: null,
-  payload: 'cipher',
+  payload: {
+    command: 'cipher',
+    data: {action: 'cipher'},
+  },
   requirements: {
     admin: false,
     dmOnly: true,

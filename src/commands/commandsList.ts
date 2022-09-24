@@ -26,7 +26,10 @@ const cmd: CommandOutputData = {
   name: 'команды',
   aliases: ['список команд'],
   description: 'показать список команд',
-  payload: 'commands',
+  payload: {
+    command: 'commands',
+    data: {action: 'commands'},
+  },
   requirements: {
     admin: false,
     dmOnly: false,
