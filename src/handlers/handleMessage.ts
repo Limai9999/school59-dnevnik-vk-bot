@@ -37,16 +37,23 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils}: CommandInputData) {
   const {text, peerId, messagePayload, id} = message;
 
   console.log(`Новое сообщение в беседе ${peerId}: ${text || '<без текста>'}`);
 
   const classData = await classes.getClass(peerId);
   const isMessagesHandling = classData.handleMessages;
+  const isLoading = classData.isLoading;
+
   if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`);
 
-  events.executeRandomEvent(message);
+  const isAdminChat = peerId === vk.config.adminChatID;
+  const isDMChat = message.isDM;
+
+  if (!isLoading && !isDMChat) events.executeRandomEvent(message);
+
+  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils});
 
   let foundCommandAlias = '';
 
@@ -58,22 +65,26 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     if (messagePayload) {
       const {command} = messagePayload as Payload;
 
-      if (command === payload) isFound = true;
+      if (command === payload.command) isFound = true;
     }
 
     if (!text || !text.length || isFound) return isFound;
 
+    const lwText = text.toLowerCase();
     aliases.some((alias) => {
-      if (text.startsWith(alias)) {
+      const lwAlias = alias.toLowerCase();
+
+      if (lwText.startsWith(lwAlias)) {
         isFound = true;
-        foundCommandAlias = alias;
+        foundCommandAlias = lwAlias;
         return true;
       }
     });
 
-    if (text.startsWith(name)) {
+    const lwName = name.toLowerCase();
+    if (lwText.startsWith(lwName)) {
       isFound = true;
-      foundCommandAlias = name;
+      foundCommandAlias = lwName;
     }
 
     return isFound;
@@ -106,9 +117,6 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!command) return;
 
-  const isAdminChat = peerId === vk.config.adminChatID;
-  const isDMChat = message.isDM;
-
   const {status, errorMessage} = checkCommand({command, data: {isAdminChat, isDMChat, args}});
 
   if (!status) {
@@ -122,8 +130,15 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   }
 
   vk.setTypingStatus(peerId);
-
   vk.setTimeoutForMessageRemove(id, peerId, 'high');
 
-  command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule});
+  if (isLoading) {
+    return vk.sendMessage({
+      message: 'Прости, я не могу выполнить эту команду, пока не выполню предыдущую.',
+      peerId: message.peerId,
+      priority: 'low',
+    });
+  }
+
+  command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils});
 };
