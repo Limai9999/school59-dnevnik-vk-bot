@@ -55,8 +55,8 @@ export default class Schedule {
       await this.classes.setSchedule(peerId, []);
 
       return {
-        status: false,
-        message: `В Сетевом Городе нет файлов с расписанием.`,
+        status: true,
+        message: [],
       };
     }
 
