@@ -2,7 +2,7 @@ export type GetChatResponse = {
   can_write: {
     allowed: boolean;
   };
-  chat_settings: {
+  chat_settings?: {
     acl: {
       can_call: boolean;
       can_change_info: boolean;
