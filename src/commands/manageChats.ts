@@ -21,6 +21,13 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
 
     const totalChats = chatsWhereAdmin.length;
 
+    if (!totalChats) {
+      return vk.sendMessage({
+        message: 'Вы не привязали ни одной беседы к своему профилю.',
+        peerId: message.peerId,
+      });
+    }
+
     const keyboard = Keyboard.builder()
         .inline();
 
@@ -52,7 +59,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     });
 
     vk.sendMessage({
-      message: `Вы можете управлять ботом в ${totalChats} беседах.\nВыберите беседу, в которой вы хотите выполнить действия.`,
+      message: `Вы можете управлять ботом в ${totalChats} беседах.\n\nВыберите беседу, в которой вы хотите выполнить действия.`,
       peerId: message.peerId,
       keyboard,
     });
