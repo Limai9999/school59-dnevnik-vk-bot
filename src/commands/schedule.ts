@@ -1,89 +1,140 @@
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
 import {Keyboard} from 'vk-io';
+import moment from 'moment';
+
+moment.locale('ru');
 
 import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
-
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
 
 export async function command({message, vk, classes, payload, schedule}: CommandInputData) {
   let loadingMessageID = 0;
 
+  const peerId = message.peerId;
+
   const removeLoadingMessage = () => {
     if (!loadingMessageID) return;
-    return vk.removeMessage(loadingMessageID, message.peerId);
+    return vk.removeMessage(loadingMessageID, peerId);
   };
 
-  const sendError = (errorMessage: string) => {
+  const sendError = async (errorMessage: string) => {
     removeLoadingMessage();
+
+    await classes.setLoading(peerId, false);
+
     return vk.sendMessage({
       message: errorMessage,
-      peerId: message.peerId,
+      peerId,
       priority: 'medium',
     });
   };
 
+  await classes.setLoading(peerId, true);
+
   try {
     const schedulePayload = payload as SchedulePayload;
+
+    const maxFileLifeTime = 1000 * 60 * 60 * 24 * 3;
 
     if (schedulePayload.data.action === 'get') {
       loadingMessageID = await vk.sendMessage({
         message: 'Поиск расписания начат, подождите...',
-        peerId: message.peerId,
+        peerId,
         priority: 'low',
       });
 
-      const scheduleData = await schedule.get(message.peerId);
-      if (!scheduleData.status) {
-        return sendError(scheduleData.message! as string);
+      const scheduleData = await schedule.get(peerId);
+
+      const {manualSchedule, netcitySchedule} = scheduleData;
+
+      if (!netcitySchedule.status) {
+        return sendError(netcitySchedule.message! as string);
       }
 
-      const parsedSchedule = scheduleData.message! as ParseScheduleResponse[];
-
-      const totalFiles = parsedSchedule.length;
+      const parsedSchedule = netcitySchedule.message! as ParseScheduleResponse[];
+      const newestNetcityFiles = parsedSchedule.filter((schedule) => Date.now() - schedule.message.creationTime < maxFileLifeTime);
 
       const keyboard = Keyboard.builder()
           .inline();
 
-      const filesString = parsedSchedule.map((schedule, index) => {
+      const netcityFilesStrings = newestNetcityFiles.map((schedule, index) => {
         const {filename, date} = schedule.message;
 
         keyboard.textButton({
           label: date,
-          color: 'primary',
+          color: Keyboard.PRIMARY_COLOR,
           payload: {
             command: 'schedule',
-            data: {action: 'choose', scheduleIndex: index},
+            data: {action: 'choose', filename, type: 'netcity'},
           } as SchedulePayload,
         });
 
         return `${index + 1} - ${filename}`;
       });
 
-      removeLoadingMessage();
-      vk.sendMessage({
-        message: `Получено ${totalFiles} файлов с расписанием.\n\n${filesString.join('\n')}`,
-        peerId: message.peerId,
-        priority: 'low',
-        keyboard,
+      keyboard.row();
+
+      const newestManualFiles = manualSchedule.filter((schedule) => Date.now() - schedule.message.creationTime < maxFileLifeTime);
+
+      const manualFilesStrings = newestManualFiles.map((schedule, index) => {
+        const {filename, date} = schedule.message;
+
+        keyboard.textButton({
+          label: date,
+          color: Keyboard.SECONDARY_COLOR,
+          payload: {
+            command: 'schedule',
+            data: {action: 'choose', filename, type: 'manual'},
+          } as SchedulePayload,
+        });
+
+        return `${index + 1} - ${filename}`;
       });
-    } else if (schedulePayload.data.action === 'choose') {
-      const index = schedulePayload.data.scheduleIndex!;
 
       const classData = await classes.getClass(message.peerId);
-      const scheduleData: ParseScheduleResponse = classData.schedule[index] as ParseScheduleResponse;
+
+      const totalNetcityFiles = newestNetcityFiles.length;
+      const totalManualFiles = newestManualFiles.length;
+
+      if (!totalNetcityFiles && !totalManualFiles) {
+        return sendError('Расписания в Сетевом Городе нет, но вы можете попросить одного из админов этой беседы, чтобы он самостоятельно добавил файл с расписанием через личные сообщения бота.');
+      }
+
+      const manualFilesString = manualFilesStrings.length ? `\n\nФайлы, добавленные вручную:\n\n${manualFilesStrings.join('\n')}` : '';
+      const netcityFilesString = netcityFilesStrings.length ? `Скачано ${totalNetcityFiles} файлов с расписанием:\n\n${netcityFilesStrings.join('\n')}` : '';
+      const lastUpdatedString = netcityFilesStrings.length ? `\n\nОбновлено: ${moment(classData.lastUpdatedScheduleDate).fromNow()}` : '';
+
+      removeLoadingMessage();
+      vk.sendMessage({
+        message: `${netcityFilesString}${manualFilesString}\n\n${lastUpdatedString}`,
+        peerId,
+        priority: 'medium',
+        keyboard,
+      });
+
+      await classes.setLoading(peerId, false);
+    } else if (schedulePayload.data.action === 'choose') {
+      const classData = await classes.getClass(peerId);
+
+      const arrayWithSchedule = schedulePayload.data.type === 'netcity' ? classData.schedule : classData.manualSchedule;
+      const scheduleData = arrayWithSchedule.find((schedule) => schedule.message!.filename! === schedulePayload.data.filename!) as ParseScheduleResponse;
 
       if (!scheduleData) {
         return sendError('Произошла неизвестная ошибка, либо выбранного расписания нет.');
       }
 
-      const {date, schedule, totalLessons, startTime, filename} = scheduleData.message;
+      const {date, schedule, totalLessons, startTime, filename, creationTime} = scheduleData.message;
+
+      const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
 
       vk.sendMessage({
-        message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}`,
-        peerId: message.peerId,
-        priority: 'medium',
+        message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
+        peerId,
+        priority: 'high',
       });
+
+      await classes.setLoading(peerId, false);
     }
   } catch (error) {
     console.log('Ошибка при отправке расписания', error);
@@ -95,7 +146,10 @@ const cmd: CommandOutputData = {
   name: 'расписание',
   aliases: ['получить расписание', 'schedule', 'рсп'],
   description: 'получить расписание уроков',
-  payload: 'schedule',
+  payload: {
+    command: 'schedule',
+    data: {action: 'get'},
+  } as SchedulePayload,
   requirements: {
     admin: false,
     dmOnly: false,
