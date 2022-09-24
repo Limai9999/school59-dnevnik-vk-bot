@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import 'moment/locale/ru';
+
 import handleMessage from './handlers/handleMessage';
 
 import Classes from './modules/Classes';
@@ -7,6 +9,7 @@ import VK from './modules/VK';
 import MessageStatistics from './modules/MessageStatistics';
 import Event from './modules/Event';
 import Schedule from './modules/Schedule';
+import Utils from './modules/Utils';
 
 import {getVKConfig, getMongoDBConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
@@ -23,6 +26,7 @@ mongoose.connect(url, {}, (err) => {
 
 const classes = new Classes();
 const statistics = new MessageStatistics();
+const utils = new Utils();
 
 const VKConfig = getVKConfig();
 
@@ -47,6 +51,7 @@ async function start() {
 
   const allClasses = await classes.getAllClasses();
   allClasses.map(({id}) => {
+    classes.setLoading(id, false);
     vkBot.addChatToState(id);
   });
 
@@ -63,7 +68,7 @@ async function start() {
   await events.init();
 
   bot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils});
   });
 }
 
