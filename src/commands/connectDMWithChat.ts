@@ -75,7 +75,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
     });
 
     return vk.sendMessage({
-      message: `Вы админ в ${totalGroups} беседах.\nВыберите беседу, в которой вы хотите управлять ботом.`,
+      message: `Вы админ в ${totalGroups} беседах.\n\nВыберите беседу, в которой вы хотите управлять ботом.`,
       peerId: message.peerId,
       keyboard,
     });
