@@ -282,8 +282,6 @@ class VkService extends VK {
     });
     if (!response.length) return null;
 
-    console.log(response);
-
     return response[0];
   }
 
