@@ -46,7 +46,7 @@ const vkUser = new VK({
 const schedule = new Schedule(vkBot, classes);
 
 async function start() {
-  const bot = await vkBot.init();
+  await vkBot.init();
   await vkUser.init();
 
   const allClasses = await classes.getAllClasses();
@@ -67,7 +67,7 @@ async function start() {
   });
   await events.init();
 
-  bot.updates.on('message_new', (message) => {
+  vkBot.updates.on('message_new', (message) => {
     handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils});
   });
 }
