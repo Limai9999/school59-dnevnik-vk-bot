@@ -45,68 +45,83 @@ export async function command({message, vk, classes, payload, schedule}: Command
       });
 
       const scheduleData = await schedule.get(peerId);
-
       const {manualSchedule, netcitySchedule} = scheduleData;
-
-      if (!netcitySchedule.status) {
-        return sendError(netcitySchedule.message! as string);
-      }
-
-      const netcityFiles = netcitySchedule.message! as ParseScheduleResponse[];
 
       const keyboard = Keyboard.builder()
           .inline();
 
-      const netcityFilesStrings = netcityFiles.map((schedule, index) => {
-        const {filename, date} = schedule.message;
+      let resultMessage = '';
 
-        keyboard.textButton({
-          label: date,
-          color: Keyboard.PRIMARY_COLOR,
-          payload: {
-            command: 'schedule',
-            data: {action: 'choose', filename, type: 'netcity'},
-          } as SchedulePayload,
+      let totalNetcityFiles = 0;
+      let totalManualFiles = 0;
+
+      if (netcitySchedule.status) {
+        const netcityFiles = netcitySchedule.message! as ParseScheduleResponse[];
+
+        const netcityFilesStrings = netcityFiles.map((schedule, index) => {
+          const {filename, date} = schedule.message;
+
+          keyboard.textButton({
+            label: date,
+            color: Keyboard.PRIMARY_COLOR,
+            payload: {
+              command: 'schedule',
+              data: {action: 'choose', filename, type: 'netcity'},
+            } as SchedulePayload,
+          });
+
+          return `${index + 1} - ${filename}`;
         });
 
-        return `${index + 1} - ${filename}`;
-      });
+        totalNetcityFiles = netcityFiles.length;
 
-      keyboard.row();
+        const netcityFilesString = netcityFilesStrings.length ? `Скачано ${totalNetcityFiles} файлов с расписанием из объявлений Сетевого Города:\n${netcityFilesStrings.join('\n')}` : 'В объявлениях Сетевого Города расписания нет.';
+        resultMessage += netcityFilesString;
+
+        // const classData = await classes.getClass(message.peerId);
+        // const lastUpdatedString = `\nОбновлено: ${moment(classData.lastUpdatedScheduleDate).fromNow()}`;
+        // resultMessage += lastUpdatedString;
+
+        keyboard.row();
+      } else {
+        resultMessage += `При получении расписания из объявлений Сетевого Города произошла ошибка:\n${netcitySchedule.message}`;
+      }
 
       const newestManualFiles = manualSchedule.filter((schedule) => Date.now() - schedule.message.creationTime < maxFileLifeTime);
 
-      const manualFilesStrings = newestManualFiles.map((schedule, index) => {
-        const {filename, date} = schedule.message;
+      totalManualFiles = newestManualFiles.length;
 
-        keyboard.textButton({
-          label: date,
-          color: Keyboard.SECONDARY_COLOR,
-          payload: {
-            command: 'schedule',
-            data: {action: 'choose', filename, type: 'manual'},
-          } as SchedulePayload,
+      if (totalManualFiles) {
+        const manualFilesStrings = newestManualFiles.map((schedule, index) => {
+          const {filename, date} = schedule.message;
+
+          keyboard.textButton({
+            label: date,
+            color: Keyboard.SECONDARY_COLOR,
+            payload: {
+              command: 'schedule',
+              data: {action: 'choose', filename, type: 'manual'},
+            } as SchedulePayload,
+          });
+
+          return `${index + 1} - ${filename}`;
         });
 
-        return `${index + 1} - ${filename}`;
-      });
+        totalManualFiles = newestManualFiles.length;
 
-      const classData = await classes.getClass(message.peerId);
+        const manualFilesString = manualFilesStrings.length ? `\n\nФайлы, добавленные вручную:\n${manualFilesStrings.join('\n')}` : '';
 
-      const totalNetcityFiles = netcityFiles.length;
-      const totalManualFiles = newestManualFiles.length;
+        resultMessage += manualFilesString;
+      }
 
       if (!totalNetcityFiles && !totalManualFiles) {
         return sendError('Расписания в Сетевом Городе нет, но вы можете попросить одного из админов этой беседы, чтобы он добавил файл с расписанием через личные сообщения бота.');
       }
 
-      const manualFilesString = manualFilesStrings.length ? `\n\nФайлы, добавленные вручную:\n\n${manualFilesStrings.join('\n')}` : '';
-      const netcityFilesString = netcityFilesStrings.length ? `Скачано ${totalNetcityFiles} файлов с расписанием:\n\n${netcityFilesStrings.join('\n')}` : '';
-      const lastUpdatedString = netcityFilesStrings.length ? `\n\nОбновлено: ${moment(classData.lastUpdatedScheduleDate).fromNow()}` : '';
-
       removeLoadingMessage();
+
       vk.sendMessage({
-        message: `${netcityFilesString}${manualFilesString}\n\n${lastUpdatedString}`,
+        message: resultMessage,
         peerId,
         priority: 'medium',
         keyboard,
