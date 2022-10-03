@@ -38,7 +38,7 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
     });
 
     const {netCityData, className} = await classes.getClass(peerId);
-    if (!netCityData || !className) {
+    if (!netCityData || !className || !netCityData.login || !netCityData.password) {
       return sendFinalMessage('Не введены данные для Сетевого Города или название класса.');
     }
 
