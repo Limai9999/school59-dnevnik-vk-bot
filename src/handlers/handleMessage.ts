@@ -37,7 +37,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI}: CommandInputData) {
   const {text, peerId, messagePayload, id} = message;
 
   console.log(`Новое сообщение в беседе ${peerId}: ${text || '<без текста>'}`);
@@ -53,7 +53,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
 
-  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils});
+  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI});
 
   let foundCommandAlias = '';
 
@@ -140,5 +140,5 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     });
   }
 
-  command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils});
+  command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI});
 };
