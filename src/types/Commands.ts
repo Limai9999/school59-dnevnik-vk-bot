@@ -6,6 +6,7 @@ import MessageStatisticsService from '../modules/MessageStatistics';
 import Event from '../modules/Event';
 import Schedule from '../modules/Schedule';
 import Utils from '../modules/Utils';
+import NetCityAPI from '../modules/NetCityAPI';
 
 import {Payload} from './VK/Payloads/Payload';
 
@@ -21,6 +22,7 @@ export type CommandInputData = {
   events: Event;
   schedule: Schedule
   utils: Utils
+  netcityAPI: NetCityAPI
 };
 
 export type CommandOutputData = {

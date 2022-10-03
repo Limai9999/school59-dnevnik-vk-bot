@@ -61,6 +61,9 @@ const classSchema = new Schema({
   connectedProfiles: {
     type: [Number],
   },
+  netcitySessionId: {
+    type: Number,
+  },
 }, {
   timestamps: true,
 });
