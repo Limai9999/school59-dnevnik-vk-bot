@@ -45,7 +45,7 @@ export default class Schedule {
     if (!getScheduleData.status) {
       return {
         status: false,
-        message: `При получении расписания произошла ошибка:\n${getScheduleData.message}`,
+        message: getScheduleData.message,
       };
     }
 
