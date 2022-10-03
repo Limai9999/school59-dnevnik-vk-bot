@@ -46,7 +46,7 @@ const vkUser = new VK({
 
 const schedule = new Schedule(vkBot, classes);
 
-const netcityAPI = new NetCityAPI(vkBot, classes);
+const netcityAPI = new NetCityAPI(vkBot, classes, utils);
 
 async function start() {
   await vkBot.init();
