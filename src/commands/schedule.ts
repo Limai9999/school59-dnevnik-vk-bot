@@ -115,6 +115,7 @@ export async function command({message, vk, classes, payload, schedule}: Command
       }
 
       if (!totalNetcityFiles && !totalManualFiles) {
+        if (message.isDM) return sendError('Расписания в Сетевом Городе нет.');
         return sendError('Расписания в Сетевом Городе нет, но вы можете попросить одного из админов этой беседы, чтобы он добавил файл с расписанием через личные сообщения бота.');
       }
 
@@ -149,6 +150,13 @@ export async function command({message, vk, classes, payload, schedule}: Command
       });
 
       await classes.setLoading(peerId, false);
+    } else if (schedulePayload.data.action === 'netCityGetToday') {
+      await classes.setLoading(peerId, false);
+
+      await vk.sendMessage({
+        peerId: message.peerId,
+        message: 'Эта команда еще не реализована.',
+      });
     }
   } catch (error) {
     console.log('Ошибка при отправке расписания', error);
