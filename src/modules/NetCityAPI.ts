@@ -43,6 +43,8 @@ class NetCityAPI {
 
       return session;
     } catch (error) {
+      console.log('createSession ошибка', error);
+
       return {
         peerId,
         status: false,
@@ -87,6 +89,8 @@ class NetCityAPI {
         data,
       };
     } catch (error) {
+      console.log('InitStudentDiary ошибка', error);
+
       return {
         status: false,
         error: `${error}`,
@@ -137,6 +141,8 @@ class NetCityAPI {
         studentDiary,
       };
     } catch (error) {
+      console.log('GetStudentDiary ошибка', error);
+
       return {
         status: false,
         error: `${error}`,
