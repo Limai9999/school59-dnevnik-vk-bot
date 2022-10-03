@@ -111,6 +111,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
       message: `Введите текст объявления, либо нажмите "отменить".`,
       peerId: message.peerId,
       keyboard: Keyboard.builder()
+          .oneTime()
           .inline()
           .textButton({
             label: 'Отменить',
@@ -163,6 +164,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
       message: `Отправьте .xlsx файл с расписанием в следующем сообщении, или нажмите "отменить"`,
       peerId: message.peerId,
       keyboard: Keyboard.builder()
+          .oneTime()
           .inline()
           .textButton({
             label: 'Отменить',
