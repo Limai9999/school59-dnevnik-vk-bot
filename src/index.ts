@@ -10,6 +10,7 @@ import MessageStatistics from './modules/MessageStatistics';
 import Event from './modules/Event';
 import Schedule from './modules/Schedule';
 import Utils from './modules/Utils';
+import NetCityAPI from './modules/NetCityAPI';
 
 import {getVKConfig, getMongoDBConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
@@ -45,6 +46,8 @@ const vkUser = new VK({
 
 const schedule = new Schedule(vkBot, classes);
 
+const netcityAPI = new NetCityAPI(vkBot, classes);
+
 async function start() {
   await vkBot.init();
   await vkUser.init();
@@ -68,7 +71,7 @@ async function start() {
   await events.init();
 
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI});
   });
 }
 
