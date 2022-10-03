@@ -88,4 +88,11 @@ export default class Classes {
       $set: {manualSchedule},
     });
   }
+
+  async setNetCitySessionId(peerId: number, netcitySessionId: number) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {netcitySessionId},
+    });
+  }
 };
