@@ -45,7 +45,10 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
     const decryptedPassword = new Password(netCityData.password!, true).decrypt();
 
     const session = await netcityAPI.createSession(peerId, netCityData.login!, decryptedPassword);
-    if (!session.status) return sendFinalMessage(`Не удалось войти в Сетевой Город, ошибка:\n${session.error!}`);
+    if (!session.status) {
+      console.log('errrrr', session);
+      return sendFinalMessage(`Не удалось войти в Сетевой Город, ошибка:\n${session.error!}`);
+    }
 
     await classes.setNetCitySessionId(peerId, session.session.id);
 
