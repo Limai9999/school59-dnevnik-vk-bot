@@ -23,10 +23,22 @@ export async function command({message, vk, classes, payload, schedule}: Command
 
     await classes.setLoading(peerId, false);
 
+    const keyboard = Keyboard.builder()
+        .inline()
+        .textButton({
+          label: 'Обновить расписание',
+          color: Keyboard.NEGATIVE_COLOR,
+          payload: {
+            command: 'schedule',
+            data: {action: 'update'},
+          } as SchedulePayload,
+        });
+
     return vk.sendMessage({
       message: errorMessage,
       peerId,
       priority: 'medium',
+      keyboard,
     });
   };
 
@@ -37,14 +49,16 @@ export async function command({message, vk, classes, payload, schedule}: Command
 
     const maxFileLifeTime = 1000 * 60 * 60 * 24 * 2;
 
-    if (schedulePayload.data.action === 'get') {
+    if (schedulePayload.data.action === 'get' || schedulePayload.data.action === 'update') {
+      const isForceUpdate = schedulePayload.data.action === 'update';
+
       loadingMessageID = await vk.sendMessage({
         message: 'Поиск расписания начат, подождите...',
         peerId,
         priority: 'low',
       });
 
-      const scheduleData = await schedule.get(peerId);
+      const scheduleData = await schedule.get(peerId, isForceUpdate);
       const {manualSchedule, netcitySchedule} = scheduleData;
 
       const keyboard = Keyboard.builder()
@@ -59,18 +73,30 @@ export async function command({message, vk, classes, payload, schedule}: Command
         const netcityFiles = netcitySchedule.message! as ParseScheduleResponse[];
 
         const netcityFilesStrings = netcityFiles.map((schedule, index) => {
-          const {filename, date} = schedule.message;
+          const isError = typeof schedule.message === 'string';
 
-          keyboard.textButton({
-            label: date,
-            color: Keyboard.PRIMARY_COLOR,
-            payload: {
-              command: 'schedule',
-              data: {action: 'choose', filename, type: 'netcity'},
-            } as SchedulePayload,
-          });
+          let returningString = '';
 
-          return `${index + 1} - ${filename}`;
+          if (!isError) {
+            const {filename, date} = schedule.message;
+
+            keyboard.textButton({
+              label: date,
+              color: Keyboard.PRIMARY_COLOR,
+              payload: {
+                command: 'schedule',
+                data: {action: 'choose', filename, type: 'netcity'},
+              } as SchedulePayload,
+            });
+
+            returningString += `${index + 1} - ${filename}`;
+          } else {
+            returningString += `${index + 1} - Неизвестное расписание ❌`;
+
+            console.log('Неизвестное расписание, ошибка:', schedule.message);
+          }
+
+          return returningString;
         });
 
         totalNetcityFiles = netcityFiles.length;
@@ -120,6 +146,15 @@ export async function command({message, vk, classes, payload, schedule}: Command
       }
 
       removeLoadingMessage();
+
+      keyboard.textButton({
+        label: 'Обновить расписание',
+        color: Keyboard.NEGATIVE_COLOR,
+        payload: {
+          command: 'schedule',
+          data: {action: 'update'},
+        } as SchedulePayload,
+      });
 
       vk.sendMessage({
         message: resultMessage,
