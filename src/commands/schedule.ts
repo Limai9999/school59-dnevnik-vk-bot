@@ -107,8 +107,6 @@ export async function command({message, vk, classes, payload, schedule}: Command
         // const classData = await classes.getClass(message.peerId);
         // const lastUpdatedString = `\nОбновлено: ${moment(classData.lastUpdatedScheduleDate).fromNow()}`;
         // resultMessage += lastUpdatedString;
-
-        keyboard.row();
       } else {
         resultMessage += `При получении расписания из объявлений Сетевого Города произошла ошибка:\n${netcitySchedule.message}`;
       }
@@ -118,6 +116,8 @@ export async function command({message, vk, classes, payload, schedule}: Command
       totalManualFiles = newestManualFiles.length;
 
       if (totalManualFiles) {
+        keyboard.row();
+
         const manualFilesStrings = newestManualFiles.map((schedule, index) => {
           const {filename, date} = schedule.message;
 
@@ -147,6 +147,7 @@ export async function command({message, vk, classes, payload, schedule}: Command
 
       removeLoadingMessage();
 
+      keyboard.row();
       keyboard.textButton({
         label: 'Обновить расписание',
         color: Keyboard.NEGATIVE_COLOR,
