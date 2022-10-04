@@ -86,15 +86,15 @@ export default class Schedule {
     return parseScheduleData;
   }
 
-  async get(peerId: number) {
+  async get(peerId: number, forceUpdate: boolean) {
     const classData = await this.classes.getClass(peerId);
     const lastUpdatedScheduleDate = classData.lastUpdatedScheduleDate!;
 
-    const maxLastUpdateDifference = 1000 * 60 * 30;
+    const maxLastUpdateDifference = 1000 * 60 * 60;
 
     const lastUpdateDifference = Date.now() - lastUpdatedScheduleDate;
 
-    if (lastUpdateDifference > maxLastUpdateDifference) {
+    if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference) {
       const schedule = await this.update(peerId);
       return {
         netcitySchedule: schedule,
