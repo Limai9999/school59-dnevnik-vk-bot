@@ -10,10 +10,10 @@ async function executeEvent({vk, statistics, message}: EventInputData) {
   const {peerId, chatId} = message;
 
   const state = vk.state.chats[peerId].events;
-  if (state.pendingOriginalTitle) return console.log('не удалось выполнить changeConversationTitle, т.к оригинальный title еще не вернулся');
+  if (state.pendingOriginalTitle) return console.log('не удалось выполнить changeConversationTitle, т.к оригинальный title еще не вернулся'.red);
 
   const chatData = await vk.getChat(peerId);
-  if (!chatData) return console.log('ошибка при получении ChatData в changeConversationTitle');
+  if (!chatData) return console.log('ошибка при получении ChatData в changeConversationTitle'.red);
 
   if (!chatData.chat_settings) return;
 

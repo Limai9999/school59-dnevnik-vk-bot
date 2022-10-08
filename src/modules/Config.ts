@@ -20,11 +20,11 @@ export default class Config {
       const stringifiedData = JSON.stringify(data, null, 2);
       writeFileSync(this.path, stringifiedData);
 
-      if (log) console.log(`Конфиг ${this.name} успешно сохранен.`);
+      if (log) console.log(`Конфиг ${this.name} успешно сохранен.`.green);
 
       return true;
     } catch (error) {
-      console.log(`Произошла ошибка при сохранении конфига ${this.name}. Ошибка:`, error);
+      console.log(`Произошла ошибка при сохранении конфига ${this.name}. Ошибка:`.red, error);
       return false;
     }
   }

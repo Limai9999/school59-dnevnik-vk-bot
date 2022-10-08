@@ -14,7 +14,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
 
     return text!.length >= 10 && args!.length;
   });
-  if (!usingMessages.length) return console.log('existingWordsSentence - no usingMessages');
+  if (!usingMessages.length) return console.log('existingWordsSentence - no usingMessages'.red);
 
   await vk.setTypingStatus(peerId);
 

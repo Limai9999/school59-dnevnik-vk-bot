@@ -2,7 +2,7 @@ export default function waitMs(min: number, max: number, log: boolean = true, ty
   return new Promise((resolve) => {
     const waiting = Math.floor(Math.random() * (max - min + 1)) + min;
 
-    if (log) console.log(`Ожидание ${waiting / 1000} секунд - ${type || 'неизвестно'}...`);
+    if (log) console.log(`Ожидание ${waiting / 1000} секунд - ${type || 'неизвестно'}...`.yellow);
 
     setTimeout(resolve, waiting);
   });

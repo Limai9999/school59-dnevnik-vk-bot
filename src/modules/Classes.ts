@@ -8,7 +8,7 @@ export default class Classes {
 
     if (!data) {
       data = await Class.create({id: peerId});
-      console.log(`Создан класс ${peerId}`);
+      console.log(`Создан класс ${peerId}`.bgYellow);
     }
 
     return data;

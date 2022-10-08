@@ -126,7 +126,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
       skipLastSentCheck: true,
     });
   } catch (error) {
-    console.log('error in sendLikedTikTokVideo event', error);
+    console.log('error in sendLikedTikTokVideo event'.red, error);
   }
 }
 

@@ -62,7 +62,7 @@ class VkService extends VK {
     const {id, name} = await this.getMe();
     this.me = {name: name!, id: id!, isUser: this.me.isUser};
 
-    console.log(`VK успешно запущено как ${name} - ${id}.`);
+    console.log(`VK успешно запущено как ${name} - ${id}.`.blue);
 
     return this;
   }
@@ -133,7 +133,7 @@ class VkService extends VK {
       });
       return response;
     } catch (error) {
-      console.log('Произошла ошибка при удалении сообщения:', error);
+      console.log('Произошла ошибка при удалении сообщения:'.red, error);
       return false;
     }
   };
@@ -222,7 +222,7 @@ class VkService extends VK {
 
       return messageId;
     } catch (error) {
-      console.log('Произошла ошибка при отправке сообщения:', error);
+      console.log('Произошла ошибка при отправке сообщения:'.red, error);
       return 0;
     }
   }
@@ -295,7 +295,7 @@ class VkService extends VK {
     if (stream) {
       formData.append('photo', stream);
     } else {
-      if (!photoPath) return console.log('no photo path');
+      if (!photoPath) return console.log('no photo path'.red);
       formData.append('photo', fs.createReadStream(photoPath));
     }
 

@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "colors": "^1.4.0",
     "crypto-js": "^4.1.1",
     "moment": "^2.29.4",
     "mongoose": "^6.5.2",
