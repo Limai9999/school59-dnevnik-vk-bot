@@ -48,7 +48,7 @@ const vkUser = new VK({
 
 const netcityAPI = new NetCityAPI(vkBot, classes, utils);
 
-const schedule = new Schedule(vkBot, classes, netcityAPI);
+const schedule = new Schedule(vkBot, classes, netcityAPI, utils);
 
 async function start() {
   await vkBot.init();
@@ -61,6 +61,7 @@ async function start() {
     vkBot.addChatToState(id);
 
     await netcityAPI.startSessionAutoCreating(id, index + 1);
+    await schedule.startAutoUpdate(id, index + 1);
   }));
 
   console.log(`Бот обрабатывает ${allClasses.length} чатов.`);
