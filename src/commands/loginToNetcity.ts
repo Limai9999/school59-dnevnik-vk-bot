@@ -69,7 +69,8 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
 
     const studentString = `Ученик: ${nickName}`;
 
-    await removeLoadingMessage();
+    removeLoadingMessage();
+    await classes.setLoading(peerId, false);
 
     const keyboard = Keyboard.builder()
         .inline()
