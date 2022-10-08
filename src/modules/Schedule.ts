@@ -187,6 +187,7 @@ export default class Schedule {
     if (!newSchedule.status) return;
 
     const keyboard = Keyboard.builder()
+        .inline()
         .textButton({
           label: newSchedule.schedule!.date,
           color: Keyboard.PRIMARY_COLOR,
