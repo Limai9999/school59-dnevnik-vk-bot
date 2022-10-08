@@ -38,15 +38,19 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
 }
 
 export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI}: CommandInputData) {
-  const {text, peerId, messagePayload, id} = message;
+  const {text, peerId, senderId, messagePayload, id} = message;
 
-  console.log(`Новое сообщение в беседе ${peerId}: ${text || '<без текста>'}`);
+  if (message.isDM) {
+    console.log(`Новое личное сообщение от ${peerId}: ${text || '<без текста>'}`.gray);
+  } else {
+    console.log(`Новое сообщение в беседе ${peerId} от ${senderId}: ${text || '<без текста>'}`.gray);
+  }
 
   const classData = await classes.getClass(peerId);
   const isMessagesHandling = classData.handleMessages;
   const isLoading = classData.isLoading;
 
-  if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`);
+  if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`.yellow);
 
   const isAdminChat = peerId === vk.config.adminChatID;
   const isDMChat = message.isDM;
