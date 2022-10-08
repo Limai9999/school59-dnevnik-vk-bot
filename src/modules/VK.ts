@@ -162,7 +162,7 @@ class VkService extends VK {
     }, timeoutMs);
   }
 
-  async sendMessage({message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false}: SendMessageData): Promise<number> {
+  async sendMessage({message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false, useAll}: SendMessageData): Promise<number> {
     const isPrivateMessages = peerId <= 2000000000;
 
     const classData = await this.classes.getClass(peerId);
@@ -185,7 +185,7 @@ class VkService extends VK {
       await this.classes.setMessagesHandlingStatus(peerId, true);
 
       await this.sendMessage({
-        message: `За короткий промежуток времени было отправлено больше ${maxLastSentMessages} сообщений.\nВсе предыдущие сообщения бота были удалены.`,
+        message: `За короткий промежуток времени было отправлено больше ${maxLastSentMessages} сообщений.\nПредыдущие сообщения бота были удалены.`,
         peerId,
         priority: 'low',
         skipLastSentCheck: true,
@@ -207,7 +207,7 @@ class VkService extends VK {
 
     try {
       const response = await this.api.messages.send({
-        message,
+        message: useAll ? message + ' [@all]' : message,
         peer_ids: peerId,
         random_id: Math.floor(Math.random() * 10000) * Date.now(),
         attachment,

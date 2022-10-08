@@ -7,4 +7,5 @@ export type SendMessageData = {
   attachment?: Attachment;
   skipLastSentCheck?: boolean;
   priority?: 'none' | 'low' | 'medium' | 'high';
+  useAll?: boolean;
 };

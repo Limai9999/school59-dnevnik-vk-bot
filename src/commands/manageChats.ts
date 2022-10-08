@@ -146,10 +146,11 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const {first_name, last_name} = announcerData!;
 
     await vk.sendMessage({
-      message: `${announceMessage.text} - ${first_name} ${last_name} [@all]`,
+      message: `${announceMessage.text} - ${first_name} ${last_name}`,
       peerId: chosenChat,
       priority: 'none',
       skipLastSentCheck: true,
+      useAll: true,
     });
 
     vk.sendMessage({
@@ -249,8 +250,9 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const genderifiedAction = utils.genderifyWord(action, sex);
 
     await vk.sendMessage({
-      message: `${first_name} ${last_name} ${genderifiedAction} файл с расписанием: "${filename}" [@all]`,
+      message: `${first_name} ${last_name} ${genderifiedAction} файл с расписанием: "${filename}"`,
       peerId: chosenChat,
+      useAll: true,
     });
 
     vk.sendMessage({
