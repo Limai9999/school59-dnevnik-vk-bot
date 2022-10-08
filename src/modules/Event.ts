@@ -50,7 +50,7 @@ class Event {
     const event = shuffledPassedEvents[Math.floor(Math.random() * shuffledPassedEvents.length)];
 
     try {
-      console.log(`Выполняется ивент ${event.name}`.bgYellow);
+      console.log(`Выполняется ивент ${event.name}`.yellow);
 
       await event.execute({
         vk: this.vk,
@@ -62,7 +62,7 @@ class Event {
         message,
       });
 
-      console.log(`Ивент ${event.name} успешно выполнился.`.bgYellow.green);
+      console.log(`Ивент ${event.name} успешно выполнился.`.green);
     } catch (error) {
       console.log(`Произошла ошибка при выполнении ивента ${event.name}`.red, error);
     }
