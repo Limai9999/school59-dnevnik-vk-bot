@@ -41,15 +41,15 @@ class NetCityAPI {
   async startSessionAutoCreating(peerId: number, index: number = 1) {
     if (this.utils.checkIfPeerIsDM(peerId)) return;
 
-    const autoUpdateTime = 1000 * 60 * 25 * index;
+    const autoUpdateTime = 1000 * 60 * (25 + index * 1.5);
 
-    const {netCityData, className} = await this.classes.getClass(peerId);
-    if (!netCityData || !className) return false;
+    const credentials = await this.getCredentials(peerId);
+    if (!credentials) return false;
 
-    const decryptedPassword = new Password(netCityData.password!, true).decrypt();
+    const {login, password, className} = credentials;
 
     const update = async () => {
-      const session = await this.createSession(peerId, netCityData.login!, decryptedPassword);
+      const session = await this.createSession(peerId, login, password);
       if (!session.status) return console.log(`Не удалось обновить сессию Сетевого Города в классе ${peerId} - ${className}.`.bgRed.cyan);
 
       await this.classes.setNetCitySessionId(peerId, session.session.id);
@@ -62,6 +62,19 @@ class NetCityAPI {
     console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города.`.cyan);
 
     return true;
+  }
+
+  async getCredentials(peerId: number) {
+    const {netCityData, className} = await this.classes.getClass(peerId);
+    if (!netCityData || !className) return false;
+
+    const decryptedPassword = new Password(netCityData.password!, true).decrypt();
+
+    return {
+      login: netCityData.login!,
+      password: decryptedPassword,
+      className,
+    };
   }
 
   async createSession(peerId: number, login: string, password: string): Promise<Session> {
