@@ -38,7 +38,7 @@ class NetCityAPI {
     this.config = getMainConfig();
   }
 
-  async setSessionAutoCreating(peerId: number, index: number = 1) {
+  async startSessionAutoCreating(peerId: number, index: number = 1) {
     if (this.utils.checkIfPeerIsDM(peerId)) return;
 
     const autoUpdateTime = 1000 * 60 * 25 * index;
