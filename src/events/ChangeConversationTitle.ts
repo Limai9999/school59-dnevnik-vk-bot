@@ -32,7 +32,7 @@ async function executeEvent({vk, statistics, message}: EventInputData) {
   state.pendingOriginalTitle = true;
 
   setTimeout(async () => {
-    const sendJokeMessage = Math.random() < 0.4;
+    const sendJokeMessage = Math.random() < 0.5;
 
     if (sendJokeMessage) {
       const jokeMessages = [
