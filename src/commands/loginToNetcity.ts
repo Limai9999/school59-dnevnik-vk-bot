@@ -8,7 +8,7 @@ import {LoginToNetcityPayload} from '../types/VK/Payloads/LoginToNetcityPayload'
 import {GradesPayload} from '../types/VK/Payloads/GradesPayload';
 import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 
-async function command({vk, classes, message, netcityAPI, payload}: CommandInputData) {
+async function command({vk, classes, message, netcityAPI, payload, utils}: CommandInputData) {
   let loadingMessageID = 0;
   const peerId = message.peerId;
   const loginToNetcityPayload = payload as LoginToNetcityPayload;
@@ -18,13 +18,13 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
     return vk.removeMessage(loadingMessageID, peerId);
   };
 
-  const sendFinalMessage = async (errorMessage: string) => {
+  const sendFinalMessage = async (message: string) => {
     removeLoadingMessage();
 
     await classes.setLoading(peerId, false);
 
     return vk.sendMessage({
-      message: errorMessage,
+      message,
       peerId: peerId,
     });
   };
@@ -44,13 +44,22 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
 
     const decryptedPassword = new Password(netCityData.password!, true).decrypt();
 
-    const session = await netcityAPI.createSession(peerId, netCityData.login!, decryptedPassword);
+    const session = await netcityAPI.findOrCreateSession(peerId, netCityData.login!, decryptedPassword, !message.isDM);
+
+    // console.log(`Успешно создана сессия ${netCityData.login!}`, session);
+    // console.log('cookie', utils.cookieArrayToString(session.cookies));
+
     if (!session.status) {
-      console.log('errrrr', session);
+      console.log('loginToNetcity error'.red, session);
       return sendFinalMessage(`Не удалось войти в Сетевой Город, ошибка:\n${session.error!}`);
     }
 
     await classes.setNetCitySessionId(peerId, session.session.id);
+
+    if (!message.isDM) {
+      removeLoadingMessage();
+      return sendFinalMessage('Сессия Сетевого Города успешно обновлена.');
+    }
 
     const studentData = await netcityAPI.initStudentDiary(session.session.id);
     if (!studentData.status) return sendFinalMessage(`Не удалось получить информацию о ученике, ошибка:\n${studentData.error!}`);
@@ -60,10 +69,7 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
 
     const studentString = `Ученик: ${nickName}`;
 
-    removeLoadingMessage();
-    await classes.setLoading(peerId, false);
-
-    console.log('studentData', studentData);
+    await removeLoadingMessage();
 
     const keyboard = Keyboard.builder()
         .inline()
@@ -96,26 +102,40 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
       keyboard,
     });
   } else if (loginToNetcityPayload.data.action === 'logout') {
-    await classes.setLoading(message.peerId, false);
+    const classData = await classes.getClass(peerId);
+    const sessionId = classData.netcitySessionId;
+
+    if (!sessionId) {
+      await vk.sendMessage({
+        peerId,
+        message: 'Вы ещё не вошли в Сетевой Город.',
+      });
+    }
+
+    const closeStatus = await netcityAPI.closeSession(sessionId!);
+
+    const msg = closeStatus.status ? 'Вы успешно вышли из Сетевого Города.' : `Не удалось выйти из Сетевого Города, ошибка:\n${closeStatus.error!}`;
+
+    await classes.setLoading(peerId, false);
 
     await vk.sendMessage({
-      peerId: message.peerId,
-      message: 'Эта команда еще не реализована.',
+      message: msg,
+      peerId,
     });
   }
 }
 
 const cmd: CommandOutputData = {
-  name: 'войти в сетевой',
+  name: 'войти в Сетевой Город',
   aliases: ['loginToNetcity'],
-  description: 'входит в профиль Сетевого Города, где вы можете посмотреть разные отчёты об оценках',
+  description: null,
   payload: {
     command: 'loginToNetcity',
     data: {action: 'login'},
   } as LoginToNetcityPayload,
   requirements: {
     admin: false,
-    dmOnly: true,
+    dmOnly: false,
     args: 0,
   },
   showInAdditionalMenu: true,
