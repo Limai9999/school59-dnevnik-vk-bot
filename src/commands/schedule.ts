@@ -70,30 +70,30 @@ export async function command({message, vk, classes, payload, schedule}: Command
       let totalManualFiles = 0;
 
       if (netcitySchedule.status) {
-        const netcityFiles = netcitySchedule.message! as ParseScheduleResponse[];
+        const netcityFiles = netcitySchedule.schedule!;
 
-        const netcityFilesStrings = netcityFiles.map((schedule, index) => {
-          const isError = typeof schedule.message === 'string';
-
+        const netcityFilesStrings = netcityFiles.map((file, index) => {
           let returningString = '';
 
-          if (!isError) {
-            const {filename, date} = schedule.message;
+          const {filename} = file;
 
-            keyboard.textButton({
-              label: date,
-              color: Keyboard.PRIMARY_COLOR,
-              payload: {
-                command: 'schedule',
-                data: {action: 'choose', filename, type: 'netcity'},
-              } as SchedulePayload,
-            });
+          let date: string | undefined;
+          if (file.status) date = file.schedule!.date;
 
-            returningString += `${index + 1} - ${filename}`;
-          } else {
-            returningString += `${index + 1} - Неизвестное расписание ❌`;
+          keyboard.textButton({
+            label: date || String(index + 1),
+            color: file.status ? Keyboard.PRIMARY_COLOR : Keyboard.NEGATIVE_COLOR,
+            payload: {
+              command: 'schedule',
+              data: {action: 'choose', filename, type: 'netcity'},
+            } as SchedulePayload,
+          });
 
-            console.log('Неизвестное расписание, ошибка:', schedule.message);
+          returningString += `${index + 1} - ${filename}`;
+
+          if (!file.status) {
+            returningString += ' ❌';
+            console.log(`${filename}, ошибка:`.red, file.error);
           }
 
           return returningString;
@@ -108,10 +108,10 @@ export async function command({message, vk, classes, payload, schedule}: Command
         // const lastUpdatedString = `\nОбновлено: ${moment(classData.lastUpdatedScheduleDate).fromNow()}`;
         // resultMessage += lastUpdatedString;
       } else {
-        resultMessage += `При получении расписания из объявлений Сетевого Города произошла ошибка:\n${netcitySchedule.message}`;
+        resultMessage += `При получении расписания из объявлений Сетевого Города произошла ошибка:\n${netcitySchedule.error!}`;
       }
 
-      const newestManualFiles = manualSchedule.filter((schedule) => Date.now() - schedule.message.creationTime < maxFileLifeTime);
+      const newestManualFiles = manualSchedule.filter((schedule) => Date.now() - schedule.schedule!.creationTime < maxFileLifeTime);
 
       totalManualFiles = newestManualFiles.length;
 
@@ -119,7 +119,7 @@ export async function command({message, vk, classes, payload, schedule}: Command
         keyboard.row();
 
         const manualFilesStrings = newestManualFiles.map((schedule, index) => {
-          const {filename, date} = schedule.message;
+          const {filename, date} = schedule.schedule!;
 
           keyboard.textButton({
             label: date,
@@ -140,7 +140,7 @@ export async function command({message, vk, classes, payload, schedule}: Command
         resultMessage += manualFilesString;
       }
 
-      if (!totalNetcityFiles && !totalManualFiles) {
+      if (!totalNetcityFiles && !totalManualFiles && !resultMessage.length) {
         if (message.isDM) return sendError('Расписания в Сетевом Городе нет.');
         return sendError('Расписания в Сетевом Городе нет, но вы можете попросить одного из админов этой беседы, чтобы он добавил файл с расписанием через личные сообщения бота.');
       }
@@ -169,21 +169,29 @@ export async function command({message, vk, classes, payload, schedule}: Command
       const classData = await classes.getClass(peerId);
 
       const arrayWithSchedule = schedulePayload.data.type === 'netcity' ? classData.schedule : classData.manualSchedule;
-      const scheduleData = arrayWithSchedule.find((schedule) => schedule.message!.filename! === schedulePayload.data.filename!) as ParseScheduleResponse;
+      const scheduleData = arrayWithSchedule.find((schedule) => schedule.filename! === schedulePayload.data.filename!) as ParseScheduleResponse;
 
       if (!scheduleData) {
         return sendError('Произошла неизвестная ошибка, либо выбранного расписания нет.');
       }
 
-      const {date, schedule, totalLessons, startTime, filename, creationTime} = scheduleData.message;
+      if (scheduleData.status) {
+        const {date, schedule, totalLessons, startTime, filename, creationTime} = scheduleData.schedule!;
 
-      const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
+        const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
 
-      vk.sendMessage({
-        message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
-        peerId,
-        priority: 'high',
-      });
+        vk.sendMessage({
+          message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
+          peerId,
+          priority: 'high',
+        });
+      } else {
+        vk.sendMessage({
+          message: `При обработке файла "${scheduleData.filename}" произошла ошибка:\n${scheduleData.error}`,
+          peerId,
+          priority: 'high',
+        });
+      }
 
       await classes.setLoading(peerId, false);
     } else if (schedulePayload.data.action === 'netCityGetToday') {
@@ -195,7 +203,7 @@ export async function command({message, vk, classes, payload, schedule}: Command
       });
     }
   } catch (error) {
-    console.log('Ошибка при отправке расписания', error);
+    console.log('Ошибка при отправке расписания'.red, error);
     sendError(`При получении расписания произошла ошибка:\n${error}`);
   }
 };
