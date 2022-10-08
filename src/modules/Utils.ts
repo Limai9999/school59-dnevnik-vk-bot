@@ -21,4 +21,8 @@ export default class Utils {
 
     return stringArray.join('; ');
   }
+
+  checkIfPeerIsDM(peerId: number) {
+    return peerId < 2000000000;
+  }
 }
