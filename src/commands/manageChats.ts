@@ -228,15 +228,15 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
 
     if (!parsedSchedule.status) {
       return vk.sendMessage({
-        message: `Не удалось получить расписание из этого файла.\nОшибка: ${parsedSchedule.message}`,
+        message: `Не удалось получить расписание из этого файла.\nОшибка: ${parsedSchedule.error}`,
         peerId: message.peerId,
       });
     }
 
-    const isAlreadyExists = classData.manualSchedule.find((existingSchedule) => existingSchedule.message!.filename === parsedSchedule.message.filename);
+    const isAlreadyExists = classData.manualSchedule.find((existingSchedule) => existingSchedule.schedule!.filename === parsedSchedule.schedule!.filename);
 
     if (isAlreadyExists) {
-      classData.manualSchedule = classData.manualSchedule.filter((existingSchedule) => existingSchedule.message!.filename !== parsedSchedule.message.filename);
+      classData.manualSchedule = classData.manualSchedule.filter((existingSchedule) => existingSchedule.schedule!.filename !== parsedSchedule.schedule!.filename);
     }
 
     const newManualSchedule = classData.manualSchedule.concat(parsedSchedule) as ParseScheduleResponse[];

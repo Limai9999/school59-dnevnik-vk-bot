@@ -1,6 +1,8 @@
 export type ParseScheduleResponse = {
   status: boolean
-  message: {
+  filename: string
+  error?: string
+  schedule?: {
     distant: boolean
     schedule: string[]
     objectedSchedule: [{

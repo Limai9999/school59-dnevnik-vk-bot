@@ -2,7 +2,9 @@ import {Schema, model} from 'mongoose';
 
 const parsedSchedule = {
   status: Boolean,
-  message: {
+  filename: String,
+  error: String,
+  schedule: {
     date: String,
     distant: Boolean,
     filename: String,
