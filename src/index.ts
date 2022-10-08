@@ -57,12 +57,13 @@ async function start() {
   const allClasses = await classes.getAllClasses();
   await Promise.all(allClasses.map(async ({id}, index) => {
     await classes.setLoading(id, false);
+
     vkBot.addChatToState(id);
 
-    await netcityAPI.setSessionAutoCreating(id, index + 1);
+    await netcityAPI.startSessionAutoCreating(id, index + 1);
   }));
 
-  console.log(`Бот обрабатывается в ${allClasses.length} чатах.`);
+  console.log(`Бот обрабатывает ${allClasses.length} чатов.`);
 
   const commands = await getCommands();
 
