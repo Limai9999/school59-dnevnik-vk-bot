@@ -1,24 +1,20 @@
 import axios from 'axios';
+import {Keyboard} from 'vk-io';
 
 import VK from './VK';
 import Classes from './Classes';
-import Password from './Password';
 import NetCityAPI from './NetCityAPI';
+import Utils from './Utils';
 
 import {Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
-import {GetScheduleResponse} from '../types/Responses/API/schedule/GetScheduleResponse';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
 import {SaveFileResponse} from '../types/Responses/API/schedule/SaveFileResponse';
+
+import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 
 import {MainConfig} from '../types/Configs/MainConfig';
 
 import {getMainConfig} from '../utils/getConfig';
-
-type UpdateSchedule = {
-  status: boolean
-  schedule?: ParseScheduleResponse[]
-  error?: string
-}
 
 type GetScheduleWithAPI = {
   status: boolean
@@ -30,79 +26,56 @@ export default class Schedule {
   vk: VK;
   classes: Classes;
   netCity: NetCityAPI;
+  utils: Utils;
 
   config: MainConfig;
 
-  constructor(vk: VK, classes: Classes, netCity: NetCityAPI) {
+  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils) {
     this.vk = vk;
     this.classes = classes;
     this.netCity = netCity;
+    this.utils = utils;
 
     this.config = getMainConfig();
   }
 
-  async update(peerId: number): Promise<UpdateSchedule> {
-    const {netCityData, className} = await this.classes.getClass(peerId);
-    if (!netCityData || !className) {
-      return {
-        status: false,
-        error: 'Не введены данные для Сетевого Города или название класса.',
-      };
-    }
+  async startAutoUpdate(peerId: number, index: number = 1) {
+    if (this.utils.checkIfPeerIsDM(peerId)) return false;
 
-    const password = new Password(netCityData.password!, true).decrypt();
+    const credentials = await this.netCity.getCredentials(peerId);
+    if (!credentials) return false;
 
-    const getScheduleResponse = await axios({
-      url: `${this.config.APIUrl}/schedule/get`,
-      data: {
-        login: netCityData.login,
-        password,
-      },
-    });
+    const autoUpdateTime = 1000 * 60 * (40 + index);
 
-    const getScheduleData: GetScheduleResponse = getScheduleResponse.data;
-    if (!getScheduleData.status) {
-      return {
-        status: false,
-        error: getScheduleData.message,
-      };
-    }
+    setInterval(async () => {
+      const data = await this.getWithAPI(peerId);
 
-    await this.classes.setLastUpdatedScheduleDate(peerId, Date.now());
+      if (data.status) {
+        console.log(`В беседе ${peerId} успешно обновлено расписание.`.cyan);
+      } else {
+        console.log(`Не удалось обновить расписание в беседе ${peerId}.`.cyan);
+      }
+    }, autoUpdateTime);
 
-    if (!getScheduleData.files.length) {
-      await this.classes.setSchedule(peerId, []);
+    console.log(`Настроено авто-обновление расписания для беседы ${peerId}.`.cyan);
 
-      return {
-        status: true,
-        schedule: [],
-      };
-    }
-
-    const parsedSchedule = await Promise.all(getScheduleData.files.map(async (file) => {
-      const parseSchedule = await this.parse(file.filename, className);
-      return parseSchedule;
-    }));
-
-    await this.classes.setSchedule(peerId, parsedSchedule);
-
-    return {
-      status: true,
-      schedule: parsedSchedule,
-    };
+    return true;
   }
 
   async getWithAPI(peerId: number): Promise<GetScheduleWithAPI> {
-    const {netCityData, className} = await this.classes.getClass(peerId);
-    if (!netCityData || !className) {
+    const classData = await this.classes.getClass(peerId);
+
+    const credentials = await this.netCity.getCredentials(peerId);
+    if (!credentials) {
       return {
         status: false,
         error: 'Не введены данные для Сетевого Города или название класса.',
       };
     }
-    const password = new Password(netCityData.password!, true).decrypt();
 
-    const session = await this.netCity.findOrCreateSession(peerId, netCityData.login!, password!, false);
+    const {login, password, className} = credentials;
+
+    const session = await this.netCity.findOrCreateSession(peerId, login, password, false);
 
     const announcementsResponse = await this.netCity.getAnnouncements(session.session.id);
 
@@ -148,8 +121,14 @@ export default class Schedule {
         } as ParseScheduleResponse;
       }
 
-      const parseSchedule = await this.parse(file.name, className);
-      return parseSchedule;
+      const parsedSchedule = await this.parse(file.name, className);
+
+      if (parsedSchedule.status) {
+        const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === file.name) as ParseScheduleResponse | undefined;
+        this.compare(oldSchedule, parsedSchedule, peerId);
+      }
+
+      return parsedSchedule;
     }));
 
     await this.classes.setSchedule(peerId, parsedSchedule);
@@ -199,6 +178,31 @@ export default class Schedule {
         manualSchedule: classData.manualSchedule as ParseScheduleResponse[],
       };
     }
+  }
+
+  async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number) {
+    const testMode = false;
+    const announceChat = testMode ? this.vk.config.adminChatID : peerId;
+
+    if (!newSchedule.status) return;
+
+    const keyboard = Keyboard.builder()
+        .textButton({
+          label: newSchedule.schedule!.date,
+          color: Keyboard.PRIMARY_COLOR,
+          payload: {
+            command: 'schedule',
+            data: {action: 'choose', filename: newSchedule.filename, type: 'netcity'},
+          } as SchedulePayload,
+        });
+
+    if (!oldSchedule || !oldSchedule.status) {
+      return this.vk.sendMessage({
+        message: `Добавился новый файл с расписанием на ${newSchedule.schedule!.date}.`,
+        peerId: announceChat,
+        keyboard,
+      });
+    };
   }
 
   async saveFile(url: string, filename: string): Promise<boolean> {
