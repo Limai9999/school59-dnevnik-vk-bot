@@ -8,7 +8,7 @@ moment.locale('ru');
 import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
 
-export async function command({message, vk, classes, payload, schedule}: CommandInputData) {
+export async function command({message, vk, classes, payload, schedule, utils}: CommandInputData) {
   let loadingMessageID = 0;
 
   const peerId = message.peerId;
@@ -101,7 +101,9 @@ export async function command({message, vk, classes, payload, schedule}: Command
 
         totalNetcityFiles = netcityFiles.length;
 
-        const netcityFilesString = netcityFilesStrings.length ? `Скачано ${totalNetcityFiles} файлов с расписанием из объявлений Сетевого Города:\n${netcityFilesStrings.join('\n')}` : 'В объявлениях Сетевого Города расписания нет.';
+        const filesString = utils.setWordEndingBasedOnThingsCount('файл', utils.types.Declination.Second, utils.types.WordGender.Masculine, totalNetcityFiles);
+
+        const netcityFilesString = netcityFilesStrings.length ? `Скачано ${totalNetcityFiles} ${filesString} с расписанием из объявлений Сетевого Города:\n${netcityFilesStrings.join('\n')}` : 'В объявлениях Сетевого Города расписания нет.';
         resultMessage += netcityFilesString;
 
         // const classData = await classes.getClass(message.peerId);
@@ -180,8 +182,10 @@ export async function command({message, vk, classes, payload, schedule}: Command
 
         const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
 
+        const totalLessonsAndStartTimeString = totalLessons === 1 ? `Всего 1 урок, начинающийся в ${startTime}.` : `Всего уроков: ${totalLessons}, начинаются в ${startTime}.`;
+
         vk.sendMessage({
-          message: `Расписание на ${date}\n\nВсего уроков: ${totalLessons}, начинаются в ${startTime}.\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
+          message: `Расписание на ${date}\n\n${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
           peerId,
           priority: 'high',
         });
