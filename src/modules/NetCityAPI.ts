@@ -128,7 +128,7 @@ class NetCityAPI {
       error?: string
     };
 
-    this.removeSession(sessionId);
+    this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
 
     return data;
   }
@@ -157,14 +157,6 @@ class NetCityAPI {
   getSessionByPeerId(peerId: number) {
     const session = this.sessions.find((session) => session.peerId === peerId);
     return session;
-  }
-
-  async removeSession(sessionId: number) {
-    await this.closeSession(sessionId);
-
-    this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
-
-    return true;
   }
 
   async initStudentDiary(sessionId: number) {
