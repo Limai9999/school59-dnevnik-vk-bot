@@ -1,18 +1,8 @@
 import {GetCookiesResponse} from '../types/Responses/API/netCity/GetCookiesResponse';
-import {Declination, WordGender} from '../types/Utils/SetWordEnding';
+
+type setWordEndingType = 'scheduleFiles' | 'addedLessons'
 
 export default class Utils {
-  types = {
-    Declination,
-    WordGender,
-  };
-
-  constructor() {
-    this.types = {
-      Declination,
-      WordGender,
-    };
-  }
   genderifyWord(word: string, sex: number) {
     switch (sex) {
       case 0:
@@ -38,17 +28,21 @@ export default class Utils {
     return peerId < 2000000000;
   }
 
-  setWordEndingBasedOnThingsCount(unformattedWord: string, declination: Declination, wordGender: WordGender, things: number): string {
+  setWordEndingBasedOnThingsCount(type: setWordEndingType, things: number): string {
     const thingsStr = String(things);
 
-    if (declination === Declination.Second) {
-      if (wordGender === WordGender.Masculine) {
-        if (thingsStr.endsWith('0') || (things >= 10 && !thingsStr.endsWith('1') && !thingsStr.endsWith('2'))) return unformattedWord + 'ов';
-        if (thingsStr.endsWith('1')) return unformattedWord;
-        if (thingsStr.endsWith('2')) return unformattedWord + 'а';
-      }
+    if (type === 'scheduleFiles') {
+      if (thingsStr.endsWith('1')) return 'Скачан 1 файл';
+      if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return `Скачано ${things} файла`;
+      return `Скачано ${things} файлов`;
     }
 
-    return unformattedWord;
+    if (type === 'addedLessons') {
+      if (thingsStr.endsWith('1')) return 'Добавился 1 урок';
+      if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return `Добавилось ${things} урока`;
+      return `Добавилось ${things} уроков`;
+    }
+
+    return type;
   }
 }
