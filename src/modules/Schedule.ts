@@ -45,7 +45,7 @@ export default class Schedule {
     const credentials = await this.netCity.getCredentials(peerId);
     if (!credentials) return false;
 
-    const autoUpdateTime = 1000 * 60 * (40 + index);
+    const autoUpdateTime = 1000 * 60 * (30 + index);
 
     setInterval(async () => {
       const data = await this.getWithAPI(peerId);
@@ -63,8 +63,9 @@ export default class Schedule {
   }
 
   async getWithAPI(peerId: number): Promise<GetScheduleWithAPI> {
-    const classData = await this.classes.getClass(peerId);
+    const isTest = false;
 
+    const classData = await this.classes.getClass(peerId);
     const credentials = await this.netCity.getCredentials(peerId);
     if (!credentials) {
       return {
@@ -77,27 +78,40 @@ export default class Schedule {
 
     const session = await this.netCity.findOrCreateSession(peerId, login, password, false);
 
-    const announcementsResponse = await this.netCity.getAnnouncements(session.session.id);
-
-    if (!announcementsResponse.status) {
-      return {
-        status: false,
-        error: announcementsResponse.error!,
-      };
-    }
-
     const scheduleFiles: Attachment[] = [];
 
-    announcementsResponse.announcements!.map((announce) => {
-      const {attachments} = announce;
-
-      const matchRegexp = /расписание|изменения|расписании/g;
-
-      attachments.map((attachment) => {
-        const isAttachmentNameMatch = attachment.name.match(matchRegexp);
-        if (isAttachmentNameMatch) scheduleFiles.push(attachment);
+    if (isTest) {
+      scheduleFiles.push({
+        id: 0,
+        name: 'расписание на 4 октября.xlsx',
+        originalFileName: 'расписание на 4 октября.xlsx',
       });
-    });
+      scheduleFiles.push({
+        id: 1,
+        name: 'расписание на 5 октября.xlsx',
+        originalFileName: 'расписание на 5 октября.xlsx',
+      });
+    } else {
+      const announcementsResponse = await this.netCity.getAnnouncements(session.session.id);
+
+      if (!announcementsResponse.status) {
+        return {
+          status: false,
+          error: announcementsResponse.error!,
+        };
+      }
+
+      announcementsResponse.announcements!.map((announce) => {
+        const {attachments} = announce;
+
+        const matchRegexp = /расписание|изменения|расписании/g;
+
+        attachments.map((attachment) => {
+          const isAttachmentNameMatch = attachment.name.match(matchRegexp);
+          if (isAttachmentNameMatch) scheduleFiles.push(attachment);
+        });
+      });
+    }
 
     await this.classes.setLastUpdatedScheduleDate(peerId, Date.now());
 
@@ -125,7 +139,7 @@ export default class Schedule {
 
       if (parsedSchedule.status) {
         const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === file.name) as ParseScheduleResponse | undefined;
-        this.compare(oldSchedule, parsedSchedule, peerId);
+        this.compare(oldSchedule, parsedSchedule, peerId, true);
       }
 
       return parsedSchedule;
@@ -180,8 +194,8 @@ export default class Schedule {
     }
   }
 
-  async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number) {
-    const testMode = false;
+  async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number, announceNewFile: boolean) {
+    const testMode = true;
     const announceChat = testMode ? this.vk.config.adminChatID : peerId;
 
     if (!newSchedule.status) return;
@@ -197,13 +211,41 @@ export default class Schedule {
           } as SchedulePayload,
         });
 
-    if (!oldSchedule || !oldSchedule.status) {
+    if (!oldSchedule || !oldSchedule.status && announceNewFile) {
       return this.vk.sendMessage({
         message: `Добавился новый файл с расписанием на ${newSchedule.schedule!.date}.`,
         peerId: announceChat,
         keyboard,
       });
     };
+
+    const oldData = oldSchedule.schedule!;
+    const newData = newSchedule.schedule!;
+
+    const stringifiedOldSchedule = oldData.schedule.join('\n');
+    const stringifiedNewSchedule = newData.schedule.join('\n');
+
+    if (stringifiedOldSchedule === stringifiedNewSchedule) return;
+
+    console.log(`Расписание на ${newData.date} изменилось - ${peerId}`.cyan);
+
+    // const changesList: string[] = [];
+
+    // if (oldData.totalLessons !== newData.totalLessons) {
+    //   const isAdded = newData.totalLessons > oldData.totalLessons;
+
+    //   if (isAdded) {
+    //     const addedLessonsCount = newData.totalLessons - oldData.totalLessons;
+    //     const addedLessonsCountString = this.utils.setWordEndingBasedOnThingsCount('addedLessons', addedLessonsCount);
+
+    //     const addedLessons = newData.objectedSchedule.filter((schedule) => !oldData.objectedSchedule.includes(schedule));
+    //     const whatAdded = addedLessons.length ? `: ${addedLessons.join(', ')}` : '.';
+
+    //     changesList.push(`${addedLessonsCountString}${whatAdded}`);
+    //   }
+    // }
+
+    // console.log(changesList);
   }
 
   async saveFile(url: string, filename: string): Promise<boolean> {

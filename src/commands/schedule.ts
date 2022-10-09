@@ -101,9 +101,9 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
 
         totalNetcityFiles = netcityFiles.length;
 
-        const filesString = utils.setWordEndingBasedOnThingsCount('файл', utils.types.Declination.Second, utils.types.WordGender.Masculine, totalNetcityFiles);
+        const filesCountString = utils.setWordEndingBasedOnThingsCount('scheduleFiles', totalNetcityFiles);
 
-        const netcityFilesString = netcityFilesStrings.length ? `Скачано ${totalNetcityFiles} ${filesString} с расписанием из объявлений Сетевого Города:\n${netcityFilesStrings.join('\n')}` : 'В объявлениях Сетевого Города расписания нет.';
+        const netcityFilesString = netcityFilesStrings.length ? `${filesCountString} с расписанием из объявлений Сетевого Города:\n${netcityFilesStrings.join('\n')}` : 'В объявлениях Сетевого Города расписания нет.';
         resultMessage += netcityFilesString;
 
         // const classData = await classes.getClass(message.peerId);
