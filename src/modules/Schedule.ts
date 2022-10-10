@@ -195,7 +195,7 @@ export default class Schedule {
   }
 
   async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number, announceNewFile: boolean) {
-    const testMode = true;
+    const testMode = false;
     const announceChat = testMode ? this.vk.config.adminChatID : peerId;
 
     if (!newSchedule.status) return;
