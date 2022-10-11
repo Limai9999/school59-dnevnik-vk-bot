@@ -146,7 +146,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const {first_name, last_name} = announcerData!;
 
     await vk.sendMessage({
-      message: `${announceMessage.text} - ${first_name} ${last_name}`,
+      message: `${announceMessage.text}\n\n${first_name} ${last_name}`,
       peerId: chosenChat,
       priority: 'none',
       skipLastSentCheck: true,
