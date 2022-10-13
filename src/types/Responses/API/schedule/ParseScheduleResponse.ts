@@ -7,8 +7,8 @@ export type ParseScheduleResponse = {
     schedule: string[]
     objectedSchedule: {
       time: string
-      lesson: string | null
-      room: string | null
+      lesson?: string
+      room?: string
     }[]
     startTime: string
     totalLessons: number

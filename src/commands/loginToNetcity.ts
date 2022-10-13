@@ -115,7 +115,7 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
 
     const closeStatus = await netcityAPI.closeSession(sessionId!);
 
-    const msg = closeStatus.status ? 'Вы успешно вышли из Сетевого Города.' : `Не удалось выйти из Сетевого Города, ошибка:\n${closeStatus.error!}`;
+    const msg = closeStatus.status ? 'Вы успешно вышли из Сетевого Города.' : `Не удалось выйти из Сетевого Города, ошибка:\n${closeStatus.message!}`;
 
     await classes.setLoading(peerId, false);
 
