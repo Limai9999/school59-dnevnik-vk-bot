@@ -5,11 +5,11 @@ export type ParseScheduleResponse = {
   schedule?: {
     distant: boolean
     schedule: string[]
-    objectedSchedule: [{
+    objectedSchedule: {
       time: string
-      lesson?: string
-      room?: string
-    }]
+      lesson: string | null
+      room: string | null
+    }[]
     startTime: string
     totalLessons: number
     date: string
