@@ -283,7 +283,7 @@ class NetCityAPI {
     }
   }
 
-  async downloadAttachment(sessionId: number, attachment: Attachment): Promise<DownloadAttachmentResponse> {
+  async downloadAttachment(sessionId: number, attachment: Attachment, isTest: boolean): Promise<DownloadAttachmentResponse> {
     const attachmentId = attachment.id;
     const filename = attachment.name;
 
@@ -291,7 +291,7 @@ class NetCityAPI {
       const request = await axios({
         method: 'post',
         url: `${this.config.APIUrl}/netcity/downloadAttachment`,
-        data: {sessionId, attachmentId, filename},
+        data: {sessionId, attachmentId, filename, isTest},
       });
 
       const data = request.data as DownloadAttachmentResponse;
