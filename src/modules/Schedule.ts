@@ -9,6 +9,7 @@ import Utils from './Utils';
 import {Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
 import {SaveFileResponse} from '../types/Responses/API/schedule/SaveFileResponse';
+import {CompareResponse} from '../types/Responses/Schedule/CompareResponse';
 
 import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 
@@ -28,7 +29,7 @@ export default class Schedule {
   netCity: NetCityAPI;
   utils: Utils;
 
-  config: MainConfig;
+  mainConfig: MainConfig;
 
   constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils) {
     this.vk = vk;
@@ -36,7 +37,7 @@ export default class Schedule {
     this.netCity = netCity;
     this.utils = utils;
 
-    this.config = getMainConfig();
+    this.mainConfig = getMainConfig();
   }
 
   async startAutoUpdate(peerId: number, index: number = 1) {
@@ -63,7 +64,7 @@ export default class Schedule {
   }
 
   async getWithAPI(peerId: number): Promise<GetScheduleWithAPI> {
-    const isTest = false;
+    const isTest = this.mainConfig.testMode;
 
     const classData = await this.classes.getClass(peerId);
     const credentials = await this.netCity.getCredentials(peerId);
@@ -77,6 +78,13 @@ export default class Schedule {
     const {login, password, className} = credentials;
 
     const session = await this.netCity.findOrCreateSession(peerId, login, password, false);
+
+    if (!session.status) {
+      return {
+        status: false,
+        error: `Не удалось войти в Сетевой Город, ошибка:\n${session.error!}`,
+      };
+    }
 
     const scheduleFiles: Attachment[] = [];
 
@@ -125,7 +133,7 @@ export default class Schedule {
     }
 
     const parsedSchedule: ParseScheduleResponse[] = await Promise.all(scheduleFiles.map(async (file) => {
-      const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file);
+      const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file, isTest);
 
       if (!downloadStatus.status) {
         return {
@@ -139,7 +147,7 @@ export default class Schedule {
 
       if (parsedSchedule.status) {
         const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === file.name) as ParseScheduleResponse | undefined;
-        this.compare(oldSchedule, parsedSchedule, peerId, true);
+        this.compare(oldSchedule, parsedSchedule, peerId, true, false);
       }
 
       return parsedSchedule;
@@ -155,7 +163,7 @@ export default class Schedule {
 
   async parse(filename: string, className: string) {
     const parseScheduleResponse = await axios({
-      url: `${this.config.APIUrl}/schedule/parse`,
+      url: `${this.mainConfig.APIUrl}/schedule/parse`,
       data: {
         filename,
         className,
@@ -194,29 +202,33 @@ export default class Schedule {
     }
   }
 
-  async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number, announceNewFile: boolean) {
-    const testMode = false;
+  async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number, announce: boolean, isManual: boolean): Promise<CompareResponse> {
+    const testMode = this.mainConfig.testMode;
     const announceChat = testMode ? this.vk.config.adminChatID : peerId;
 
-    if (!newSchedule.status) return;
+    if (!newSchedule.status) return {isChanged: false};
 
     const keyboard = Keyboard.builder()
         .inline()
         .textButton({
           label: newSchedule.schedule!.date,
-          color: Keyboard.PRIMARY_COLOR,
+          color: isManual ? Keyboard.SECONDARY_COLOR : Keyboard.PRIMARY_COLOR,
           payload: {
             command: 'schedule',
-            data: {action: 'choose', filename: newSchedule.filename, type: 'netcity'},
+            data: {action: 'choose', filename: newSchedule.filename, type: isManual ? 'manual' : 'netcity'},
           } as SchedulePayload,
         });
 
-    if (!oldSchedule || !oldSchedule.status && announceNewFile) {
-      return this.vk.sendMessage({
-        message: `Добавился новый файл с расписанием на ${newSchedule.schedule!.date}.`,
-        peerId: announceChat,
-        keyboard,
-      });
+    if (!oldSchedule || !oldSchedule.status) {
+      if (announce) {
+        this.vk.sendMessage({
+          message: `Добавился новый файл с расписанием на ${newSchedule.schedule!.date}.`,
+          peerId: announceChat,
+          keyboard,
+        });
+      }
+
+      return {isChanged: false, keyboard};
     };
 
     const oldData = oldSchedule.schedule!;
@@ -225,33 +237,67 @@ export default class Schedule {
     const stringifiedOldSchedule = oldData.schedule.join('\n');
     const stringifiedNewSchedule = newData.schedule.join('\n');
 
-    if (stringifiedOldSchedule === stringifiedNewSchedule) return;
+    if (stringifiedOldSchedule === stringifiedNewSchedule) return {isChanged: false, keyboard};
 
-    console.log(`Расписание на ${newData.date} изменилось - ${peerId}`.cyan);
+    console.log(`Расписание на ${newData.date} изменилось - ${peerId}`.cyan.bgYellow);
 
-    // const changesList: string[] = [];
+    // console.log('old', oldSchedule);
+    // console.log('new', newSchedule);
 
-    // if (oldData.totalLessons !== newData.totalLessons) {
-    //   const isAdded = newData.totalLessons > oldData.totalLessons;
+    const changesList: string[] = [];
 
-    //   if (isAdded) {
-    //     const addedLessonsCount = newData.totalLessons - oldData.totalLessons;
-    //     const addedLessonsCountString = this.utils.setWordEndingBasedOnThingsCount('addedLessons', addedLessonsCount);
+    if (oldData.totalLessons !== newData.totalLessons) {
+      const isAdded = newData.totalLessons > oldData.totalLessons;
 
-    //     const addedLessons = newData.objectedSchedule.filter((schedule) => !oldData.objectedSchedule.includes(schedule));
-    //     const whatAdded = addedLessons.length ? `: ${addedLessons.join(', ')}` : '.';
+      if (isAdded) {
+        const addedLessonsCount = newData.totalLessons - oldData.totalLessons;
+        const addedLessonsCountString = this.utils.setWordEndingBasedOnThingsCount('addedLessons', addedLessonsCount);
 
-    //     changesList.push(`${addedLessonsCountString}${whatAdded}`);
-    //   }
-    // }
+        const addedLessons: string[] = newData.objectedSchedule.map((lessonObj) => {
+          const {lesson} = lessonObj;
+          if (!lesson) return false;
 
-    // console.log(changesList);
+          const isExistsInOld = oldData.objectedSchedule.find((schedule) => schedule.lesson === lesson);
+          if (isExistsInOld) return false;
+
+          return lesson;
+        }).filter((lesson) => lesson) as string[];
+
+        const addedLessonsString = addedLessons.join(', ');
+
+        // console.log(1111, {addedLessonsCount, addedLessonsCountString, addedLessonsString});
+
+        changesList.push(`${addedLessonsCountString}: ${addedLessonsString}`);
+      }
+    }
+
+    if (announce) {
+      const changesStrings = changesList.map((change, index) => {
+        return `${index + 1} - ${change}`;
+      });
+
+      let resultMessage = `Расписание на ${newSchedule.schedule!.date} изменилось.`;
+
+      if (changesStrings.length) {
+        resultMessage += `\n\nИзменения:\n${changesStrings.join('\n')}`;
+      }
+
+      this.vk.sendMessage({
+        message: resultMessage,
+        peerId: announceChat,
+        keyboard,
+        useAll: true,
+      });
+    }
+
+    const result = {isChanged: true, keyboard, changesList};
+    return result;
   }
 
   async saveFile(url: string, filename: string): Promise<boolean> {
     const response = await axios({
       method: 'post',
-      url: `${this.config.APIUrl}/schedule/saveFile`,
+      url: `${this.mainConfig.APIUrl}/schedule/saveFile`,
       data: {filename, url},
     });
     const saveFileResponse: SaveFileResponse = response.data;
