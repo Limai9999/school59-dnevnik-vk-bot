@@ -4,10 +4,12 @@ import fs from 'fs';
 import axios from 'axios';
 
 import Classes from './Classes';
+import Utils from './Utils';
 
-import {Settings} from '../types/VK/Settings';
+import {VKSettings} from '../types/VK/Settings';
 import {SendMessageData} from '../types/VK/SendMessageData';
 import {VKConfig} from '../types/Configs/VKConfig';
+import {MainConfig} from '../types/Configs/MainConfig';
 import {State} from '../types/VK/State';
 
 import {MessagesSendResponse} from '../types/VK/Responses/MessagesSendResponse';
@@ -15,9 +17,11 @@ import {GetUserResponse} from '../types/VK/Responses/GetUserResponse';
 import {GetChatResponse} from '../types/VK/Responses/GetChatResponse';
 import {PhotoUploadResponse} from '../types/Responses/PhotoUploadResponse';
 
+import {CommandInputData} from '../types/Commands';
+
 import {MainKeyboard} from '../keyboards/MainKeyboard';
 
-import {CommandInputData} from '../types/Commands';
+import {getMainConfig} from '../utils/getConfig';
 
 type TempMessage = {
   date: number
@@ -26,7 +30,9 @@ type TempMessage = {
 
 class VkService extends VK {
   classes: Classes;
+  utils: Utils;
   config: VKConfig;
+  mainConfig: MainConfig;
   savedKeyboards: {
     [peerId: number]: KeyboardBuilder;
   };
@@ -40,14 +46,16 @@ class VkService extends VK {
 
   messages: TempMessage[];
 
-  constructor({config, classes, token, isUser}: Settings) {
+  constructor({config, classes, token, utils, isUser}: VKSettings) {
     super({
       token,
       language: 'ru',
     });
 
     this.classes = classes;
+    this.utils = utils;
     this.config = config;
+    this.mainConfig = getMainConfig();
     this.savedKeyboards = {};
 
     this.me = {name: '', id: 0, isUser};
@@ -90,7 +98,7 @@ class VkService extends VK {
       stopTimeout = setTimeout(() => {
         clearInterval(findInterval);
         resolve(null);
-      }, 1000 * 60 * 3);
+      }, 1000 * 60 * 5);
     });
   }
 
@@ -163,7 +171,7 @@ class VkService extends VK {
   }
 
   async sendMessage({message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false, useAll}: SendMessageData): Promise<number> {
-    const isPrivateMessages = peerId <= 2000000000;
+    const isPrivateMessages = this.utils.checkIfPeerIsDM(peerId);
 
     const classData = await this.classes.getClass(peerId);
 
@@ -207,7 +215,7 @@ class VkService extends VK {
 
     try {
       const response = await this.api.messages.send({
-        message: useAll ? message + ' [@all]' : message,
+        message: useAll ? message + '\n[@all]' : message,
         peer_ids: peerId,
         random_id: Math.floor(Math.random() * 10000) * Date.now(),
         attachment,
