@@ -234,9 +234,9 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
       });
     }
 
-    const isAlreadyExists = classData.manualSchedule.find((existingSchedule) => existingSchedule.schedule!.filename === parsedSchedule.schedule!.filename);
+    const alreadyExistingSchedule = classData.manualSchedule.find((existingSchedule) => existingSchedule.schedule!.filename === parsedSchedule.schedule!.filename) as ParseScheduleResponse;
 
-    if (isAlreadyExists) {
+    if (alreadyExistingSchedule) {
       classData.manualSchedule = classData.manualSchedule.filter((existingSchedule) => existingSchedule.schedule!.filename !== parsedSchedule.schedule!.filename);
     }
 
@@ -246,12 +246,31 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const ownerData = await vk.getUser(message.senderId);
     const {first_name, last_name, sex} = ownerData!;
 
-    const action = isAlreadyExists ? 'обновил' : 'добавил';
+    const {isChanged, keyboard, changesList} = await schedule.compare(alreadyExistingSchedule, parsedSchedule, message.peerId, false, true);
+
+    const action = alreadyExistingSchedule && !isChanged ? 'обновил' : 'добавил';
     const genderifiedAction = utils.genderifyWord(action, sex);
 
+    let resultMessage = '';
+
+    if (isChanged) {
+      resultMessage = `${first_name} ${last_name} ${genderifiedAction} изменённый файл с расписанием:\n${filename}`;
+
+      if (changesList!.length) {
+        const changesStrings = changesList!.map((change, index) => {
+          return `${index + 1} - ${change}`;
+        });
+
+        resultMessage += `\n\nИзменения:\n${changesStrings.join('\n')}`;
+      }
+    } else {
+      resultMessage = `${first_name} ${last_name} ${genderifiedAction} файл с расписанием:\n${filename}`;
+    }
+
     await vk.sendMessage({
-      message: `${first_name} ${last_name} ${genderifiedAction} файл с расписанием: "${filename}"`,
+      message: resultMessage,
       peerId: chosenChat,
+      keyboard,
       useAll: true,
     });
 
