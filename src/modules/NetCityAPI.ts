@@ -5,6 +5,7 @@ import {GetStudentDiary} from '../types/Responses/API/netCity/GetStudentDiary';
 import {InitStudentDiary} from '../types/Responses/API/netCity/InitStudentDiary';
 import {GetAnnouncementsResponse, Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import {DownloadAttachmentResponse} from '../types/Responses/API/netCity/DownloadAttachmentResponse';
+import {CloseSessionResponse} from '../types/Responses/API/netCity/CloseSessionResponse';
 
 import {MainConfig} from '../types/Configs/MainConfig';
 
@@ -117,16 +118,13 @@ class NetCityAPI {
     }
   }
 
-  async closeSession(sessionId: number) {
+  async closeSession(sessionId: number): Promise<CloseSessionResponse> {
     const request = await axios({
       url: `${this.config.APIUrl}/netcity/closeSession`,
       data: {sessionId},
     });
 
-    const data = request.data as {
-      status: boolean
-      error?: string
-    };
+    const data = request.data as CloseSessionResponse;
 
     this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
 
