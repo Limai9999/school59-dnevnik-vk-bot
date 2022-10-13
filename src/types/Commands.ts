@@ -10,6 +10,8 @@ import NetCityAPI from '../modules/NetCityAPI';
 
 import {Payload} from './VK/Payloads/Payload';
 
+import {MainConfig} from './Configs/MainConfig';
+
 export type CommandInputData = {
   vk: VKService;
   vkUser: VKService;
@@ -23,6 +25,7 @@ export type CommandInputData = {
   schedule: Schedule
   utils: Utils
   netcityAPI: NetCityAPI
+  mainConfig: MainConfig
 };
 
 export type CommandOutputData = {
