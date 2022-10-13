@@ -37,7 +37,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig}: CommandInputData) {
   const {text, peerId, senderId, messagePayload, id} = message;
 
   if (message.isDM) {
@@ -57,7 +57,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
 
-  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI});
+  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig});
 
   let foundCommandAlias = '';
 
@@ -144,5 +144,13 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     });
   }
 
-  command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI});
+  if (mainConfig.testMode && (peerId !== vk.config.adminChatID && senderId !== vk.config.adminUserID)) {
+    return vk.sendMessage({
+      message: 'Бот временно отключён, попробуйте позже.',
+      peerId: message.peerId,
+      priority: 'low',
+    });
+  }
+
+  await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig});
 };

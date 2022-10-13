@@ -14,7 +14,7 @@ import Schedule from './modules/Schedule';
 import Utils from './modules/Utils';
 import NetCityAPI from './modules/NetCityAPI';
 
-import {getVKConfig, getMongoDBConfig} from './utils/getConfig';
+import {getVKConfig, getMongoDBConfig, getMainConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
 
 const {url} = getMongoDBConfig();
@@ -27,6 +27,11 @@ mongoose.connect(url, {}, (err) => {
   console.log('Mongo DB подключено.'.green);
 });
 
+const mainConfig = getMainConfig();
+
+const testNotice = mainConfig.testMode ? 'БОТ ЗАПУЩЕН В ТЕСТОВОМ РЕЖИМЕ'.bgRed : '';
+console.log(testNotice);
+
 const classes = new Classes();
 const statistics = new MessageStatistics();
 const utils = new Utils();
@@ -36,12 +41,14 @@ const VKConfig = getVKConfig();
 const vkBot = new VK({
   token: VKConfig.bot_token,
   config: VKConfig,
+  utils,
   classes,
   isUser: false,
 });
 const vkUser = new VK({
   token: VKConfig.user_token,
   config: VKConfig,
+  utils,
   classes,
   isUser: true,
 });
@@ -81,7 +88,7 @@ async function start() {
   console.log('\nБот запущен!'.green);
 
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig});
   });
 }
 
