@@ -37,6 +37,7 @@ export type CommandOutputData = {
     admin: boolean;
     dmOnly: boolean;
     args: number;
+    paidSubscription: boolean;
   };
   showInAdditionalMenu: boolean;
   showInCommandsList: boolean;

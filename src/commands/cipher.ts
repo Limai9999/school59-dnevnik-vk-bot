@@ -40,6 +40,7 @@ const cmd: CommandOutputData = {
     admin: false,
     dmOnly: true,
     args: 1,
+    paidSubscription: false,
   },
   showInAdditionalMenu: false,
   showInCommandsList: true,

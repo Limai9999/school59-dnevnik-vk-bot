@@ -293,6 +293,7 @@ const cmd: CommandOutputData = {
     admin: false,
     dmOnly: true,
     args: 0,
+    paidSubscription: false,
   },
   showInAdditionalMenu: true,
   showInCommandsList: true,
