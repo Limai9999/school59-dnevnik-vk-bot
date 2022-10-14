@@ -9,7 +9,7 @@ import Utils from './Utils';
 import {Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
 import {SaveFileResponse} from '../types/Responses/API/schedule/SaveFileResponse';
-import {CompareResponse} from '../types/Responses/Schedule/CompareResponse';
+import {CompareResponse} from '../types/Schedule/CompareResponse';
 
 import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 

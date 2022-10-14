@@ -1,4 +1,5 @@
 import {CommandInputData, CommandOutputData} from '../types/Commands';
+import {SubscriptionData} from '../types/Subscription/SubscriptionData';
 
 import {Payload} from '../types/VK/Payloads/Payload';
 
@@ -6,21 +7,29 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   isAdminChat: boolean,
   isDMChat: boolean,
   args: string[],
+  subscriptionData: SubscriptionData,
 }}) {
-  const {isAdminChat, isDMChat, args} = data;
+  const {isAdminChat, isDMChat, args, subscriptionData} = data;
   const {requirements, name, howToUse} = command;
-
-  if (requirements.dmOnly && !isDMChat) {
-    return {
-      status: false,
-      errorMessage: 'Эта команда работает только в личных сообщениях.',
-    };
-  }
 
   if (requirements.admin && !isAdminChat) {
     return {
       status: false,
       errorMessage: null,
+    };
+  }
+
+  if (requirements.paidSubscription && isDMChat && !subscriptionData.active) {
+    return {
+      status: false,
+      errorMessage: 'Для использования этой команды необходимо оплатить подписку.',
+    };
+  }
+
+  if (requirements.dmOnly && !isDMChat) {
+    return {
+      status: false,
+      errorMessage: 'Эта команда работает только в личных сообщениях.',
     };
   }
 
@@ -37,7 +46,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription}: CommandInputData) {
   const {text, peerId, senderId, messagePayload, id} = message;
 
   if (message.isDM) {
@@ -50,6 +59,10 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   const isMessagesHandling = classData.handleMessages;
   const isLoading = classData.isLoading;
 
+  const subscriptionData = await subscription.checkSubscription(peerId);
+
+  // console.log('data sub', subscriptionData);
+
   if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`.yellow);
 
   const isAdminChat = peerId === vk.config.adminChatID;
@@ -57,7 +70,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
 
-  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig});
+  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription});
 
   let foundCommandAlias = '';
 
@@ -121,7 +134,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!command) return;
 
-  const {status, errorMessage} = checkCommand({command, data: {isAdminChat, isDMChat, args}});
+  const {status, errorMessage} = checkCommand({command, data: {isAdminChat, isDMChat, args, subscriptionData}});
 
   if (!status) {
     if (!errorMessage) return;
@@ -152,5 +165,5 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     });
   }
 
-  await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig});
+  await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription});
 };

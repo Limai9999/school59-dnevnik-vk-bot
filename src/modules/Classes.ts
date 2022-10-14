@@ -1,7 +1,7 @@
 import Class from '../models/Class';
 
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
-
+import {SubscriptionData} from '../types/Subscription/SubscriptionData';
 export default class Classes {
   async getClass(peerId: number) {
     let data = await Class.findOne({id: peerId});
@@ -93,6 +93,13 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $set: {netcitySessionId},
+    });
+  }
+
+  async setSubscription(peerId: number, subscription: SubscriptionData) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {subscription},
     });
   }
 };

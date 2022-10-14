@@ -7,6 +7,7 @@ import Event from '../modules/Event';
 import Schedule from '../modules/Schedule';
 import Utils from '../modules/Utils';
 import NetCityAPI from '../modules/NetCityAPI';
+import Subscription from '../modules/Subscription';
 
 import {Payload} from './VK/Payloads/Payload';
 
@@ -26,6 +27,7 @@ export type CommandInputData = {
   utils: Utils
   netcityAPI: NetCityAPI
   mainConfig: MainConfig
+  subscription: Subscription
 };
 
 export type CommandOutputData = {

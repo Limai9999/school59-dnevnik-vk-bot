@@ -66,6 +66,12 @@ const classSchema = new Schema({
   netcitySessionId: {
     type: Number,
   },
+  subscription: {
+    type: {
+      active: Boolean,
+      endDate: Number,
+    },
+  },
 }, {
   timestamps: true,
 });
