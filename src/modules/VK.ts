@@ -15,7 +15,7 @@ import {State} from '../types/VK/State';
 import {MessagesSendResponse} from '../types/VK/Responses/MessagesSendResponse';
 import {GetUserResponse} from '../types/VK/Responses/GetUserResponse';
 import {GetChatResponse} from '../types/VK/Responses/GetChatResponse';
-import {PhotoUploadResponse} from '../types/Responses/PhotoUploadResponse';
+import {PhotoUploadResponse} from '../types/VK/Responses/PhotoUploadResponse';
 
 import {CommandInputData} from '../types/Commands';
 
