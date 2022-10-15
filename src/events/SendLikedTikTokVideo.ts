@@ -110,7 +110,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
 const evt: EventOutputData = {
   name: 'sendLikedTikTokVideo',
   disabled: false,
-  executeProbability: 0.35,
+  executeProbability: 0.4,
   execute: executeEvent,
 };
 
