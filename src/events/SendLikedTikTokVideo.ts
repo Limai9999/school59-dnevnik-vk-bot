@@ -1,86 +1,63 @@
 import {EventInputData, EventOutputData} from '../types/Event/Events';
 
-import puppeteer from 'puppeteer';
 import axios from 'axios';
 import request from 'request-promise';
 
 import {getTikTokConfig, getMainConfig} from '../utils/getConfig';
-import waitMs from '../utils/waitMs';
 
-import {TikTokVideoDataResponse} from '../types/Responses/TikTokVideoDataResponse';
-import {UploadVideoResponse} from '../types/Responses/UploadVideoResponse';
+import {UploadVideoResponse} from '../types/VK/Responses/UploadVideoResponse';
 import {Attachment} from 'vk-io';
+import {ProfileDataResponse} from '../types/Responses/TikTok/ProfileDataResponse';
+import {LikedVideosResponse} from '../types/Responses/TikTok/LikedVideosResponse';
+
+import waitMs from '../utils/waitMs';
 
 async function executeEvent({vk, vkUser, message}: EventInputData) {
   if (!message) return;
 
+  const tiktokRapidHOST = 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com';
+  const tiktokRapidAPIUrl = `https://${tiktokRapidHOST}`;
+
+  const {username} = getTikTokConfig();
+  const {rapidApiKey} = getMainConfig();
+
   try {
-    const {username, cookies} = getTikTokConfig();
-    const {rapidApiKey} = getMainConfig();
-
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      defaultViewport: null,
-    });
-    const page = await browser.newPage();
-
-    await page.setCookie(...cookies);
-
-    await page.goto(`https://www.tiktok.com/@${username}`, {
-      waitUntil: 'networkidle0',
-    });
-
-    // clicking on liked videos page
-    await page.click('[data-e2e="liked-tab"]');
-
-    // waiting for liked videos list
-    await page.waitForSelector('[data-e2e="user-liked-item-list"]');
-
-    await page.evaluate(() => {
-      window.scrollBy(0, window.innerHeight);
-    });
-
-    await waitMs(2000, 3000, false, '');
-
-    const videoLinks: string[] = await page.evaluate(() => {
-      const videos = document.querySelector('[data-e2e="user-liked-item-list"]')?.children!;
-
-      const links = Array.from(videos).map((video) => {
-        const userLikedItem = video.children[0];
-        const divWrapper = userLikedItem.children[0].children[0];
-        const linkElement = divWrapper.children[0] as HTMLAnchorElement;
-
-        const link = linkElement.href;
-
-        return link;
-      });
-
-      return links;
-    });
-    browser.close();
-
-    const randomVideoLink = videoLinks[Math.floor(Math.random() * videoLinks.length)];
-
-    const videoDataResponse = await axios({
-      method: 'GET',
-      url: 'https://tiktok-videos-without-watermark.p.rapidapi.com/getVideo',
-      params: {
-        url: randomVideoLink,
-      },
+    const userResponse = await axios({
+      url: `${tiktokRapidAPIUrl}/api/search_full`,
+      method: 'POST',
+      data: {username, amount_of_posts: 0},
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
-        'X-RapidAPI-Host': 'tiktok-videos-without-watermark.p.rapidapi.com',
+        'X-RapidAPI-Host': tiktokRapidHOST,
       },
     });
-    const videoData: TikTokVideoDataResponse = videoDataResponse.data;
 
-    const videoUrl = videoData.video.wihout_watermark.url_list[0];
+    const userData: ProfileDataResponse = userResponse.data;
 
-    const description = videoData.desc.length ? videoData.desc : 'видево прикол';
+    const {user: {sid}} = userData;
+
+    await waitMs(3500, 4000, true, 'ожидание перед вторым запросом');
+
+    const likedVideosResponse = await axios({
+      url: `${tiktokRapidAPIUrl}/api/liked`,
+      method: 'POST',
+      data: {sid, amount_of_posts: 20},
+      headers: {
+        'X-RapidAPI-Key': rapidApiKey,
+        'X-RapidAPI-Host': tiktokRapidHOST,
+      },
+    });
+
+    const likedVideosData: LikedVideosResponse = likedVideosResponse.data;
+
+    const randomVideo = likedVideosData.posts[Math.floor(Math.random() * likedVideosData.posts.length)];
+    const {description, play_links} = randomVideo;
+
+    const videoUrl = play_links[Math.floor(Math.random() * play_links.length)];
+    const descr = description.length ? description : 'видео прикол';
 
     const saveVideoResponse = await vkUser.api.video.save({
-      name: description,
+      name: descr,
       description,
       is_private: true,
       group_id: vk.me.id,
@@ -133,7 +110,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
 const evt: EventOutputData = {
   name: 'sendLikedTikTokVideo',
   disabled: false,
-  executeProbability: 0.3,
+  executeProbability: 0.35,
   execute: executeEvent,
 };
 
