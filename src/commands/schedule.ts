@@ -124,7 +124,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
           const {filename, date} = schedule.schedule!;
 
           keyboard.textButton({
-            label: date,
+            label: date || String(index + 1),
             color: Keyboard.SECONDARY_COLOR,
             payload: {
               command: 'schedule',
@@ -181,11 +181,11 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
         const {date, schedule, totalLessons, startTime, filename, creationTime} = scheduleData.schedule!;
 
         const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
-
         const totalLessonsAndStartTimeString = totalLessons === 1 ? `Всего 1 урок, начинающийся в ${startTime}.` : `Всего уроков: ${totalLessons}, начинаются в ${startTime}.`;
+        const dateString = date ? `Расписание на ${date}` : 'Неизвестное расписание';
 
         vk.sendMessage({
-          message: `Расписание на ${date}\n\n${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
+          message: `${dateString}\n\n${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
           peerId,
           priority: 'high',
         });

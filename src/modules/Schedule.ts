@@ -211,7 +211,7 @@ export default class Schedule {
     const keyboard = Keyboard.builder()
         .inline()
         .textButton({
-          label: newSchedule.schedule!.date,
+          label: newSchedule.schedule!.date || 'Открыть',
           color: isManual ? Keyboard.SECONDARY_COLOR : Keyboard.PRIMARY_COLOR,
           payload: {
             command: 'schedule',
@@ -221,8 +221,10 @@ export default class Schedule {
 
     if (!oldSchedule || !oldSchedule.status) {
       if (announce) {
+        const dateString = newSchedule.schedule!.date ? `с расписанием на ${newSchedule.schedule!.date}` : 'с неизвестным расписанием';
+
         this.vk.sendMessage({
-          message: `Добавился новый файл с расписанием на ${newSchedule.schedule!.date}.`,
+          message: `Добавился новый файл ${dateString}.`,
           peerId: announceChat,
           keyboard,
         });

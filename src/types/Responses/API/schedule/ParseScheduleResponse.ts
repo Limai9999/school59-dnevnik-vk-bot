@@ -12,7 +12,7 @@ export type ParseScheduleResponse = {
     }[]
     startTime: string
     totalLessons: number
-    date: string
+    date?: string
     filename: string
     room?: number
     creationTime: number
