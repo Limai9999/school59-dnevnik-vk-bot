@@ -113,10 +113,13 @@ export default class Schedule {
         const {attachments} = announce;
 
         const matchRegexp = /расписание|изменения|расписании/g;
+        const skipRegexp = /основное|полугодие/g;
 
         attachments.map((attachment) => {
           const isAttachmentNameMatch = attachment.name.match(matchRegexp);
-          if (isAttachmentNameMatch) scheduleFiles.push(attachment);
+          const mustSkip = attachment.name.match(skipRegexp);
+
+          if (isAttachmentNameMatch && !mustSkip) scheduleFiles.push(attachment);
         });
       });
     }
