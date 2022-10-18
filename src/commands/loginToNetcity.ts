@@ -65,7 +65,7 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
     const {students} = studentData.data!;
     const {nickName} = students[0];
 
-    const studentString = `Ученик: ${nickName}`;
+    const studentString = `Ученик: ${nickName} - ID сессии: ${session.session.id}`;
 
     removeLoadingMessage();
     await classes.setLoading(peerId, false);
