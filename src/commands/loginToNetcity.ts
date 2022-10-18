@@ -1,12 +1,10 @@
-import {Keyboard} from 'vk-io';
-
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
 import Password from '../modules/Password';
 
 import {LoginToNetcityPayload} from '../types/VK/Payloads/LoginToNetcityPayload';
-import {GradesPayload} from '../types/VK/Payloads/GradesPayload';
-import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
+
+import {LoginToNetcityKeyboard} from '../keyboards/LoginToNetcityKeyboard';
 
 async function command({vk, classes, message, netcityAPI, payload, utils}: CommandInputData) {
   let loadingMessageID = 0;
@@ -72,30 +70,7 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
     removeLoadingMessage();
     await classes.setLoading(peerId, false);
 
-    const keyboard = Keyboard.builder()
-        .inline()
-        .textButton({
-          label: 'Расписание на сегодня',
-          color: Keyboard.POSITIVE_COLOR,
-          payload: {command: 'schedule', data: {action: 'netCityGetToday'}} as SchedulePayload,
-        })
-        .row()
-        .textButton({
-          label: 'Оценки за сегодня',
-          color: Keyboard.SECONDARY_COLOR,
-          payload: {command: 'grades', data: {action: 'today'}} as GradesPayload,
-        })
-        .textButton({
-          label: 'Средний балл',
-          color: Keyboard.SECONDARY_COLOR,
-          payload: {command: 'grades', data: {action: 'average'}} as GradesPayload,
-        })
-        .row()
-        .textButton({
-          label: 'Выйти из Сетевого Города',
-          color: Keyboard.NEGATIVE_COLOR,
-          payload: {command: 'loginToNetcity', data: {action: 'logout'}} as LoginToNetcityPayload,
-        });
+    const keyboard = LoginToNetcityKeyboard;
 
     await vk.sendMessage({
       peerId,
