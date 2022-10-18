@@ -15,6 +15,7 @@ import Utils from './modules/Utils';
 import NetCityAPI from './modules/NetCityAPI';
 import Subscription from './modules/Subscription';
 import API from './modules/API';
+import Grades from './modules/Grades';
 
 import {getVKConfig, getMongoDBConfig, getMainConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
@@ -60,6 +61,7 @@ const subscription = new Subscription(vkBot, classes, utils);
 
 const netcityAPI = new NetCityAPI(vkBot, classes, utils, api);
 const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api);
+const grades = new Grades(vkBot, classes, utils, netcityAPI, api);
 
 async function start() {
   await vkBot.init();
@@ -92,7 +94,7 @@ async function start() {
   console.log('\nБот запущен!'.green);
 
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades});
   });
 }
 

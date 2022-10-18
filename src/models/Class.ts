@@ -21,6 +21,27 @@ const parsedSchedule = {
   },
 };
 
+const totalStudentReport = {
+  status: Boolean,
+  error: String,
+  info: [String],
+  result: {
+    daysData: {
+      month: String,
+      day: String,
+      lessonsWithGrades: [{
+        grades: [String],
+        lesson: String,
+      }],
+    },
+    averageGrades: [{
+      lesson: String,
+      average: String,
+    }],
+  },
+  screenshot: String,
+};
+
 const classSchema = new Schema({
   id: {
     type: Number,
@@ -71,6 +92,13 @@ const classSchema = new Schema({
       active: Boolean,
       endDate: Number,
     },
+  },
+  totalStudentReport: {
+    type: totalStudentReport,
+  },
+  lastUpdatedTotalStudentReport: {
+    type: Number,
+    default: 0,
   },
 }, {
   timestamps: true,

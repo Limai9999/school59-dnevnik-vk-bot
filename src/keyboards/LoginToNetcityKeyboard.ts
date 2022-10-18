@@ -13,14 +13,9 @@ export const LoginToNetcityKeyboard = Keyboard.builder()
     })
     .row()
     .textButton({
-      label: 'Оценки за сегодня',
+      label: 'Оценки',
       color: Keyboard.SECONDARY_COLOR,
-      payload: {command: 'grades', data: {action: 'today'}} as GradesPayload,
-    })
-    .textButton({
-      label: 'Средний балл',
-      color: Keyboard.SECONDARY_COLOR,
-      payload: {command: 'grades', data: {action: 'average'}} as GradesPayload,
+      payload: {command: 'grades', data: {action: 'chooseMenu'}} as GradesPayload,
     })
     .row()
     .textButton({

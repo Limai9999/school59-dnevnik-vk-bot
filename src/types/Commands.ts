@@ -9,6 +9,7 @@ import Utils from '../modules/Utils';
 import NetCityAPI from '../modules/NetCityAPI';
 import Subscription from '../modules/Subscription';
 import API from '../modules/API';
+import Grades from '../modules/Grades';
 
 import {Payload} from './VK/Payloads/Payload';
 
@@ -25,6 +26,7 @@ export type CommandInputData = {
   statistics: MessageStatisticsService;
   events: Event;
   schedule: Schedule
+  grades: Grades
   utils: Utils
   netcityAPI: NetCityAPI
   mainConfig: MainConfig

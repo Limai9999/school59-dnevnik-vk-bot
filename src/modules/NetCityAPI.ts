@@ -6,6 +6,7 @@ import {InitStudentDiary} from '../types/Responses/API/netCity/InitStudentDiary'
 import {GetAnnouncementsResponse, Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import {DownloadAttachmentResponse} from '../types/Responses/API/netCity/DownloadAttachmentResponse';
 import {CloseSessionResponse} from '../types/Responses/API/netCity/CloseSessionResponse';
+import {GetTotalStudentReport} from '../types/Responses/API/grades/GetTotalStudentReport';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -105,6 +106,8 @@ class NetCityAPI {
 
       return {
         peerId,
+        login,
+        password,
         status: false,
         error: `${error}`,
         session: {id: 0, endTime: 0},
@@ -311,6 +314,49 @@ class NetCityAPI {
         status: false,
         error: `${error}`,
         filename,
+      };
+    }
+  }
+
+  async getTotalStudentReport(peerId: number): Promise<GetTotalStudentReport> {
+    try {
+      const credentials = await this.getCredentials(peerId);
+      if (!credentials) {
+        return {
+          status: false,
+          error: 'Вы не ввели данные для Сетевого Города.',
+          info: [],
+          result: {averageGrades: [], daysData: []},
+        };
+      }
+
+      const {login, password} = credentials;
+
+      const session = await this.findOrCreateSession(peerId, login, password, false);
+      if (!session) {
+        return {
+          status: false,
+          error: 'Вы не вошли в Сетевой Город.',
+          info: [],
+          result: {averageGrades: [], daysData: []},
+        };
+      }
+
+      const response = await this.api.request({
+        url: '/grades/getTotalStudentReport',
+        data: {sessionId: session.session.id},
+      });
+      if (!response) throw new Error('Не удалось обратиться к API.');
+
+      const data = response.data as GetTotalStudentReport;
+
+      return data;
+    } catch (error) {
+      return {
+        status: false,
+        error: `${error}`,
+        info: [],
+        result: {averageGrades: [], daysData: []},
       };
     }
   }
