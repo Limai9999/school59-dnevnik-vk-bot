@@ -8,6 +8,7 @@ import Schedule from '../modules/Schedule';
 import Utils from '../modules/Utils';
 import NetCityAPI from '../modules/NetCityAPI';
 import Subscription from '../modules/Subscription';
+import API from '../modules/API';
 
 import {Payload} from './VK/Payloads/Payload';
 
@@ -28,6 +29,7 @@ export type CommandInputData = {
   netcityAPI: NetCityAPI
   mainConfig: MainConfig
   subscription: Subscription
+  api: API
 };
 
 export type CommandOutputData = {

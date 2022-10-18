@@ -14,6 +14,7 @@ import Schedule from './modules/Schedule';
 import Utils from './modules/Utils';
 import NetCityAPI from './modules/NetCityAPI';
 import Subscription from './modules/Subscription';
+import API from './modules/API';
 
 import {getVKConfig, getMongoDBConfig, getMainConfig} from './utils/getConfig';
 import getCommands from './utils/getCommands';
@@ -36,6 +37,7 @@ console.log(testNotice);
 const classes = new Classes();
 const statistics = new MessageStatistics();
 const utils = new Utils();
+const api = new API();
 
 const VKConfig = getVKConfig();
 
@@ -56,8 +58,8 @@ const vkUser = new VK({
 
 const subscription = new Subscription(vkBot, classes, utils);
 
-const netcityAPI = new NetCityAPI(vkBot, classes, utils);
-const schedule = new Schedule(vkBot, classes, netcityAPI, utils);
+const netcityAPI = new NetCityAPI(vkBot, classes, utils, api);
+const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api);
 
 async function start() {
   await vkBot.init();
@@ -90,7 +92,7 @@ async function start() {
   console.log('\nБот запущен!'.green);
 
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription});
+    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api});
   });
 }
 

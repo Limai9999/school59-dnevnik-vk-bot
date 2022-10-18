@@ -46,7 +46,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription}: CommandInputData) {
+export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api}: CommandInputData) {
   const {text, peerId, senderId, messagePayload, id} = message;
 
   if (message.isDM) {
@@ -70,7 +70,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
 
-  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription});
+  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription, api});
 
   let foundCommandAlias = '';
 
@@ -165,5 +165,5 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     });
   }
 
-  await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription});
+  await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api});
 };

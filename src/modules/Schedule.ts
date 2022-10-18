@@ -1,10 +1,10 @@
-import axios from 'axios';
 import {Keyboard} from 'vk-io';
 
 import VK from './VK';
 import Classes from './Classes';
 import NetCityAPI from './NetCityAPI';
 import Utils from './Utils';
+import API from './API';
 
 import {Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
@@ -28,14 +28,16 @@ export default class Schedule {
   classes: Classes;
   netCity: NetCityAPI;
   utils: Utils;
+  api: API;
 
   mainConfig: MainConfig;
 
-  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils) {
+  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils, api: API) {
     this.vk = vk;
     this.classes = classes;
     this.netCity = netCity;
     this.utils = utils;
+    this.api = api;
 
     this.mainConfig = getMainConfig();
   }
@@ -165,13 +167,15 @@ export default class Schedule {
   }
 
   async parse(filename: string, className: string) {
-    const parseScheduleResponse = await axios({
-      url: `${this.mainConfig.APIUrl}/schedule/parse`,
+    const parseScheduleResponse = await this.api.request({
+      url: `/schedule/parse`,
       data: {
         filename,
         className,
       },
     });
+    if (!parseScheduleResponse) throw new Error('Не удалось обратиться к API.');
+
     const parseScheduleData: ParseScheduleResponse = parseScheduleResponse.data;
 
     return parseScheduleData;
@@ -300,11 +304,13 @@ export default class Schedule {
   }
 
   async saveFile(url: string, filename: string): Promise<boolean> {
-    const response = await axios({
+    const response = await this.api.request({
       method: 'post',
-      url: `${this.mainConfig.APIUrl}/schedule/saveFile`,
+      url: `/schedule/saveFile`,
       data: {filename, url},
     });
+    if (!response) throw new Error('Не удалось обратиться к API.');
+
     const saveFileResponse: SaveFileResponse = response.data;
 
     return saveFileResponse.status;

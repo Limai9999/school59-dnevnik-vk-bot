@@ -7,14 +7,11 @@ import {GetAnnouncementsResponse, Attachment} from '../types/Responses/API/netCi
 import {DownloadAttachmentResponse} from '../types/Responses/API/netCity/DownloadAttachmentResponse';
 import {CloseSessionResponse} from '../types/Responses/API/netCity/CloseSessionResponse';
 
-import {MainConfig} from '../types/Configs/MainConfig';
-
-import {getMainConfig} from '../utils/getConfig';
-
 import Classes from './Classes';
 import Utils from './Utils';
 import VK from './VK';
 import Password from './Password';
+import API from './API';
 
 interface Session extends GetCookiesResponse {
   peerId: number
@@ -26,17 +23,15 @@ class NetCityAPI {
   vk: VK;
   classes: Classes;
   utils: Utils;
+  api: API;
 
-  config: MainConfig;
-
-  constructor(vk: VK, classes: Classes, utils: Utils) {
+  constructor(vk: VK, classes: Classes, utils: Utils, api: API) {
     this.sessions = [];
 
     this.vk = vk;
     this.classes = classes;
     this.utils = utils;
-
-    this.config = getMainConfig();
+    this.api = api;
   }
 
   async startSessionAutoCreating(peerId: number, index: number = 1) {
@@ -83,10 +78,11 @@ class NetCityAPI {
     if (existingSession) await this.closeSession(existingSession.session.id);
 
     try {
-      const request = await axios({
-        url: `${this.config.APIUrl}/netcity/getCookies`,
+      const request = await this.api.request({
+        url: `/netcity/getCookies`,
         data: {login, password},
       });
+      if (!request) throw new Error('Не удалось обратиться к API.');
 
       const session: Session = {
         peerId,
@@ -119,16 +115,26 @@ class NetCityAPI {
   }
 
   async closeSession(sessionId: number): Promise<CloseSessionResponse> {
-    const request = await axios({
-      url: `${this.config.APIUrl}/netcity/closeSession`,
-      data: {sessionId},
-    });
+    try {
+      const request = await this.api.request({
+        url: `/netcity/closeSession`,
+        data: {sessionId},
+      });
+      if (!request) throw new Error('Не удалось обратиться к API.');
 
-    const data = request.data as CloseSessionResponse;
+      const data = request.data as CloseSessionResponse;
 
-    this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
+      this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
 
-    return data;
+      return data;
+    } catch (error) {
+      console.log('closeSession ошибка'.red, error);
+
+      return {
+        status: false,
+        message: `${error}`,
+      };
+    }
   }
 
   async findOrCreateSession(peerId: number, login: string, password: string, forceCreate: boolean): Promise<Session> {
@@ -288,11 +294,12 @@ class NetCityAPI {
     const filename = attachment.name;
 
     try {
-      const request = await axios({
+      const request = await this.api.request({
         method: 'post',
-        url: `${this.config.APIUrl}/netcity/downloadAttachment`,
+        url: `/netcity/downloadAttachment`,
         data: {sessionId, attachmentId, filename, isTest},
       });
+      if (!request) throw new Error('Не удалось обратиться к API.');
 
       const data = request.data as DownloadAttachmentResponse;
 
