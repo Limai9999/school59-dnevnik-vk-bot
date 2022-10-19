@@ -333,10 +333,10 @@ class NetCityAPI {
       const {login, password} = credentials;
 
       const session = await this.findOrCreateSession(peerId, login, password, false);
-      if (!session) {
+      if (!session || !session.status) {
         return {
           status: false,
-          error: 'Вы не вошли в Сетевой Город.',
+          error: !session.status ? `При входе в Сетевой Город произошла ошибка:\n${session.error}` : 'Вы не вошли в Сетевой Город.',
           info: [],
           result: {averageGrades: [], daysData: []},
         };
