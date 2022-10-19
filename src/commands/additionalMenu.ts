@@ -63,7 +63,7 @@ const cmd: CommandOutputData = {
   aliases: ['дополнительно', 'additional menu'],
   description: 'включить дополнительное меню',
   payload: {
-    command: 'additional',
+    command: 'additionalMenu',
     data: {
       action: 'enable',
     },

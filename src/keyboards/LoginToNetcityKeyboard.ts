@@ -15,7 +15,7 @@ export const LoginToNetcityKeyboard = Keyboard.builder()
     .textButton({
       label: 'Оценки',
       color: Keyboard.SECONDARY_COLOR,
-      payload: {command: 'grades', data: {action: 'chooseMenu'}} as GradesPayload,
+      payload: {command: 'grades', data: {action: 'update', forceUpdate: false}} as GradesPayload,
     })
     .row()
     .textButton({

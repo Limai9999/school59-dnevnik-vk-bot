@@ -14,7 +14,7 @@ export const MainKeyboard = Keyboard.builder()
     .row()
     .textButton({
       label: 'Дополнительно',
-      payload: {command: 'additional', data: {
+      payload: {command: 'additionalMenu', data: {
         action: 'enable',
       }} as AdditionalMenuPayload,
       color: Keyboard.SECONDARY_COLOR,

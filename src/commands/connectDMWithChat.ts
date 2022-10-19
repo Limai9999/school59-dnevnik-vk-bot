@@ -61,7 +61,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
         payload: {
           command: 'connectDMWithChat',
           data: {
-            action: 'choosegroup',
+            action: 'chooseGroup',
             chatTitle: group.title,
             chatId: group.id,
           },
@@ -79,7 +79,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
       peerId: message.peerId,
       keyboard,
     });
-  } else if (connectDMPayload.data.action === 'choosegroup') {
+  } else if (connectDMPayload.data.action === 'chooseGroup') {
     const chosenChat = connectDMPayload.data.chatId!;
 
     const classData = await classes.getClass(chosenChat);
