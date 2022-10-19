@@ -26,14 +26,14 @@ const totalStudentReport = {
   error: String,
   info: [String],
   result: {
-    daysData: {
+    daysData: [{
       month: String,
       day: String,
       lessonsWithGrades: [{
         grades: [String],
         lesson: String,
       }],
-    },
+    }],
     averageGrades: [{
       lesson: String,
       average: String,
