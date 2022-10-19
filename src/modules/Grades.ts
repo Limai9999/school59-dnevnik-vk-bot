@@ -21,7 +21,7 @@ class Grades {
     this.api = api;
   }
 
-  async getTotalStudentReport(peerId: number) {
+  async getTotalStudentReport(peerId: number, forceUpdate: boolean) {
     const classData = await this.classes.getClass(peerId);
 
     const lastUpdatedDate = classData.lastUpdatedTotalStudentReport;
@@ -29,7 +29,7 @@ class Grades {
     const maxLastUpdateDifference = 1000 * 60 * 60;
     const lastUpdateDifference = Date.now() - lastUpdatedDate;
 
-    if (lastUpdateDifference > maxLastUpdateDifference) {
+    if (lastUpdateDifference > maxLastUpdateDifference || !classData.totalStudentReport!.status || forceUpdate) {
       const report = await this.netcityAPI.getTotalStudentReport(peerId);
 
       await this.classes.setLastUpdatedTotalStudentReportDate(peerId, Date.now());
