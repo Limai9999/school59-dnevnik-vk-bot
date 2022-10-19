@@ -34,8 +34,9 @@ export async function command({message, vk, classes, payload}: CommandInputData)
   const whereUserIsAdmin = adminStatuses.filter(({isAdmin}) => isAdmin);
 
   const connectDMPayload = payload as ConnectDMPayload;
+  const action = connectDMPayload.data.action;
 
-  if (connectDMPayload.data.action === 'findgroups') {
+  if (action === 'findgroups') {
     const totalGroups = whereUserIsAdmin.length;
 
     if (!totalGroups) {
@@ -79,7 +80,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
       peerId: message.peerId,
       keyboard,
     });
-  } else if (connectDMPayload.data.action === 'chooseGroup') {
+  } else if (action === 'chooseGroup') {
     const chosenChat = connectDMPayload.data.chatId!;
 
     const classData = await classes.getClass(chosenChat);

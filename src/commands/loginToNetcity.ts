@@ -9,7 +9,9 @@ import {LoginToNetcityKeyboard} from '../keyboards/LoginToNetcityKeyboard';
 async function command({vk, classes, message, netcityAPI, payload, utils}: CommandInputData) {
   let loadingMessageID = 0;
   const peerId = message.peerId;
+
   const loginToNetcityPayload = payload as LoginToNetcityPayload;
+  const action = loginToNetcityPayload.data.action;
 
   const removeLoadingMessage = () => {
     if (!loadingMessageID) return;
@@ -27,7 +29,7 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
     });
   };
 
-  if (!loginToNetcityPayload || loginToNetcityPayload.data.action === 'login') {
+  if (!loginToNetcityPayload || action === 'login') {
     await classes.setLoading(peerId, true);
 
     loadingMessageID = await vk.sendMessage({
@@ -77,7 +79,7 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
       message: `Вы успешно вошли в Сетевой Город.\n\n${studentString}\n\nВыберите действие:`,
       keyboard,
     });
-  } else if (loginToNetcityPayload.data.action === 'logout') {
+  } else if (action === 'logout') {
     const classData = await classes.getClass(peerId);
     const sessionId = classData.netcitySessionId;
 

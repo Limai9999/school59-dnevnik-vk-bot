@@ -9,6 +9,7 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
   const peerId = message.peerId;
 
   const gradesPayload = payload as GradesPayload;
+  const action = gradesPayload.data.action;
 
   let loadingMessageID = 0;
 
@@ -22,7 +23,7 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
     peerId,
   });
 
-  if (gradesPayload.data.action === 'update') {
+  if (action === 'update') {
     const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate);
     removeLoadingMessage();
 
@@ -56,17 +57,17 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
       message: `Отчёт об оценках:\n${lastUpdatedString}\n\n${studentInfo}\n\n${totalGradesString}\n\nВыберите действие:`,
       keyboard,
     });
-  } else if (gradesPayload.data.action === 'average') {
+  } else if (action === 'average') {
     await vk.sendMessage({
       peerId,
       message: 'Эта команда еще не реализована',
     });
-  } else if (gradesPayload.data.action === 'fullReport') {
+  } else if (action === 'fullReport') {
     await vk.sendMessage({
       peerId,
       message: 'Эта команда еще не реализована',
     });
-  } else if (gradesPayload.data.action === 'today') {
+  } else if (action === 'today') {
     await vk.sendMessage({
       peerId,
       message: 'Эта команда еще не реализована',

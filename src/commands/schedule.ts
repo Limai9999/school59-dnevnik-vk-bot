@@ -46,11 +46,12 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
 
   try {
     const schedulePayload = payload as SchedulePayload;
+    const action = schedulePayload.data.action;
 
     const maxFileLifeTime = 1000 * 60 * 60 * 24 * 2;
 
-    if (schedulePayload.data.action === 'get' || schedulePayload.data.action === 'update') {
-      const isForceUpdate = schedulePayload.data.action === 'update';
+    if (action === 'get' || action === 'update') {
+      const isForceUpdate = action === 'update';
 
       loadingMessageID = await vk.sendMessage({
         message: 'Поиск расписания начат, подождите...',
@@ -167,7 +168,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
       });
 
       await classes.setLoading(peerId, false);
-    } else if (schedulePayload.data.action === 'choose') {
+    } else if (action === 'choose') {
       const classData = await classes.getClass(peerId);
 
       const arrayWithSchedule = schedulePayload.data.type === 'netcity' ? classData.schedule : classData.manualSchedule;
@@ -198,7 +199,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
       }
 
       await classes.setLoading(peerId, false);
-    } else if (schedulePayload.data.action === 'netCityGetToday') {
+    } else if (action === 'netCityGetToday') {
       await classes.setLoading(peerId, false);
 
       await vk.sendMessage({
