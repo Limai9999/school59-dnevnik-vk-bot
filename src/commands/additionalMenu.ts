@@ -19,7 +19,7 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
     keyboard = Keyboard.builder()
         .textButton({
           label: 'Вернуться в главное меню',
-          payload: {command: 'additional', data: {action: 'disable'}} as AdditionalMenuPayload,
+          payload: {command: 'additionalMenu', data: {action: 'disable'}} as AdditionalMenuPayload,
         })
         .row();
 
