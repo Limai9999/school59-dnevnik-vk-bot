@@ -5,6 +5,7 @@ import Utils from './Utils';
 import VK from './VK';
 
 import {GetTotalStudentReport} from '../types/Responses/API/grades/GetTotalStudentReport';
+import {Readable} from 'stream';
 
 class Grades {
   vk: VK;
@@ -38,6 +39,37 @@ class Grades {
       return report;
     } else {
       return classData.totalStudentReport! as unknown as GetTotalStudentReport;
+    }
+  }
+
+  async getScreenshot(screenshotName: string) {
+    try {
+      const response = await this.api.request({
+        method: 'get',
+        url: '/grades/getReportScreenshot',
+        data: {screenshotName},
+        responseType: 'stream',
+      });
+      if (!response) throw new Error('Не удалось обратиться к API.');
+
+      const data = response.data as Readable;
+
+      if (response.status === 400) {
+        return {
+          status: false,
+          error: 'Не удалось получить скриншот с сервера.',
+        };
+      } else {
+        return {
+          status: true,
+          fileStream: data,
+        };
+      }
+    } catch (error) {
+      return {
+        status: false,
+        error: `${error}`,
+      };
     }
   }
 }
