@@ -14,6 +14,7 @@ class API {
 
     this.instance = axios.create({
       baseURL: this.mainConfig.APIUrl,
+      validateStatus: (status) => status >= 200 && status < 500,
     });
   }
 
