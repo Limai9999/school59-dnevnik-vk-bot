@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {Attachment} from 'vk-io';
 
 import {GradesKeyboard} from '../keyboards/GradesKeyboard';
 import {CommandInputData, CommandOutputData} from '../types/Commands';
@@ -23,10 +24,10 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
     peerId,
   });
 
-  if (action === 'update') {
-    const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate);
-    removeLoadingMessage();
+  const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate);
+  removeLoadingMessage();
 
+  if (action === 'update') {
     const classData = await classes.getClass(peerId);
 
     console.log(report);
@@ -63,9 +64,40 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
       message: 'Эта команда еще не реализована',
     });
   } else if (action === 'fullReport') {
+    const screenshotName = report.screenshot;
+    if (!screenshotName) {
+      return await vk.sendMessage({
+        peerId,
+        message: 'Не удалось получить скриншот.\nПопробуйте обновить отчёт.',
+      });
+    }
+
+    const result = await grades.getScreenshot(screenshotName);
+    if (!result.status) {
+      return await vk.sendMessage({
+        peerId,
+        message: result.error!,
+      });
+    }
+
+    const uploadResponse = await vk.uploadAndGetPhoto({peerId, stream: result.fileStream!});
+    if (!uploadResponse) {
+      return await vk.sendMessage({
+        peerId,
+        message: 'Не удалось загрузить картинку.\nПопробуйте обновить отчёт.',
+      });
+    }
+
+    const attachment = new Attachment({
+      api: vk.api,
+      type: 'photo',
+      payload: uploadResponse,
+    });
+
     await vk.sendMessage({
       peerId,
-      message: 'Эта команда еще не реализована',
+      attachment,
+      message: 'Полный отчёт об оценках из Сетевого Города:',
     });
   } else if (action === 'today') {
     await vk.sendMessage({
@@ -85,7 +117,7 @@ const cmd: CommandOutputData = {
   } as GradesPayload,
   requirements: {
     admin: false,
-    dmOnly: false,
+    dmOnly: true,
     args: 0,
     paidSubscription: true,
   },
