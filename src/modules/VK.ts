@@ -2,6 +2,7 @@ import {VK, KeyboardBuilder} from 'vk-io';
 import FormData from 'form-data';
 import fs from 'fs';
 import axios from 'axios';
+import {Readable} from 'stream';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -293,36 +294,41 @@ class VkService extends VK {
     return response[0];
   }
 
-  async uploadAndGetPhoto({photoPath, peerId, stream}: {photoPath?: string, peerId: number, stream?: any}) {
-    const {upload_url} = await this.api.photos.getMessagesUploadServer({
-      peer_id: peerId,
-    });
+  async uploadAndGetPhoto({photoPath, peerId, stream}: {photoPath?: string, peerId: number, stream?: Readable}) {
+    try {
+      const {upload_url} = await this.api.photos.getMessagesUploadServer({
+        peer_id: peerId,
+      });
 
-    const formData = new FormData();
+      const formData = new FormData();
 
-    if (stream) {
-      formData.append('photo', stream);
-    } else {
-      if (!photoPath) return console.log('no photo path'.red);
-      formData.append('photo', fs.createReadStream(photoPath));
+      if (stream) {
+        formData.append('photo', stream, {filename: 'photo.jpg'});
+      } else {
+        if (!photoPath) return console.log('no photo path'.red);
+        formData.append('photo', fs.createReadStream(photoPath));
+      }
+
+      const uploadResponse = await axios({
+        method: 'post',
+        url: upload_url,
+        data: formData,
+        headers: formData.getHeaders(),
+      });
+
+      const {server, hash, photo}: PhotoUploadResponse = uploadResponse.data;
+
+      const saved = await this.api.photos.saveMessagesPhoto({
+        photo,
+        server,
+        hash,
+      });
+
+      return saved[0];
+    } catch (error) {
+      console.log('Произошла ошибка в VK - uploadAndGetPhoto', error);
+      return false;
     }
-
-    const uploadResponse = await axios({
-      method: 'post',
-      url: upload_url,
-      data: formData,
-      headers: formData.getHeaders(),
-    });
-
-    const {server, hash, photo}: PhotoUploadResponse = uploadResponse.data;
-
-    const saved = await this.api.photos.saveMessagesPhoto({
-      photo,
-      server,
-      hash,
-    });
-
-    return saved[0];
   }
 }
 
