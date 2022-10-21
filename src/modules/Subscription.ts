@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import Classes from './Classes';
 import Utils from './Utils';
 import VK from './VK';
@@ -20,7 +22,7 @@ class Subscription {
 
     if (!classData.subscription) {
       const newData: SubscriptionData = {active: false, endDate: 0};
-      await this.updateSubscription(peerId, newData);
+      await this.updateSubscription(peerId, newData, false);
 
       return newData;
     }
@@ -30,7 +32,7 @@ class Subscription {
     const isExpired = endDate! < Date.now();
     if (active && isExpired) {
       const newData: SubscriptionData = {active: false, endDate: endDate!};
-      await this.updateSubscription(peerId, newData);
+      await this.updateSubscription(peerId, newData, false);
 
       await this.vk.sendMessage({
         message: `⚠️ Ваша подписка истекла, продлите её, если хотите пользоваться ботом.`,
@@ -43,8 +45,18 @@ class Subscription {
     return {active: active!, endDate: endDate!};
   }
 
-  async updateSubscription(peerId: number, subscription: SubscriptionData) {
+  async updateSubscription(peerId: number, subscription: SubscriptionData, notifyUser: boolean) {
     await this.classes.setSubscription(peerId, subscription);
+
+    const endDateString = moment(subscription.endDate).format('LLL');
+    const statusString = subscription.active ? `активна, действует до ${endDateString}` : 'неактивна';
+
+    if (notifyUser) {
+      await this.vk.sendMessage({
+        peerId,
+        message: `Ваша подписка была обновлена.\nТеперь она ${statusString}.`,
+      });
+    }
 
     console.log(`Подписка в ${peerId} была обновлена. Теперь она ${subscription.active ? 'активна' : 'неактивна'}.`.yellow);
   }
