@@ -41,7 +41,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
     const likedVideosResponse = await axios({
       url: `${tiktokRapidAPIUrl}/api/liked`,
       method: 'POST',
-      data: {sid, amount_of_posts: 20},
+      data: {sid, amount_of_posts: 40},
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': tiktokRapidHOST,
