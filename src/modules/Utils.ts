@@ -1,6 +1,6 @@
 import {GetCookiesResponse} from '../types/Responses/API/netCity/GetCookiesResponse';
 
-type setWordEndingType = 'scheduleFiles' | 'addedLessons'
+type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
@@ -41,6 +41,12 @@ export default class Utils {
       if (thingsStr.endsWith('1')) return 'Добавился 1 урок';
       if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return `Добавилось ${things} урока`;
       return `Добавилось ${things} уроков`;
+    }
+
+    if (type === 'totalGrades') {
+      if (thingsStr.endsWith('1')) return 'всего 1 оценка';
+      if (!thingsStr[0].startsWith('1') && (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4'))) return `всего ${things} оценки`;
+      return `всего ${things} оценок`;
     }
 
     return type;
