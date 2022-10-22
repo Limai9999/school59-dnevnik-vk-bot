@@ -49,7 +49,7 @@ const cmd: CommandOutputData = {
   },
   showInAdditionalMenu: false,
   showInCommandsList: true,
-  howToUse: '[логин] [пароль] [класс (напр: 9Б)]',
+  howToUse: '[логин] [пароль] [класс (напр: 9б)]',
   execute: command,
 };
 
