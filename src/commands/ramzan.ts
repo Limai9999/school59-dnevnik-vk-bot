@@ -1,3 +1,5 @@
+import {DMMainKeyboard} from '../keyboards/DMMainKeyboard';
+import {MainKeyboard} from '../keyboards/MainKeyboard';
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
 async function command({message, vk}: CommandInputData) {
@@ -20,18 +22,21 @@ async function command({message, vk}: CommandInputData) {
     'Артем Рулетов отключись',
   ];
 
-  const answer = random(answers);
+  let answer = random(answers);
+
+  if (message.text?.includes('клавиатура')) answer = 'Клавиатура открыта.';
 
   vk.sendMessage({
     message: answer,
     peerId: message.peerId,
     priority: 'low',
+    keyboard: message.isDM ? DMMainKeyboard : MainKeyboard,
   });
 }
 
 const cmd: CommandOutputData = {
   name: 'рамзан',
-  aliases: ['ramzan'],
+  aliases: ['ramzan', 'клавиатура'],
   description: 'тестовая команда',
   payload: {
     command: 'ramzan',

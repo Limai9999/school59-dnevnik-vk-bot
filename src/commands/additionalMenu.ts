@@ -4,6 +4,7 @@ import {CommandInputData, CommandOutputData} from '../types/Commands';
 import {AdditionalMenuPayload} from '../types/VK/Payloads/AdditionalMenuPayload';
 
 import {MainKeyboard} from '../keyboards/MainKeyboard';
+import {DMMainKeyboard} from '../keyboards/DMMainKeyboard';
 
 async function command({message, vk, classes, payload, commands}: CommandInputData) {
   const additionalMenuPayload = payload as AdditionalMenuPayload;
@@ -52,7 +53,7 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
       currentButtonsInRowCount++;
     });
   } else {
-    keyboard = MainKeyboard;
+    keyboard = message.isDM ? DMMainKeyboard : MainKeyboard;
   }
 
   vk.sendMessage({
