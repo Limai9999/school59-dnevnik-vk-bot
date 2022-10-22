@@ -17,7 +17,8 @@ async function command({message, vk, subscription, payload}: CommandInputData) {
   const statusString = subscriptionData.active ? `Ваша подписка активна\n\nДействует до ${endDate}` : 'У вас нет активной подписки.';
 
   if (action === 'status') {
-    const keyboard = Keyboard.builder();
+    const keyboard = Keyboard.builder()
+        .inline();
 
     if (!subscriptionData.active) {
       keyboard.textButton({
