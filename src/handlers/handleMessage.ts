@@ -112,9 +112,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   let args: string[] = [];
 
   if (text) {
-    args = text
-        .toLowerCase()
-        .replace(foundCommandAlias, '')
+    args = utils.caseInsensitiveReplace(text, foundCommandAlias, '')
         .trim()
         .split(' ')
         .filter((arg) => arg.length);
