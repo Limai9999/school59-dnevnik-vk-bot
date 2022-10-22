@@ -24,6 +24,8 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
     peerId,
   });
 
+  await grades.startAutoUpdate(peerId);
+
   const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate);
   removeLoadingMessage();
 
@@ -76,8 +78,8 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
       const {lesson, average} = averageGrade;
       const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
 
-      const allLessonGrades = getGradesByLesson(lesson);
-      const isNoGrades = !allLessonGrades.length;
+      const lessonGrades = getGradesByLesson(lesson);
+      const isNoGrades = !lessonGrades.length;
 
       const splittedAverage = average.split(',');
       const integer = Number(splittedAverage[0]);
@@ -99,9 +101,11 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
         roundedAverage = null;
       }
 
-      const isCertified = allLessonGrades.length >= 3;
+      const isCertified = lessonGrades.length >= 3;
 
-      const isCertifiedString = isCertified ? 'Аттестован ✅' : `Не аттестован ❌` + (isNoGrades ? '' : `, всего ${allLessonGrades.length} оценок`);
+      const lessonTotalGradesString = utils.setWordEndingBasedOnThingsCount('totalGrades', lessonGrades.length);
+
+      const isCertifiedString = isCertified ? 'Аттестован ✅' : `Не аттестован ❌` + (isNoGrades ? '' : `, ${lessonTotalGradesString}`);
       const roundedAverageString = roundedAverage && isCertified ? `\nОжидаемая оценка за четверть: ${roundedAverage}` : '';
 
       return `${index + 1}. ${abbreviatedLessonTitle}\n${isNoGrades ? 'Нет оценок' : `Балл ${averageNum}`}\n${isCertifiedString}${roundedAverageString}`;
@@ -202,7 +206,7 @@ const cmd: CommandOutputData = {
     color: Keyboard.POSITIVE_COLOR,
     positionSeparatelyFromAllButton: false,
   },
-  showInAdditionalMenu: true,
+  showInAdditionalMenu: false,
   showInCommandsList: true,
   howToUse: null,
   execute: command,
