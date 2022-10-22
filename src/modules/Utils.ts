@@ -45,4 +45,22 @@ export default class Utils {
 
     return type;
   }
+
+  caseInsensitiveReplace(original: string, searchValue: string, replaceValue: string) {
+    const regexp = new RegExp('('+searchValue+')', 'gi');
+    return original.replace(regexp, replaceValue);
+  }
+
+  abbreviateLessonTitle(lessonTitle: string) {
+    switch (lessonTitle) {
+      case 'История России. Всеобщая история':
+        return 'История';
+      case 'Иностранный язык (английский)':
+        return 'Английский язык';
+      case 'Основы безопасности жизнедеятельности':
+        return 'ОБЖ';
+    }
+
+    return lessonTitle;
+  }
 }
