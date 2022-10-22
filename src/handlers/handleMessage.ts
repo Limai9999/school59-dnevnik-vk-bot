@@ -10,10 +10,10 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   args: string[],
   subscriptionData: SubscriptionData,
 }}) {
-  const {isAdminChat, isDMChat, args, subscriptionData} = data;
+  const {isUserAdmin, isAdminChat, isDMChat, args, subscriptionData} = data;
   const {requirements, name, howToUse} = command;
 
-  if (requirements.admin && !isAdminChat) {
+  if (requirements.admin && !isAdminChat && !isUserAdmin) {
     return {
       status: false,
       errorMessage: null,
