@@ -1,4 +1,4 @@
-import {Keyboard, KeyboardBuilder} from 'vk-io';
+import {ButtonColor, Keyboard, KeyboardBuilder} from 'vk-io';
 
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 import {AdditionalMenuPayload} from '../types/VK/Payloads/AdditionalMenuPayload';
@@ -20,6 +20,7 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
         .textButton({
           label: 'Вернуться в главное меню',
           payload: {command: 'additionalMenu', data: {action: 'disable'}} as AdditionalMenuPayload,
+          color: Keyboard.NEGATIVE_COLOR,
         })
         .row();
 
@@ -27,23 +28,27 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
     const isAdminChat = message.peerId === vk.config.adminChatID;
 
     let currentButtonsInRowCount = 0;
-    commands.map(({name, payload, showInAdditionalMenu, requirements: {admin, dmOnly}}) => {
+    let lastKeyboardColor: ButtonColor;
+    commands.map(({name, payload, showInAdditionalMenu, requirements: {admin, dmOnly}, keyboardData}) => {
       if (!showInAdditionalMenu) return;
 
       if (dmOnly && !isDMChat) return;
       if (admin && !isAdminChat) return;
 
-      if (currentButtonsInRowCount >= 2) {
+      if (currentButtonsInRowCount >= 2 || (keyboardData && keyboardData.positionSeparatelyFromAllButton) || (keyboardData && keyboardData.color !== lastKeyboardColor)) {
         keyboard!.row();
         currentButtonsInRowCount = 0;
       }
 
+      const keyboardColor = (keyboardData && keyboardData.color) ? keyboardData.color : Keyboard.PRIMARY_COLOR;
+
       keyboard!.textButton({
         label: name[0].toUpperCase() + name.slice(1),
         payload,
-        color: admin ? Keyboard.NEGATIVE_COLOR : Keyboard.PRIMARY_COLOR,
+        color: keyboardColor,
       });
 
+      lastKeyboardColor = keyboardColor;
       currentButtonsInRowCount++;
     });
   } else {
