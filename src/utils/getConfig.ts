@@ -6,6 +6,8 @@ import {MainConfig} from '../types/Configs/MainConfig';
 import {EventConfig} from '../types/Configs/EventConfig';
 import {TikTokConfig} from '../types/Configs/TikTokConfig';
 
+import {GetTotalStudentReport} from '../types/Responses/API/grades/GetTotalStudentReport';
+
 export function getVKConfig(): VKConfig {
   return new Config('vk.json').getData();
 };
@@ -25,3 +27,7 @@ export function getEventConfig(): EventConfig {
 export function getTikTokConfig(): TikTokConfig {
   return new Config('tiktok.json').getData();
 };
+
+export function getGradesDebugData(): GetTotalStudentReport {
+  return new Config('gradesDebugData.json').getData();
+}
