@@ -85,7 +85,7 @@ export default class Schedule {
       if (data.status) {
         console.log(`${peerType} ${peerId} успешно обновлено расписание.`.cyan);
       } else {
-        console.log(`Не удалось обновить расписание ${peerType} ${peerId}.`.cyan);
+        console.log(`Не удалось обновить расписание ${peerType} ${peerId}. Ошибка:`.cyan, data.error!);
       }
     }, autoUpdateTime);
 

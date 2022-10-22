@@ -74,7 +74,7 @@ class NetCityAPI {
       }
 
       const session = await this.createSession(peerId, login, password);
-      if (!session.status) return console.log(`Не удалось обновить сессию Сетевого Города в классе ${peerId} - ${className}.`.bgRed.cyan);
+      if (!session.status) return console.log(`Не удалось обновить сессию Сетевого Города в классе ${peerId} - ${className}. Ошибка:`.bgRed.cyan, session.error!);
 
       await this.classes.setNetCitySessionId(peerId, session.session.id);
 
