@@ -59,9 +59,9 @@ const vkUser = new VK({
 
 const subscription = new Subscription(vkBot, classes, utils);
 
-const netcityAPI = new NetCityAPI(vkBot, classes, utils, api);
-const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api);
-const grades = new Grades(vkBot, classes, utils, netcityAPI, api);
+const netcityAPI = new NetCityAPI(vkBot, classes, utils, api, subscription);
+const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api, subscription);
+const grades = new Grades(vkBot, classes, utils, netcityAPI, api, subscription);
 
 async function start() {
   await vkBot.init();
@@ -75,6 +75,7 @@ async function start() {
 
     await netcityAPI.startSessionAutoCreating(id, index + 1);
     await schedule.startAutoUpdate(id, index + 1);
+    await grades.startAutoUpdate(id, index + 1);
   }));
 
   console.log(`Бот обрабатывает ${allClasses.length} чатов.`);
