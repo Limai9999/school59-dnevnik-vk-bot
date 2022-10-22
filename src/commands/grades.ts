@@ -1,12 +1,12 @@
 import moment from 'moment';
-import {Attachment} from 'vk-io';
+import {Attachment, Keyboard} from 'vk-io';
 
 import {GradesKeyboard} from '../keyboards/GradesKeyboard';
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
 import {GradesPayload} from '../types/VK/Payloads/GradesPayload';
 
-async function command({message, classes, vk, payload, grades}: CommandInputData) {
+async function command({message, classes, vk, payload, grades, utils}: CommandInputData) {
   const peerId = message.peerId;
 
   const gradesPayload = payload as GradesPayload;
@@ -34,7 +34,7 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
 
     if (!report.status) {
       return vk.sendMessage({
-        message: `Не удалось получить отчёт с оценками, ошибка:\n${report.error!}`,
+        message: `Не удалось получить отчёт с оценками, ошибка:\n\n${report.error!}`,
         peerId,
       });
     }
@@ -47,8 +47,8 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
         totalGrades += lessonWithGrade.grades.length;
       });
     });
-    const totalGradesString = `Всего оценок: ${totalGrades}`;
 
+    const totalGradesString = `Всего оценок: ${totalGrades}`;
     const lastUpdatedString = `Обновлен: ${moment(classData.lastUpdatedTotalStudentReport).fromNow()}`;
 
     const keyboard = GradesKeyboard;
@@ -59,9 +59,91 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
       keyboard,
     });
   } else if (action === 'average') {
+    const getGradesByLesson = (lessonTitle: string) => {
+      const grades: string[] = [];
+
+      report.result.daysData.map((dayData) => {
+        const selectedLesson = dayData.lessonsWithGrades.find((lessonsWithGrade) => lessonsWithGrade.lesson === lessonTitle);
+        if (!selectedLesson) return;
+
+        grades.push(...selectedLesson.grades);
+      });
+
+      return grades;
+    };
+
+    const lessonsAverages = report.result.averageGrades.map((averageGrade, index) => {
+      const {lesson, average} = averageGrade;
+      const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
+
+      const allLessonGrades = getGradesByLesson(lesson);
+      const isNoGrades = !allLessonGrades.length;
+
+      const splittedAverage = average.split(',');
+      const integer = Number(splittedAverage[0]);
+      const averageNum = Number(average.replace(',', '.'));
+
+      let roundedAverage: string | number | null = null;
+
+      if (splittedAverage.length === 2) {
+        const onlyFraction = +(averageNum - integer).toFixed(2);
+
+        if (onlyFraction > 0.75) {
+          roundedAverage = integer + 1;
+        } else if (onlyFraction >= 0.75) {
+          roundedAverage = `между ${integer} и ${integer + 1}`;
+        } else if (onlyFraction < 0.75) {
+          roundedAverage = integer;
+        }
+      } else {
+        roundedAverage = null;
+      }
+
+      const isCertified = allLessonGrades.length >= 3;
+
+      const isCertifiedString = isCertified ? 'Аттестован ✅' : `Не аттестован ❌` + (isNoGrades ? '' : `, всего ${allLessonGrades.length} оценок`);
+      const roundedAverageString = roundedAverage && isCertified ? `\nОжидаемая оценка за четверть: ${roundedAverage}` : '';
+
+      return `${index + 1}. ${abbreviatedLessonTitle}\n${isNoGrades ? 'Нет оценок' : `Балл ${averageNum}`}\n${isCertifiedString}${roundedAverageString}`;
+    });
+
+    const resultMessage = lessonsAverages.join('\n\n');
+
     await vk.sendMessage({
       peerId,
-      message: 'Эта команда еще не реализована',
+      message: resultMessage,
+    });
+  } else if (action === 'today') {
+    const todayGrades = report.result.daysData.pop();
+    if (!todayGrades) {
+      return vk.sendMessage({
+        message: `Произошла неизвестная ошибка.`,
+        peerId,
+      });
+    }
+
+    const {day, month, lessonsWithGrades} = todayGrades;
+
+    let resultMessage: string = '';
+
+    if (lessonsWithGrades.length) {
+      resultMessage = `Оценки за ${day} ${month.toLowerCase()}:\n\n`;
+
+      lessonsWithGrades.map((lessonWithGrade) => {
+        const {lesson, grades} = lessonWithGrade;
+        if (!grades.length) return;
+
+        const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
+
+        resultMessage += `${abbreviatedLessonTitle}: ${grades.join(', ')}\n`;
+      });
+    } else {
+      resultMessage = `У вас нет оценок за ${day} ${month.toLowerCase()}.`;
+    }
+
+    await vk.sendMessage({
+      peerId,
+      message: resultMessage,
     });
   } else if (action === 'fullReport') {
     const screenshotName = report.screenshot;
@@ -99,11 +181,6 @@ async function command({message, classes, vk, payload, grades}: CommandInputData
       attachment,
       message: 'Полный отчёт об оценках из Сетевого Города:',
     });
-  } else if (action === 'today') {
-    await vk.sendMessage({
-      peerId,
-      message: 'Эта команда еще не реализована',
-    });
   }
 };
 
@@ -120,6 +197,10 @@ const cmd: CommandOutputData = {
     dmOnly: true,
     args: 0,
     paidSubscription: true,
+  },
+  keyboardData: {
+    color: Keyboard.POSITIVE_COLOR,
+    positionSeparatelyFromAllButton: false,
   },
   showInAdditionalMenu: true,
   showInCommandsList: true,
