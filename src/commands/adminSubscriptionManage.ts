@@ -8,8 +8,7 @@ import {AdminSubscriptionManagePayload} from '../types/VK/Payloads/AdminSubscrip
 async function command({message, vk, args, payload, subscription}: CommandInputData) {
   const {peerId, senderId} = message;
 
-  const [giveToIdStr] = args;
-  const giveToId = Number(giveToIdStr);
+  const [giveToId] = args;
 
   if (payload) return;
 
@@ -17,13 +16,6 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
     return vk.sendMessage({
       peerId,
       message: 'Сначала необходимо указать ID пользователя.',
-    });
-  }
-
-  if (isNaN(giveToId)) {
-    return vk.sendMessage({
-      peerId,
-      message: 'Введённый ID неверен.',
     });
   }
 
@@ -68,12 +60,23 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
   }
 
   const newPayload = newMessage.messagePayload as AdminSubscriptionManagePayload;
+  if (!newPayload || !newPayload.data) return;
+
   const action = newPayload.data.action;
 
   if (action === 'give') {
+    const howManyDaysKeyboard = Keyboard.builder()
+        .inline()
+        .textButton({label: '1'})
+        .textButton({label: '7'})
+        .textButton({label: '30'})
+        .textButton({label: '60'})
+        .textButton({label: '90'});
+
     const lastMessageId = await vk.sendMessage({
       peerId,
-      message: 'На сколько дней вы хотите выдать подписку?',
+      message: 'На сколько дней вы хотите выдать подписку?\nВведите число, либо выберите из списка.',
+      keyboard: howManyDaysKeyboard,
     });
     const howManyDaysMessage = await vk.waitForMessage(peerId, senderId, lastMessageId);
     if (!howManyDaysMessage || !howManyDaysMessage.text) {
@@ -83,7 +86,10 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
       });
     }
 
-    const setDays = Number(howManyDaysMessage.text);
+    const botPingString = await vk.getBotPingString();
+    const daysString = howManyDaysMessage.text.replace(botPingString, '').trim();
+
+    const setDays = Number(daysString);
     if (isNaN(setDays)) {
       return vk.sendMessage({
         peerId,
