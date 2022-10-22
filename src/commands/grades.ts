@@ -32,8 +32,6 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
   if (action === 'update') {
     const classData = await classes.getClass(peerId);
 
-    console.log(report);
-
     if (!report.status) {
       return vk.sendMessage({
         message: `Не удалось получить отчёт с оценками, ошибка:\n\n${report.error!}`,
