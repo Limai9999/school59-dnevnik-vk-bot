@@ -84,7 +84,11 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     if (messagePayload) {
       const {command} = messagePayload as Payload;
 
-      if (command === payload.command) isFound = true;
+      if (command === payload.command) {
+        isFound = true;
+      } else {
+        return false;
+      }
     }
 
     if (!text || !text.length || isFound) return isFound;
@@ -166,5 +170,6 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
     });
   }
 
+  console.log(`В ${peerId} выполняется команда ${command.name}.`.green);
   await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades});
 };
