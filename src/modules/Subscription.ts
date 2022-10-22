@@ -35,7 +35,7 @@ class Subscription {
       await this.updateSubscription(peerId, newData, false);
 
       await this.vk.sendMessage({
-        message: `⚠️ Ваша подписка истекла, продлите её, если хотите пользоваться ботом.`,
+        message: `⚠️ Ваша подписка истекла.\nПродлите её, если хотите продолжить пользоваться ботом.`,
         peerId,
       });
 
