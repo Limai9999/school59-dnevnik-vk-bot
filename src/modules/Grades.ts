@@ -106,6 +106,8 @@ class Grades {
     try {
       const changesList: string[] = [];
 
+      if (!oldReport.status || !newReport.status) return;
+
       const oldAverage = oldReport.result.averageGrades;
       const newAverage = newReport.result.averageGrades;
 
