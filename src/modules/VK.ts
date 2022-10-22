@@ -1,4 +1,6 @@
-import {VK, KeyboardBuilder} from 'vk-io';
+import {VK, KeyboardBuilder, Attachment} from 'vk-io';
+import {PhotosPhoto} from 'vk-io/lib/api/schemas/objects';
+
 import FormData from 'form-data';
 import fs from 'fs';
 import axios from 'axios';
@@ -339,6 +341,20 @@ class VkService extends VK {
       console.log('Произошла ошибка в VK - uploadAndGetPhoto', error);
       return false;
     }
+  }
+
+  createPhotoAttachment(upload: PhotosPhoto) {
+    const {id, owner_id} = upload;
+    const attachment = new Attachment({
+      api: this.api,
+      type: 'photo',
+      payload: {
+        id,
+        owner_id,
+      },
+    });
+
+    return attachment;
   }
 }
 
