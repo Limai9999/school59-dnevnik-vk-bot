@@ -7,13 +7,13 @@ import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 export const LoginToNetcityKeyboard = Keyboard.builder()
     .inline()
     .textButton({
-      label: 'Расписание на сегодня',
+      label: 'Открыть расписание',
       color: Keyboard.POSITIVE_COLOR,
-      payload: {command: 'schedule', data: {action: 'netCityGetToday'}} as SchedulePayload,
+      payload: {command: 'schedule', data: {action: 'get'}} as SchedulePayload,
     })
     .row()
     .textButton({
-      label: 'Оценки',
+      label: 'Узнать оценки',
       color: Keyboard.SECONDARY_COLOR,
       payload: {command: 'grades', data: {action: 'update', forceUpdate: false}} as GradesPayload,
     })
