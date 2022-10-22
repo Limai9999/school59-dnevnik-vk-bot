@@ -16,14 +16,14 @@ import {Payload} from './VK/Payloads/Payload';
 import {MainConfig} from './Configs/MainConfig';
 
 export type CommandInputData = {
-  vk: VKService;
-  vkUser: VKService;
-  classes: Classes;
-  message: MessageContext<ContextDefaultState>;
-  commands: CommandOutputData[];
-  args: string[];
-  payload?: Payload;
-  statistics: MessageStatisticsService;
+  vk: VKService
+  vkUser: VKService
+  classes: Classes
+  message: MessageContext<ContextDefaultState>
+  commands: CommandOutputData[]
+  args: string[]
+  payload?: Payload
+  statistics: MessageStatisticsService
   events: Event;
   schedule: Schedule
   grades: Grades
@@ -35,18 +35,18 @@ export type CommandInputData = {
 };
 
 export type CommandOutputData = {
-  name: string;
-  aliases: string[];
-  payload: Payload,
-  description: string | null;
+  name: string
+  aliases: string[]
+  payload: Payload
+  description: string | null
   requirements: {
-    admin: boolean;
-    dmOnly: boolean;
-    args: number;
-    paidSubscription: boolean;
-  };
-  showInAdditionalMenu: boolean;
-  showInCommandsList: boolean;
-  howToUse: string | null;
-  execute: ({}: CommandInputData) => Promise<any>;
+    admin: boolean
+    dmOnly: boolean
+    args: number
+    paidSubscription: boolean
+  }
+  showInAdditionalMenu: boolean
+  showInCommandsList: boolean
+  howToUse: string | null
+  execute: ({}: CommandInputData) => Promise<any>
 };
