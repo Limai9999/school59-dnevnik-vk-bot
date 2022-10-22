@@ -175,7 +175,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
       const scheduleData = arrayWithSchedule.find((schedule) => schedule.filename! === schedulePayload.data.filename!) as ParseScheduleResponse;
 
       if (!scheduleData) {
-        return sendError('Произошла неизвестная ошибка, либо выбранного расписания нет.');
+        return sendError('Произошла неизвестная ошибка, либо выбранного расписания больше нет.');
       }
 
       if (scheduleData.status) {
@@ -183,16 +183,16 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
 
         const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
         const totalLessonsAndStartTimeString = totalLessons === 1 ? `Всего 1 урок, начинающийся в ${startTime}.` : `Всего уроков: ${totalLessons}, начинаются в ${startTime}.`;
-        const dateString = date ? `Расписание на ${date}` : 'Неизвестное расписание';
+        const dateString = date ? `Расписание на ${date}` : filename;
 
         vk.sendMessage({
-          message: `${dateString}\n\n${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${filename}\n${creationTimeString}`,
+          message: `${dateString}\n\n${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${creationTimeString}`,
           peerId,
           priority: 'high',
         });
       } else {
         vk.sendMessage({
-          message: `При обработке файла "${scheduleData.filename}" произошла ошибка:\n${scheduleData.error}`,
+          message: `При обработке файла "${scheduleData.filename}" произошла ошибка:\n\n${scheduleData.error}\n\nПопробуйте обновить расписание.`,
           peerId,
           priority: 'high',
         });
