@@ -50,7 +50,7 @@ class Grades {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateTime = 1000 * 60 * (35 + index);
+    const autoUpdateTime = 1000 * 60 * (25 + index);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 
