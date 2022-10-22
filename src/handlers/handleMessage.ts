@@ -10,7 +10,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   args: string[],
   subscriptionData: SubscriptionData,
 }}) {
-  const {isUserAdmin, isAdminChat, isDMChat, args, subscriptionData} = data;
+  const {isAdminChat, isDMChat, args, subscriptionData} = data;
   const {requirements, name, howToUse} = command;
 
   if (requirements.admin && !isAdminChat) {
@@ -20,7 +20,7 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
     };
   }
 
-  if (requirements.paidSubscription && isDMChat && !subscriptionData.active && !isUserAdmin) {
+  if (requirements.paidSubscription && isDMChat && !subscriptionData.active) {
     return {
       status: false,
       errorMessage: 'Для использования этой команды необходимо оплатить подписку.',
