@@ -68,7 +68,7 @@ class Grades {
       if (report.status) {
         console.log(`В ${peerId} успешно обновлен отчёт с оценками.`.magenta);
       } else {
-        console.log(`В ${peerId} не удалось обновить отчёт с оценками.`.bgMagenta.black);
+        console.log(`В ${peerId} не удалось обновить отчёт с оценками. Ошибка`.bgMagenta.black, report.error!);
       }
     }, autoUpdateTime);
 
@@ -92,7 +92,8 @@ class Grades {
                       await this.netcityAPI.getTotalStudentReport(peerId);
 
       await this.classes.setLastUpdatedTotalStudentReportDate(peerId, Date.now());
-      await this.classes.setTotalStudentReport(peerId, report);
+
+      if (report.status) await this.classes.setTotalStudentReport(peerId, report);
 
       await this.compare(peerId, previousReport, report);
 
