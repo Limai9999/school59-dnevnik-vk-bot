@@ -21,6 +21,7 @@ import {PhotoUploadResponse} from '../types/VK/Responses/PhotoUploadResponse';
 import {CommandInputData} from '../types/Commands';
 
 import {MainKeyboard} from '../keyboards/MainKeyboard';
+import {DMMainKeyboard} from '../keyboards/DMMainKeyboard';
 
 import {getMainConfig} from '../utils/getConfig';
 
@@ -68,10 +69,17 @@ class VkService extends VK {
   async init() {
     if (!this.me.isUser) await this.updates.start();
 
-    const {id, name} = await this.getMe();
-    this.me = {name: name!, id: id!, isUser: this.me.isUser};
+    if (this.me.isUser) {
+      const {id, first_name, last_name} = await this.getMeUser();
+      const name = this.me.isUser ? `${first_name} ${last_name}` : '';
 
-    console.log(`VK успешно запущено как ${name} - ${id}.`.blue);
+      this.me = {name, id: id!, isUser: this.me.isUser};
+    } else {
+      const {id, name} = await this.getMeGroup();
+      this.me = {name: name!, id: id!, isUser: this.me.isUser};
+    }
+
+    console.log(`VK успешно запущено как ${this.me.name} - ${this.me.id}.`.blue);
 
     return this;
   }
@@ -103,23 +111,25 @@ class VkService extends VK {
     });
   }
 
-  async getMe() {
-    if (this.me.isUser) {
-      const response = await this.api.users.get({});
+  async getMeUser() {
+    const response = await this.api.users.get({});
 
-      const {first_name, last_name, id}: GetUserResponse = response[0];
+    return response[0] as GetUserResponse;
+  }
 
-      return {
-        name: `${first_name} ${last_name}`,
-        id,
-      };
-    } else {
-      const response = await this.api.groups.getById({
-        group_id: this.config.id,
-      });
+  async getMeGroup() {
+    const response = await this.api.groups.getById({
+      group_id: this.config.id,
+    });
 
-      return response[0];
-    }
+    return response[0];
+  }
+
+  async getBotPingString() {
+    const {screen_name, id} = await this.getMeGroup();
+    const peerType = this.me.isUser ? 'id' : 'club';
+
+    return `[${peerType}${id}|@${screen_name}]`;
   }
 
   async removeAllLastSentMessages(peerId: number) {
@@ -210,8 +220,8 @@ class VkService extends VK {
     } else if (savedKeyboard) {
       usingKeyboard = savedKeyboard;
     } else {
-      this.savedKeyboards[peerId] = MainKeyboard;
-      usingKeyboard = MainKeyboard;
+      this.savedKeyboards[peerId] = isPrivateMessages ? DMMainKeyboard : MainKeyboard;
+      usingKeyboard = isPrivateMessages ? DMMainKeyboard : MainKeyboard;
     }
 
     try {
@@ -284,9 +294,9 @@ class VkService extends VK {
     return response.items[0] as unknown as GetChatResponse;
   }
 
-  async getUser(userId: number): Promise<GetUserResponse | null> {
+  async getUser(userIdOrUsername: number | string): Promise<GetUserResponse | null> {
     const response = await this.api.users.get({
-      user_ids: [userId],
+      user_ids: [userIdOrUsername],
       fields: ['bdate', 'screen_name', 'city', 'sex'],
     });
     if (!response.length) return null;
