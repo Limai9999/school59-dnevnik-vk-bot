@@ -13,6 +13,7 @@ import Utils from './Utils';
 import VK from './VK';
 import Password from './Password';
 import API from './API';
+import Subscription from './Subscription';
 
 interface Session extends GetCookiesResponse {
   peerId: number
@@ -25,36 +26,62 @@ class NetCityAPI {
   classes: Classes;
   utils: Utils;
   api: API;
+  subscription: Subscription;
 
-  constructor(vk: VK, classes: Classes, utils: Utils, api: API) {
+  autoUpdatePeerIds: number[];
+
+  constructor(vk: VK, classes: Classes, utils: Utils, api: API, subscription: Subscription) {
     this.sessions = [];
 
     this.vk = vk;
     this.classes = classes;
     this.utils = utils;
     this.api = api;
+    this.subscription = subscription;
+
+    this.autoUpdatePeerIds = [];
   }
 
   async startSessionAutoCreating(peerId: number, index: number = 1) {
-    if (this.utils.checkIfPeerIsDM(peerId)) return;
+    const isDM = this.utils.checkIfPeerIsDM(peerId);
 
-    const autoUpdateTime = 1000 * 60 * (25 + index * 1.5);
+    if (isDM) {
+      const subscription = await this.subscription.checkSubscription(peerId);
+      if (!subscription.active) return;
+    }
+
+    const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
+    if (isAutoUpdateAlreadyActive) return;
 
     const credentials = await this.getCredentials(peerId);
     if (!credentials) return false;
 
     const {login, password, className} = credentials;
 
-    const update = async () => {
+    const autoUpdateTime = 1000 * 60 * (20 + index);
+
+    let autoUpdateInterval: NodeJS.Timer | null = null;
+
+    autoUpdateInterval = setInterval(async () => {
+      if (isDM) {
+        const subscription = await this.subscription.checkSubscription(peerId);
+        if (!subscription.active) {
+          console.log('Во время обновления сессии Сетевого Города, у пользователя закончилась подписка.'.bgCyan.black);
+
+          this.autoUpdatePeerIds = this.autoUpdatePeerIds.filter((autoUpdatePeerId) => autoUpdatePeerId !== peerId);
+          return clearInterval(autoUpdateInterval!);
+        }
+      }
+
       const session = await this.createSession(peerId, login, password);
       if (!session.status) return console.log(`Не удалось обновить сессию Сетевого Города в классе ${peerId} - ${className}.`.bgRed.cyan);
 
       await this.classes.setNetCitySessionId(peerId, session.session.id);
 
       console.log(`В классе ${peerId} - ${className} успешно обновлена сессия Сетевого Города.`.cyan);
-    };
+    }, autoUpdateTime);
 
-    setInterval(update, autoUpdateTime);
+    this.autoUpdatePeerIds.push(peerId);
 
     console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города.`.cyan);
 

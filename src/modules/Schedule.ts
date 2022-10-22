@@ -5,6 +5,7 @@ import Classes from './Classes';
 import NetCityAPI from './NetCityAPI';
 import Utils from './Utils';
 import API from './API';
+import Subscription from './Subscription';
 
 import {Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
@@ -29,38 +30,68 @@ export default class Schedule {
   netCity: NetCityAPI;
   utils: Utils;
   api: API;
+  subscription: Subscription;
+
+  autoUpdatePeerIds: number[];
 
   mainConfig: MainConfig;
 
-  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils, api: API) {
+  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils, api: API, subscription: Subscription) {
     this.vk = vk;
     this.classes = classes;
     this.netCity = netCity;
     this.utils = utils;
     this.api = api;
+    this.subscription = subscription;
+
+    this.autoUpdatePeerIds = [];
 
     this.mainConfig = getMainConfig();
   }
 
   async startAutoUpdate(peerId: number, index: number = 1) {
-    if (this.utils.checkIfPeerIsDM(peerId)) return false;
+    const isDM = this.utils.checkIfPeerIsDM(peerId);
+
+    if (isDM) {
+      const subscription = await this.subscription.checkSubscription(peerId);
+      if (!subscription.active) return;
+    }
 
     const credentials = await this.netCity.getCredentials(peerId);
     if (!credentials) return false;
 
+    const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
+    if (isAutoUpdateAlreadyActive) return;
+
     const autoUpdateTime = 1000 * 60 * (30 + index);
 
-    setInterval(async () => {
+    let autoUpdateInterval: NodeJS.Timer | null = null;
+
+    autoUpdateInterval = setInterval(async () => {
+      if (isDM) {
+        const subscription = await this.subscription.checkSubscription(peerId);
+        if (!subscription.active) {
+          console.log('Во время обновления расписания, у пользователя закончилась подписка.'.bgCyan.black);
+
+          this.autoUpdatePeerIds = this.autoUpdatePeerIds.filter((autoUpdatePeerId) => autoUpdatePeerId !== peerId);
+          return clearInterval(autoUpdateInterval!);
+        }
+      }
+
       const data = await this.getWithAPI(peerId);
 
+      const peerType = isDM ? 'У пользователя' : 'В беседе';
+
       if (data.status) {
-        console.log(`В беседе ${peerId} успешно обновлено расписание.`.cyan);
+        console.log(`${peerType} ${peerId} успешно обновлено расписание.`.cyan);
       } else {
-        console.log(`Не удалось обновить расписание в беседе ${peerId}.`.cyan);
+        console.log(`Не удалось обновить расписание ${peerType} ${peerId}.`.cyan);
       }
     }, autoUpdateTime);
 
-    console.log(`Настроено авто-обновление расписания для беседы ${peerId}.`.cyan);
+    this.autoUpdatePeerIds.push(peerId);
+
+    console.log(`Настроено авто-обновление расписания для ${peerId}.`.cyan);
 
     return true;
   }

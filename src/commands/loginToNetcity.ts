@@ -8,12 +8,14 @@ import {LoginToNetcityPayload} from '../types/VK/Payloads/LoginToNetcityPayload'
 
 import {LoginToNetcityKeyboard} from '../keyboards/LoginToNetcityKeyboard';
 
-async function command({vk, classes, message, netcityAPI, payload, utils}: CommandInputData) {
+async function command({vk, classes, message, netcityAPI, payload}: CommandInputData) {
   let loadingMessageID = 0;
   const peerId = message.peerId;
 
   const loginToNetcityPayload = payload as LoginToNetcityPayload;
   const action = loginToNetcityPayload.data.action;
+
+  await netcityAPI.startSessionAutoCreating(peerId);
 
   const removeLoadingMessage = () => {
     if (!loadingMessageID) return;

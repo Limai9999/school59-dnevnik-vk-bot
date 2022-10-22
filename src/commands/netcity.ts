@@ -1,7 +1,7 @@
 import Password from '../modules/Password';
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
-async function command({message, args, vk, classes}: CommandInputData) {
+async function command({message, args, vk, classes, netcityAPI}: CommandInputData) {
   const [login, inputPassword, className] = args;
 
   if (login.length < 4 || inputPassword.length < 4 || (inputPassword.length < 35 && !message.isDM)) {
@@ -28,7 +28,7 @@ async function command({message, args, vk, classes}: CommandInputData) {
   const [classNumber, classLetter] = className.split('');
   if (!parseInt(classNumber) || parseInt(classLetter) || !classLetter) {
     return vk.sendMessage({
-      message: 'Класс введён некорректно. Пример: 9б',
+      message: 'Класс введён некорректно.\nПример: 9б',
       peerId: message.peerId,
       priority: 'low',
     });
@@ -44,6 +44,8 @@ async function command({message, args, vk, classes}: CommandInputData) {
   });
   await classes.setClassName(message.peerId, className);
 
+  await netcityAPI.startSessionAutoCreating(message.peerId);
+
   vk.sendMessage({
     message: 'Данные для Сетевого Города успешно сохранены.',
     peerId: message.peerId,
@@ -54,7 +56,7 @@ async function command({message, args, vk, classes}: CommandInputData) {
 const cmd: CommandOutputData = {
   name: 'сетевой город',
   aliases: ['сетевой', 'netcity', 'дневник'],
-  description: 'изменить данные для входа в Сетевой Город',
+  description: 'ввести данные для входа в Сетевой Город',
   payload: {
     command: 'netcity',
     data: {action: 'netcity'},

@@ -13,6 +13,8 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
 
   const peerId = message.peerId;
 
+  await schedule.startAutoUpdate(peerId);
+
   const removeLoadingMessage = () => {
     if (!loadingMessageID) return;
     return vk.removeMessage(loadingMessageID, peerId);
