@@ -1,4 +1,4 @@
-import {MessageContext, ContextDefaultState} from 'vk-io';
+import {MessageContext, ContextDefaultState, ButtonColor} from 'vk-io';
 
 import VKService from '../modules/VK';
 import Classes from '../modules/Classes';
@@ -44,6 +44,10 @@ export type CommandOutputData = {
     dmOnly: boolean
     args: number
     paidSubscription: boolean
+  }
+  keyboardData?: {
+    color: ButtonColor,
+    positionSeparatelyFromAllButton: boolean,
   }
   showInAdditionalMenu: boolean
   showInCommandsList: boolean

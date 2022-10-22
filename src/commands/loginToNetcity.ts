@@ -1,3 +1,5 @@
+import {Keyboard} from 'vk-io';
+
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
 import Password from '../modules/Password';
@@ -67,7 +69,7 @@ async function command({vk, classes, message, netcityAPI, payload, utils}: Comma
     const {students} = studentData.data!;
     const {nickName} = students[0];
 
-    const studentString = `Ученик: ${nickName} - ID сессии: ${session.session.id}`;
+    const studentString = `Ученик: ${nickName}\nID сессии: ${session.session.id}`;
 
     removeLoadingMessage();
     await classes.setLoading(peerId, false);
@@ -116,6 +118,10 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 0,
     paidSubscription: true,
+  },
+  keyboardData: {
+    color: Keyboard.POSITIVE_COLOR,
+    positionSeparatelyFromAllButton: false,
   },
   showInAdditionalMenu: true,
   showInCommandsList: true,

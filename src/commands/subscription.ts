@@ -60,6 +60,10 @@ const cmd: CommandOutputData = {
     args: 0,
     paidSubscription: false,
   },
+  keyboardData: {
+    color: Keyboard.POSITIVE_COLOR,
+    positionSeparatelyFromAllButton: true,
+  },
   showInAdditionalMenu: true,
   showInCommandsList: true,
   howToUse: null,

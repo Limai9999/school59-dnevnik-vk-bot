@@ -295,6 +295,10 @@ const cmd: CommandOutputData = {
     args: 0,
     paidSubscription: false,
   },
+  keyboardData: {
+    color: Keyboard.PRIMARY_COLOR,
+    positionSeparatelyFromAllButton: false,
+  },
   showInAdditionalMenu: true,
   showInCommandsList: true,
   howToUse: null,

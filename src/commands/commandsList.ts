@@ -1,3 +1,4 @@
+import {Keyboard} from 'vk-io';
 import {CommandInputData, CommandOutputData} from '../types/Commands';
 
 async function command({message, vk, commands}: CommandInputData) {
@@ -35,6 +36,10 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 0,
     paidSubscription: false,
+  },
+  keyboardData: {
+    color: Keyboard.SECONDARY_COLOR,
+    positionSeparatelyFromAllButton: true,
   },
   showInAdditionalMenu: true,
   showInCommandsList: true,
