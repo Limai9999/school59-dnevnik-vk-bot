@@ -65,7 +65,7 @@ export default class Schedule {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateTime = 1000 * 60 * (30 + this.autoUpdateCount);
+    const autoUpdateTime = 1000 * 60 * (17 + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 

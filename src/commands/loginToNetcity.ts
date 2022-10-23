@@ -125,7 +125,7 @@ const cmd: CommandOutputData = {
     color: Keyboard.POSITIVE_COLOR,
     positionSeparatelyFromAllButton: false,
   },
-  showInAdditionalMenu: true,
+  showInAdditionalMenu: false,
   showInCommandsList: true,
   howToUse: null,
   execute: command,
