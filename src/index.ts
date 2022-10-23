@@ -68,7 +68,7 @@ async function start() {
   await vkUser.init();
 
   const allClasses = await classes.getAllClasses();
-  await Promise.all(allClasses.map(async ({id}, index) => {
+  await Promise.all(allClasses.map(async ({id}) => {
     await classes.setLoading(id, false);
 
     vkBot.addChatToState(id);
