@@ -52,7 +52,8 @@ class Grades {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateTime = 1000 * 60 * (16 + this.autoUpdateCount);
+    const autoUpdateMinutes = 17;
+    const autoUpdateTime = 1000 * 60 * (autoUpdateMinutes + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 
@@ -76,7 +77,7 @@ class Grades {
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`Настроено авто-обновление отчёта с оценками для пользователя ${peerId}. (20 + ${this.autoUpdateCount})`.magenta);
+    console.log(`Настроено авто-обновление отчёта с оценками для пользователя ${peerId}. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.magenta);
     this.autoUpdateCount++;
   }
 

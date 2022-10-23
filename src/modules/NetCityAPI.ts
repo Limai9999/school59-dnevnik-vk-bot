@@ -60,6 +60,7 @@ class NetCityAPI {
 
     const {login, password, className} = credentials;
 
+    const autoUpdateMinutes = 15;
     const autoUpdateTime = 1000 * 60 * (15 + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
@@ -85,7 +86,7 @@ class NetCityAPI {
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города. (15 + ${this.autoUpdateCount})`.cyan);
+    console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.cyan);
     this.autoUpdateCount++;
 
     return true;
