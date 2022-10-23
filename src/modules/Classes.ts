@@ -17,7 +17,7 @@ export default class Classes {
 
   async getAllClasses() {
     const classes = await Class.find();
-    return Array.from(classes);
+    return Array.from(classes).filter((classData) => !classData.isDisabled);
   }
 
   async addLastSentMessage(peerId: number, messageId: number) {
@@ -115,6 +115,13 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $set: {lastUpdatedTotalStudentReport},
+    });
+  }
+
+  async setDisabledStatus(peerId: number, isDisabled: boolean) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: {isDisabled},
     });
   }
 }

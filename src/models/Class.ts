@@ -100,6 +100,10 @@ const classSchema = new Schema({
     type: Number,
     default: 0,
   },
+  isDisabled: {
+    type: Boolean,
+    default: false,
+  },
 }, {
   timestamps: true,
 });

@@ -57,14 +57,15 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   }
 
   const classData = await classes.getClass(peerId);
-  const isMessagesHandling = classData.handleMessages;
-  const isLoading = classData.isLoading;
+  const {handleMessages, isLoading, isDisabled} = classData;
+
+  if (isDisabled) return;
 
   const subscriptionData = await subscription.checkSubscription(peerId);
 
   // console.log('data sub', subscriptionData);
 
-  if (!isMessagesHandling) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`.yellow);
+  if (!handleMessages) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`.yellow);
 
   const isAdminChat = peerId === vk.config.adminChatID;
   const isUserAdmin = senderId === vk.config.adminUserID;
