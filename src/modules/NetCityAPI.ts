@@ -29,6 +29,7 @@ class NetCityAPI {
   subscription: Subscription;
 
   autoUpdatePeerIds: number[];
+  autoUpdateCount: number;
 
   constructor(vk: VK, classes: Classes, utils: Utils, api: API, subscription: Subscription) {
     this.sessions = [];
@@ -40,9 +41,10 @@ class NetCityAPI {
     this.subscription = subscription;
 
     this.autoUpdatePeerIds = [];
+    this.autoUpdateCount = 0;
   }
 
-  async startSessionAutoCreating(peerId: number, index: number = 1) {
+  async startSessionAutoCreating(peerId: number) {
     const isDM = this.utils.checkIfPeerIsDM(peerId);
 
     if (isDM) {
@@ -58,7 +60,7 @@ class NetCityAPI {
 
     const {login, password, className} = credentials;
 
-    const autoUpdateTime = 1000 * 60 * (20 + index);
+    const autoUpdateTime = 1000 * 60 * (15 + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 
@@ -83,7 +85,8 @@ class NetCityAPI {
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города.`.cyan);
+    console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города. (15 + ${this.autoUpdateCount})`.cyan);
+    this.autoUpdateCount++;
 
     return true;
   }

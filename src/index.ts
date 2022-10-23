@@ -73,9 +73,9 @@ async function start() {
 
     vkBot.addChatToState(id);
 
-    await netcityAPI.startSessionAutoCreating(id, index + 1);
-    await schedule.startAutoUpdate(id, index + 1);
-    await grades.startAutoUpdate(id, index + 1);
+    await netcityAPI.startSessionAutoCreating(id);
+    await schedule.startAutoUpdate(id);
+    await grades.startAutoUpdate(id);
   }));
 
   console.log(`Бот обрабатывает ${allClasses.length} чатов.`);

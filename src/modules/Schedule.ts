@@ -33,6 +33,7 @@ export default class Schedule {
   subscription: Subscription;
 
   autoUpdatePeerIds: number[];
+  autoUpdateCount: number;
 
   mainConfig: MainConfig;
 
@@ -45,11 +46,12 @@ export default class Schedule {
     this.subscription = subscription;
 
     this.autoUpdatePeerIds = [];
+    this.autoUpdateCount = 0;
 
     this.mainConfig = getMainConfig();
   }
 
-  async startAutoUpdate(peerId: number, index: number = 1) {
+  async startAutoUpdate(peerId: number) {
     const isDM = this.utils.checkIfPeerIsDM(peerId);
 
     if (isDM) {
@@ -63,7 +65,7 @@ export default class Schedule {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateTime = 1000 * 60 * (30 + index);
+    const autoUpdateTime = 1000 * 60 * (30 + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 
@@ -91,7 +93,8 @@ export default class Schedule {
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`Настроено авто-обновление расписания для ${peerId}.`.cyan);
+    console.log(`Настроено авто-обновление расписания для ${peerId}. (30 + ${this.autoUpdateCount})`.cyan);
+    this.autoUpdateCount++;
 
     return true;
   }

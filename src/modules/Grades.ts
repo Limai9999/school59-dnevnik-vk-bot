@@ -21,6 +21,7 @@ class Grades {
   subscription: Subscription;
 
   autoUpdatePeerIds: number[];
+  autoUpdateCount: number;
 
   isDebug: boolean;
 
@@ -33,11 +34,12 @@ class Grades {
     this.subscription = subscription;
 
     this.autoUpdatePeerIds = [];
+    this.autoUpdateCount = 0;
 
     this.isDebug = this.vk.mainConfig.testMode;
   }
 
-  async startAutoUpdate(peerId: number, index: number = 1) {
+  async startAutoUpdate(peerId: number) {
     const isDM = this.utils.checkIfPeerIsDM(peerId);
     if (!isDM) return;
 
@@ -50,7 +52,7 @@ class Grades {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateTime = 1000 * 60 * (25 + index);
+    const autoUpdateTime = 1000 * 60 * (20 + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 
@@ -74,7 +76,8 @@ class Grades {
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`Настроено авто-обновление отчёта с оценками для пользователя ${peerId}.`.magenta);
+    console.log(`Настроено авто-обновление отчёта с оценками для пользователя ${peerId}. (20 + ${this.autoUpdateCount})`.magenta);
+    this.autoUpdateCount++;
   }
 
   async getTotalStudentReport(peerId: number, forceUpdate: boolean) {
