@@ -15,6 +15,8 @@ import Password from './Password';
 import API from './API';
 import Subscription from './Subscription';
 
+import {MainConfig} from '../types/Configs/MainConfig';
+
 interface Session extends GetCookiesResponse {
   peerId: number
 }
@@ -28,10 +30,12 @@ class NetCityAPI {
   api: API;
   subscription: Subscription;
 
+  mainConfig: MainConfig;
+
   autoUpdatePeerIds: number[];
   autoUpdateCount: number;
 
-  constructor(vk: VK, classes: Classes, utils: Utils, api: API, subscription: Subscription) {
+  constructor(vk: VK, classes: Classes, utils: Utils, api: API, subscription: Subscription, mainConfig: MainConfig) {
     this.sessions = [];
 
     this.vk = vk;
@@ -39,6 +43,8 @@ class NetCityAPI {
     this.utils = utils;
     this.api = api;
     this.subscription = subscription;
+
+    this.mainConfig = mainConfig;
 
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
@@ -60,7 +66,7 @@ class NetCityAPI {
 
     const {login, password, className} = credentials;
 
-    const autoUpdateMinutes = 15;
+    const autoUpdateMinutes = this.mainConfig.autoUpdateMin.netcity;
     const autoUpdateTime = 1000 * 60 * (15 + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;

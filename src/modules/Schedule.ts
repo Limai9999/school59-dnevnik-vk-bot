@@ -16,8 +16,6 @@ import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
 
 import {MainConfig} from '../types/Configs/MainConfig';
 
-import {getMainConfig} from '../utils/getConfig';
-
 type GetScheduleWithAPI = {
   status: boolean
   schedule?: ParseScheduleResponse[]
@@ -32,12 +30,12 @@ export default class Schedule {
   api: API;
   subscription: Subscription;
 
+  mainConfig: MainConfig;
+
   autoUpdatePeerIds: number[];
   autoUpdateCount: number;
 
-  mainConfig: MainConfig;
-
-  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils, api: API, subscription: Subscription) {
+  constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils, api: API, subscription: Subscription, mainConfig: MainConfig) {
     this.vk = vk;
     this.classes = classes;
     this.netCity = netCity;
@@ -45,10 +43,10 @@ export default class Schedule {
     this.api = api;
     this.subscription = subscription;
 
+    this.mainConfig = mainConfig;
+
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
-
-    this.mainConfig = getMainConfig();
   }
 
   async startAutoUpdate(peerId: number) {
@@ -65,7 +63,7 @@ export default class Schedule {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateMinutes = 18;
+    const autoUpdateMinutes = this.mainConfig.autoUpdateMin.schedule;
     const autoUpdateTime = 1000 * 60 * (autoUpdateMinutes + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;

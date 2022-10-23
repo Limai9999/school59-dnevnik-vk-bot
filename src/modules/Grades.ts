@@ -12,6 +12,8 @@ import {GetTotalStudentReport} from '../types/Responses/API/grades/GetTotalStude
 
 import {getGradesDebugData} from '../utils/getConfig';
 
+import {MainConfig} from '../types/Configs/MainConfig';
+
 class Grades {
   vk: VK;
   classes: Classes;
@@ -20,18 +22,22 @@ class Grades {
   api: API;
   subscription: Subscription;
 
+  mainConfig: MainConfig;
+
   autoUpdatePeerIds: number[];
   autoUpdateCount: number;
 
   isDebug: boolean;
 
-  constructor(vk: VK, classes: Classes, utils: Utils, netcityAPI: NetCityAPI, api: API, subscription: Subscription) {
+  constructor(vk: VK, classes: Classes, utils: Utils, netcityAPI: NetCityAPI, api: API, subscription: Subscription, mainConfig: MainConfig) {
     this.vk = vk;
     this.classes = classes;
     this.utils = utils;
     this.netcityAPI = netcityAPI;
     this.api = api;
     this.subscription = subscription;
+
+    this.mainConfig = mainConfig;
 
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
@@ -52,7 +58,7 @@ class Grades {
     const isAutoUpdateAlreadyActive = this.autoUpdatePeerIds.find((autoUpdatePeerId) => autoUpdatePeerId === peerId);
     if (isAutoUpdateAlreadyActive) return;
 
-    const autoUpdateMinutes = 17;
+    const autoUpdateMinutes = this.mainConfig.autoUpdateMin.grades;
     const autoUpdateTime = 1000 * 60 * (autoUpdateMinutes + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;

@@ -59,9 +59,9 @@ const vkUser = new VK({
 
 const subscription = new Subscription(vkBot, classes, utils);
 
-const netcityAPI = new NetCityAPI(vkBot, classes, utils, api, subscription);
-const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api, subscription);
-const grades = new Grades(vkBot, classes, utils, netcityAPI, api, subscription);
+const netcityAPI = new NetCityAPI(vkBot, classes, utils, api, subscription, mainConfig);
+const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api, subscription, mainConfig);
+const grades = new Grades(vkBot, classes, utils, netcityAPI, api, subscription, mainConfig);
 
 async function start() {
   await vkBot.init();
