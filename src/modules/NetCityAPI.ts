@@ -175,6 +175,8 @@ class NetCityAPI {
     if (existingSession && !forceCreate) {
       const isEnded = existingSession.session.endTime - Date.now() < 0;
 
+      console.log('findOrCreateSession', 'found existing session'.red, {peerId, forceCreate, sessions: this.sessions, isEnded});
+
       if (isEnded) {
         await this.closeSession(existingSession.session.id);
         return await this.createSession(peerId, login, password);
@@ -182,6 +184,8 @@ class NetCityAPI {
 
       return existingSession;
     }
+
+    console.log('findOrCreateSession', 'unable to find existing session'.red, {peerId, forceCreate, sessions: this.sessions});
 
     return await this.createSession(peerId, login, password);
   }
