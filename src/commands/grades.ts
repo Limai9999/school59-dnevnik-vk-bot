@@ -88,22 +88,25 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
       if (splittedAverage.length === 2) {
         const onlyFraction = +(averageNum - integer).toFixed(2);
 
-        if (onlyFraction > 0.75) {
+        if (onlyFraction > 0.60) {
           roundedAverage = integer + 1;
-        } else if (onlyFraction >= 0.75) {
+        } else if (onlyFraction >= 0.60) {
           roundedAverage = `между ${integer} и ${integer + 1}`;
-        } else if (onlyFraction < 0.75) {
+        } else if (onlyFraction < 0.60) {
           roundedAverage = integer;
         }
       } else {
         roundedAverage = null;
       }
 
-      const isCertified = lessonGrades.length >= 3;
+      const isCertified = lessonGrades.length >= 1;
 
       const lessonTotalGradesString = utils.setWordEndingBasedOnThingsCount('totalGrades', lessonGrades.length);
 
-      const isCertifiedString = isCertified ? 'Аттестован ✅' : `Не аттестован ❌` + (isNoGrades ? '' : `, ${lessonTotalGradesString}`);
+      const isCertifiedString = isCertified ?
+      lessonGrades.length < 3 ? `Рекомендуется получить еще ${3 - lessonGrades.length} оценки ⚠️` : 'Аттестован ✅' :
+      `Не аттестован ❌` + (isNoGrades ? '' : `, ${lessonTotalGradesString}`);
+
       const roundedAverageString = roundedAverage && isCertified ? `\nОжидаемая оценка за четверть: ${roundedAverage}` : '';
 
       return `${index + 1}. ${abbreviatedLessonTitle}\n${isNoGrades ? 'Нет оценок' : `Балл ${averageNum}`}\n${isCertifiedString}${roundedAverageString}`;
