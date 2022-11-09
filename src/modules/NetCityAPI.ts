@@ -208,17 +208,17 @@ class NetCityAPI {
   }
 
   async initStudentDiary(sessionId: number) {
+    const session = this.getSession(sessionId);
+    if (!session) {
+      return {
+        status: false,
+        error: 'Не удалось найти сессию Сетевого Города.',
+      };
+    }
+
+    const cookie = this.utils.cookieArrayToString(session.cookies);
+
     try {
-      const session = this.getSession(sessionId);
-      if (!session) {
-        return {
-          status: false,
-          error: 'Не удалось найти сессию Сетевого Города.',
-        };
-      }
-
-      const cookie = this.utils.cookieArrayToString(session.cookies);
-
       const request = await axios({
         method: 'get',
         url: 'https://dnevnik.school59-ekb.ru/webapi/student/diary/init',
@@ -236,6 +236,8 @@ class NetCityAPI {
       };
     } catch (error) {
       console.log('InitStudentDiary ошибка'.red, error);
+
+      await this.closeSession(session.session.id);
 
       return {
         status: false,

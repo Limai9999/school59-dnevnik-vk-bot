@@ -22,14 +22,25 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
     return vk.removeMessage(loadingMessageID, peerId);
   };
 
-  const sendFinalMessage = async (message: string) => {
+  const sendFinalMessage = async (message: string, isError = false) => {
     removeLoadingMessage();
 
     await classes.setLoading(peerId, false);
 
+    const keyboard = Keyboard.builder().inline();
+
+    if (isError) {
+      keyboard.textButton({
+        label: 'Попробовать снова',
+        color: 'secondary',
+        payload: {command: 'loginToNetcity', data: {action: 'login'}} as LoginToNetcityPayload,
+      });
+    }
+
     return vk.sendMessage({
       message,
       peerId: peerId,
+      keyboard,
     });
   };
 
@@ -66,7 +77,7 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
     }
 
     const studentData = await netcityAPI.initStudentDiary(session.session.id);
-    if (!studentData.status) return sendFinalMessage(`Не удалось получить информацию о ученике, ошибка:\n${studentData.error!}`);
+    if (!studentData.status) return sendFinalMessage(`Не удалось получить информацию о ученике, ошибка:\n${studentData.error!}`, true);
 
     const {students} = studentData.data!;
     const {nickName} = students[0];
