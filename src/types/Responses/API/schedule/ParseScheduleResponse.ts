@@ -14,7 +14,7 @@ export type ParseScheduleResponse = {
     totalLessons: number
     date?: string
     filename: string
-    room?: number
+    room?: string
     creationTime: number
   }
 };
