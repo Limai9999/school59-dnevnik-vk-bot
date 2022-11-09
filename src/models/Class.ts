@@ -13,7 +13,7 @@ const parsedSchedule = {
       lesson: String,
       room: String,
     }],
-    room: Number,
+    room: String,
     schedule: [String],
     startTime: String,
     totalLessons: Number,

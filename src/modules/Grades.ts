@@ -101,9 +101,10 @@ class Grades {
                       getGradesDebugData() :
                       await this.netcityAPI.getTotalStudentReport(peerId);
 
-      await this.classes.setLastUpdatedTotalStudentReportDate(peerId, Date.now());
-
-      if (report.status) await this.classes.setTotalStudentReport(peerId, report);
+      if (report.status) {
+        await this.classes.setTotalStudentReport(peerId, report);
+        await this.classes.setLastUpdatedTotalStudentReportDate(peerId, Date.now());
+      }
 
       await this.compare(peerId, previousReport, report);
 

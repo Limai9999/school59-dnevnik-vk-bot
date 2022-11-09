@@ -179,15 +179,15 @@ class NetCityAPI {
 
   async findOrCreateSession(peerId: number, login: string, password: string, forceCreate: boolean): Promise<Session> {
     const existingSession = this.getSessionByPeerId(peerId);
-    if (existingSession && !forceCreate) {
+    if (existingSession && existingSession.status && !forceCreate) {
       const isEnded = existingSession.session.endTime - Date.now() < 0;
-
-      console.log('findOrCreateSession', 'found existing session'.green, peerId, forceCreate);
 
       if (isEnded) {
         await this.closeSession(existingSession.session.id);
         return await this.createSession(peerId, login, password);
       }
+
+      console.log('findOrCreateSession', 'found existing session'.green, peerId, forceCreate);
 
       return existingSession;
     }
