@@ -328,6 +328,8 @@ class NetCityAPI {
     } catch (error) {
       console.log('getAnnouncements ошибка'.red, error);
 
+      this.closeSession(sessionId);
+
       return {
         status: false,
         error: `${error}`,

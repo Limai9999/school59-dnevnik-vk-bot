@@ -1,14 +1,14 @@
-import {Keyboard} from 'vk-io';
+import { Keyboard } from 'vk-io';
 
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
 import Password from '../modules/Password';
 
-import {LoginToNetcityPayload} from '../types/VK/Payloads/LoginToNetcityPayload';
+import { LoginToNetcityPayload } from '../types/VK/Payloads/LoginToNetcityPayload';
 
-import {LoginToNetcityKeyboard} from '../keyboards/LoginToNetcityKeyboard';
+import { LoginToNetcityKeyboard } from '../keyboards/LoginToNetcityKeyboard';
 
-async function command({vk, classes, message, netcityAPI, payload}: CommandInputData) {
+async function command({ vk, classes, message, netcityAPI, payload }: CommandInputData) {
   let loadingMessageID = 0;
   const peerId = message.peerId;
 
@@ -33,7 +33,7 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
       keyboard.textButton({
         label: 'Попробовать снова',
         color: 'secondary',
-        payload: {command: 'loginToNetcity', data: {action: 'login'}} as LoginToNetcityPayload,
+        payload: { command: 'loginToNetcity', data: { action: 'login' } } as LoginToNetcityPayload,
       });
     }
 
@@ -52,7 +52,7 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
       peerId,
     });
 
-    const {netCityData, className} = await classes.getClass(peerId);
+    const { netCityData, className } = await classes.getClass(peerId);
     if (!netCityData || !className || !netCityData.login || !netCityData.password) {
       return sendFinalMessage('Не введены данные для Сетевого Города или название класса.');
     }
@@ -79,8 +79,8 @@ async function command({vk, classes, message, netcityAPI, payload}: CommandInput
     const studentData = await netcityAPI.initStudentDiary(session.session.id);
     if (!studentData.status) return sendFinalMessage(`Не удалось получить информацию о ученике, ошибка:\n${studentData.error!}`, true);
 
-    const {students} = studentData.data!;
-    const {nickName} = students[0];
+    const { students } = studentData.data!;
+    const { nickName } = students[0];
 
     const studentString = `Ученик: ${nickName}\nID сессии: ${session.session.id}`;
 
@@ -124,7 +124,7 @@ const cmd: CommandOutputData = {
   description: null,
   payload: {
     command: 'loginToNetcity',
-    data: {action: 'login'},
+    data: { action: 'login' },
   } as LoginToNetcityPayload,
   requirements: {
     admin: false,
@@ -134,9 +134,9 @@ const cmd: CommandOutputData = {
   },
   keyboardData: {
     color: Keyboard.POSITIVE_COLOR,
-    positionSeparatelyFromAllButton: false,
+    positionSeparatelyFromAllButton: true,
   },
-  showInAdditionalMenu: false,
+  showInAdditionalMenu: true,
   showInCommandsList: true,
   howToUse: null,
   execute: command,
