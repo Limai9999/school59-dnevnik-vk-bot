@@ -5,6 +5,8 @@ import { CommandInputData } from '../types/Commands';
 import { HandleHomeworkPayload } from '../types/VK/Payloads/HandleHomeworkPayload';
 
 export default async function handleHomework({ message, classes, vk }: CommandInputData) {
+  if (message.isDM) return;
+
   const { peerId, senderId } = message;
 
   const keyboard = Keyboard.builder()
@@ -32,7 +34,11 @@ export default async function handleHomework({ message, classes, vk }: CommandIn
   const replyPayload = replyMessage.messagePayload as HandleHomeworkPayload;
 
   if (replyPayload.data.choice === 'agree') {
-    await classes.addManualHomework(peerId, { date: Date.now() + 1000 * 60 * 60 * 24, text: message.text! });
+    await classes.addManualHomework(peerId, {
+      date: Date.now() + 1000 * 60 * 60 * 24,
+      text: message.text!,
+      messageId: message.conversationMessageId!,
+    });
 
     await vk.api.messages.pin({
       peer_id: peerId,
