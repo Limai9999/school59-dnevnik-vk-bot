@@ -1,4 +1,34 @@
-import { Schema, model } from 'mongoose';
+import { Document, Schema, model } from 'mongoose';
+
+import { ManualHomework } from '../types/Homework/ManualHomework';
+import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
+import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
+
+export interface IClass {
+  id: number
+  className: string
+  netCityData: {
+    login: string
+    password: string
+  }
+  schedule: ParseScheduleResponse[]
+  manualSchedule: ParseScheduleResponse[]
+  isLoading: boolean
+  lastUpdatedScheduleDate: number
+  lastSentMessages: number[]
+  bannedUsers: []
+  handleMessages: boolean
+  connectedProfiles: number[]
+  netcitySessionId: number
+  subscription: {
+    active: boolean
+    endDate: number
+  }
+  totalStudentReport: GetTotalStudentReport
+  lastUpdatedTotalStudentReport: number
+  isDisabled: boolean
+  manualHomework: ManualHomework[]
+}
 
 const parsedSchedule = {
   status: Boolean,
@@ -50,6 +80,7 @@ const classSchema = new Schema({
   },
   className: {
     type: String,
+    default: null,
   },
   netCityData: {
     type: {
@@ -59,9 +90,11 @@ const classSchema = new Schema({
   },
   schedule: {
     type: [parsedSchedule],
+    default: [],
   },
   manualSchedule: {
     type: [parsedSchedule],
+    default: [],
   },
   isLoading: {
     type: Boolean,
@@ -73,9 +106,11 @@ const classSchema = new Schema({
   },
   lastSentMessages: {
     type: [Number],
+    default: [],
   },
   bannedUsers: {
     type: Array,
+    default: [],
   },
   handleMessages: {
     type: Boolean,
@@ -83,9 +118,11 @@ const classSchema = new Schema({
   },
   connectedProfiles: {
     type: [Number],
+    default: [],
   },
   netcitySessionId: {
     type: Number,
+    default: 0,
   },
   subscription: {
     type: {
@@ -104,8 +141,17 @@ const classSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  manualHomework: {
+    type: [{
+      date: Number,
+      text: String,
+      messageId: Number,
+    }],
+  },
 }, {
   timestamps: true,
 });
 
-export default model('Class', classSchema, 'classes');
+export type ClassDoc = IClass & Document
+
+export default model<ClassDoc>('Class', classSchema, 'classes');
