@@ -1,8 +1,8 @@
-import axios, {AxiosInstance, AxiosRequestConfig} from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-import {MainConfig} from '../types/Configs/MainConfig';
+import { MainConfig } from '../types/Configs/MainConfig';
 
-import {getMainConfig} from '../utils/getConfig';
+import { getMainConfig } from '../utils/getConfig';
 
 class API {
   mainConfig: MainConfig;

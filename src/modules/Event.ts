@@ -1,11 +1,11 @@
-import {getEventConfig} from '../utils/getConfig';
+import { getEventConfig } from '../utils/getConfig';
 
 import getEvents from '../utils/getEvents';
 
-import {MessageContext, ContextDefaultState} from 'vk-io';
-import {EventConfig} from '../types/Configs/EventConfig';
-import {CommandOutputData} from '../types/Commands';
-import {EventInputData, EventOutputData} from '../types/Event/Events';
+import { MessageContext, ContextDefaultState } from 'vk-io';
+import { EventConfig } from '../types/Configs/EventConfig';
+import { CommandOutputData } from '../types/Commands';
+import { EventInputData, EventOutputData } from '../types/Event/Events';
 
 import VkService from './VK';
 import Classes from './Classes';
@@ -23,7 +23,7 @@ class Event {
   statistics: MessageStatistics;
   schedule: Schedule;
 
-  constructor({vk, vkUser, classes, commands, statistics, schedule}: EventInputData) {
+  constructor({ vk, vkUser, classes, commands, statistics, schedule }: EventInputData) {
     this.config = getEventConfig();
     this.events = [];
 
@@ -69,7 +69,7 @@ class Event {
   }
 
   executeRoulette(): boolean {
-    const {enabled, generalRandom} = this.config;
+    const { enabled, generalRandom } = this.config;
 
     if (!enabled) return false;
 

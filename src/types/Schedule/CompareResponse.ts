@@ -1,4 +1,4 @@
-import {KeyboardBuilder} from 'vk-io';
+import { KeyboardBuilder } from 'vk-io';
 
 export type CompareResponse = {
   isChanged: boolean

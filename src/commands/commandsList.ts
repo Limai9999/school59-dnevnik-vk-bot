@@ -1,11 +1,11 @@
-import {Keyboard} from 'vk-io';
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { Keyboard } from 'vk-io';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-async function command({message, vk, commands}: CommandInputData) {
+async function command({ message, vk, commands }: CommandInputData) {
   const isAdminChat = message.peerId === vk.config.adminChatID;
 
   let cmdCount = 0;
-  const commandsFormatted = commands.map(({name, howToUse, description, requirements: {admin}, showInCommandsList}) => {
+  const commandsFormatted = commands.map(({ name, howToUse, description, requirements: { admin }, showInCommandsList }) => {
     if (!isAdminChat && admin) return;
     if (!showInCommandsList) return;
 
@@ -29,7 +29,7 @@ const cmd: CommandOutputData = {
   description: 'показать список команд',
   payload: {
     command: 'commands',
-    data: {action: 'commands'},
+    data: { action: 'commands' },
   },
   requirements: {
     admin: false,

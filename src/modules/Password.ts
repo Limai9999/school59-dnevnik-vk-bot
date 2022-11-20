@@ -1,7 +1,7 @@
 import CryptoJS from 'crypto-js';
 
-import {MainConfig} from '../types/Configs/MainConfig';
-import {getMainConfig} from '../utils/getConfig';
+import { MainConfig } from '../types/Configs/MainConfig';
+import { getMainConfig } from '../utils/getConfig';
 
 export default class Password {
   password: string;
@@ -33,4 +33,4 @@ export default class Password {
 
     return decrypted;
   }
-};
+}

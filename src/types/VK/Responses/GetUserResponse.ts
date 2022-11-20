@@ -11,4 +11,4 @@ export type GetUserResponse = {
   last_name: string
   screen_name: string
   sex: number
-};
+}

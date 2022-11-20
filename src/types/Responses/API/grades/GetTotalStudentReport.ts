@@ -15,12 +15,12 @@ export type AverageGrade = {
 }
 
 export type GetTotalStudentReport = {
-  status: boolean,
-  error?: string,
-  info: string[],
+  status: boolean
+  error?: string
+  info: string[]
   result: {
-    daysData: DayData[],
-    averageGrades: AverageGrade[],
-  },
+    daysData: DayData[]
+    averageGrades: AverageGrade[]
+  }
   screenshot?: string
-};
+}

@@ -1,8 +1,8 @@
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
 import PasswordService from '../modules/Password';
 
-async function command({message, args, vk}: CommandInputData) {
+async function command({ message, args, vk }: CommandInputData) {
   const [password] = args;
 
   if (password.length < 6) {
@@ -26,7 +26,7 @@ async function command({message, args, vk}: CommandInputData) {
     peerId: message.peerId,
     priority: 'high',
   });
-};
+}
 
 const cmd: CommandOutputData = {
   name: 'зашифровать пароль',
@@ -34,7 +34,7 @@ const cmd: CommandOutputData = {
   description: null,
   payload: {
     command: 'cipher',
-    data: {action: 'cipher'},
+    data: { action: 'cipher' },
   },
   requirements: {
     admin: false,

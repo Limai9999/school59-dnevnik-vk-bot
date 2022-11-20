@@ -17,4 +17,4 @@ export type ParseScheduleResponse = {
     room?: string
     creationTime: number
   }
-};
+}

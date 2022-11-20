@@ -1,12 +1,12 @@
 import moment from 'moment';
-import {Attachment, Keyboard} from 'vk-io';
+import { Attachment, Keyboard } from 'vk-io';
 
-import {GradesKeyboard} from '../keyboards/GradesKeyboard';
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { GradesKeyboard } from '../keyboards/GradesKeyboard';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-import {GradesPayload} from '../types/VK/Payloads/GradesPayload';
+import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
 
-async function command({message, classes, vk, payload, grades, utils}: CommandInputData) {
+async function command({ message, classes, vk, payload, grades, utils }: CommandInputData) {
   const peerId = message.peerId;
 
   const gradesPayload = payload as GradesPayload;
@@ -73,7 +73,7 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
     };
 
     const lessonsAverages = report.result.averageGrades.map((averageGrade, index) => {
-      const {lesson, average} = averageGrade;
+      const { lesson, average } = averageGrade;
       const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
 
       const lessonGrades = getGradesByLesson(lesson);
@@ -104,8 +104,8 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
       const lessonTotalGradesString = utils.setWordEndingBasedOnThingsCount('totalGrades', lessonGrades.length);
 
       const isCertifiedString = isCertified ?
-      lessonGrades.length < 3 ? `Рекомендуется получить еще ${3 - lessonGrades.length} оценки ⚠️` : 'Аттестован ✅' :
-      `Не аттестован ❌` + (isNoGrades ? '' : `, ${lessonTotalGradesString}`);
+        lessonGrades.length < 3 ? `Рекомендуется получить еще ${3 - lessonGrades.length} оценки ⚠️` : 'Аттестован ✅' :
+        'Не аттестован ❌' + (isNoGrades ? '' : `, ${lessonTotalGradesString}`);
 
       const roundedAverageString = roundedAverage && isCertified ? `\nОжидаемая оценка за четверть: ${roundedAverage}` : '';
 
@@ -122,20 +122,20 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
     const todayGrades = report.result.daysData.pop();
     if (!todayGrades) {
       return vk.sendMessage({
-        message: `Произошла неизвестная ошибка.`,
+        message: 'Произошла неизвестная ошибка.',
         peerId,
       });
     }
 
-    const {day, month, lessonsWithGrades} = todayGrades;
+    const { day, month, lessonsWithGrades } = todayGrades;
 
-    let resultMessage: string = '';
+    let resultMessage = '';
 
     if (lessonsWithGrades.length) {
       resultMessage = `Оценки за ${day} ${month.toLowerCase()}:\n\n`;
 
       lessonsWithGrades.map((lessonWithGrade) => {
-        const {lesson, grades} = lessonWithGrade;
+        const { lesson, grades } = lessonWithGrade;
         if (!grades.length) return;
 
         const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
@@ -167,7 +167,7 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
       });
     }
 
-    const uploadResponse = await vk.uploadAndGetPhoto({peerId, stream: result.fileStream!});
+    const uploadResponse = await vk.uploadAndGetPhoto({ peerId, stream: result.fileStream! });
     if (!uploadResponse) {
       return await vk.sendMessage({
         peerId,
@@ -187,7 +187,7 @@ async function command({message, classes, vk, payload, grades, utils}: CommandIn
       message: 'Полный отчёт об оценках из Сетевого Города:',
     });
   }
-};
+}
 
 const cmd: CommandOutputData = {
   name: 'оценки',
@@ -195,7 +195,7 @@ const cmd: CommandOutputData = {
   description: null,
   payload: {
     command: 'grades',
-    data: {action: 'update', forceUpdate: false},
+    data: { action: 'update', forceUpdate: false },
   } as GradesPayload,
   requirements: {
     admin: false,

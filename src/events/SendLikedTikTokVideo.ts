@@ -1,31 +1,31 @@
-import {EventInputData, EventOutputData} from '../types/Event/Events';
+import { EventInputData, EventOutputData } from '../types/Event/Events';
 
 import axios from 'axios';
 import request from 'request-promise';
 
-import {getTikTokConfig, getMainConfig} from '../utils/getConfig';
+import { getTikTokConfig, getMainConfig } from '../utils/getConfig';
 
-import {UploadVideoResponse} from '../types/VK/Responses/UploadVideoResponse';
-import {Attachment} from 'vk-io';
-import {ProfileDataResponse} from '../types/Responses/TikTok/ProfileDataResponse';
-import {LikedVideosResponse} from '../types/Responses/TikTok/LikedVideosResponse';
+import { UploadVideoResponse } from '../types/VK/Responses/UploadVideoResponse';
+import { Attachment } from 'vk-io';
+import { ProfileDataResponse } from '../types/Responses/TikTok/ProfileDataResponse';
+import { LikedVideosResponse } from '../types/Responses/TikTok/LikedVideosResponse';
 
 import waitMs from '../utils/waitMs';
 
-async function executeEvent({vk, vkUser, message}: EventInputData) {
+async function executeEvent({ vk, vkUser, message }: EventInputData) {
   if (!message) return;
 
   const tiktokRapidHOST = 'tiktok-unauthorized-api-scraper-no-watermark-analytics-feed.p.rapidapi.com';
   const tiktokRapidAPIUrl = `https://${tiktokRapidHOST}`;
 
-  const {username} = getTikTokConfig();
-  const {rapidApiKey} = getMainConfig();
+  const { username } = getTikTokConfig();
+  const { rapidApiKey } = getMainConfig();
 
   try {
     const userResponse = await axios({
       url: `${tiktokRapidAPIUrl}/api/search_full`,
       method: 'POST',
-      data: {username, amount_of_posts: 0},
+      data: { username, amount_of_posts: 0 },
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': tiktokRapidHOST,
@@ -34,14 +34,14 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
 
     const userData: ProfileDataResponse = userResponse.data;
 
-    const {user: {sid}} = userData;
+    const { user: { sid } } = userData;
 
     await waitMs(3500, 4000, true, 'ожидание перед вторым запросом');
 
     const likedVideosResponse = await axios({
       url: `${tiktokRapidAPIUrl}/api/liked`,
       method: 'POST',
-      data: {sid, amount_of_posts: 40},
+      data: { sid, amount_of_posts: 40 },
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': tiktokRapidHOST,
@@ -51,7 +51,7 @@ async function executeEvent({vk, vkUser, message}: EventInputData) {
     const likedVideosData: LikedVideosResponse = likedVideosResponse.data;
 
     const randomVideo = likedVideosData.posts[Math.floor(Math.random() * likedVideosData.posts.length)];
-    const {description, play_links} = randomVideo;
+    const { description, play_links } = randomVideo;
 
     const videoUrl = play_links[Math.floor(Math.random() * play_links.length)];
     const descr = description.length ? description : 'видео прикол';

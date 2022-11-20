@@ -1,9 +1,9 @@
-import {ContextDefaultState, MessageContext} from 'vk-io';
+import { ContextDefaultState, MessageContext } from 'vk-io';
 import Classes from '../../modules/Classes';
 import MessageStatistics from '../../modules/MessageStatistics';
 import Schedule from '../../modules/Schedule';
 import VkService from '../../modules/VK';
-import {CommandOutputData} from '../Commands';
+import { CommandOutputData } from '../Commands';
 
 export type EventInputData = {
   vk: VkService
@@ -19,5 +19,5 @@ export type EventOutputData = {
   name: string
   disabled: boolean
   executeProbability: number
-  execute: ({}: EventInputData) => Promise<void>
+  execute: ({ vk, classes, commands, schedule, statistics, vkUser, message }: EventInputData) => Promise<void>
 };

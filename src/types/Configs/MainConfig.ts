@@ -8,4 +8,4 @@ export type MainConfig = {
     schedule: number
     grades: number
   }
-};
+}

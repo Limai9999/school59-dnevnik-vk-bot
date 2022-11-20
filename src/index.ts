@@ -17,10 +17,10 @@ import Subscription from './modules/Subscription';
 import API from './modules/API';
 import Grades from './modules/Grades';
 
-import {getVKConfig, getMongoDBConfig, getMainConfig} from './utils/getConfig';
+import { getVKConfig, getMongoDBConfig, getMainConfig } from './utils/getConfig';
 import getCommands from './utils/getCommands';
 
-const {url} = getMongoDBConfig();
+const { url } = getMongoDBConfig();
 mongoose.connect(url, {}, (err) => {
   if (err) {
     console.log('Ошибка при подключении к Mongo DB:'.red, err);
@@ -68,7 +68,7 @@ async function start() {
   await vkUser.init();
 
   const allClasses = await classes.getAllClasses();
-  await Promise.all(allClasses.map(async ({id}) => {
+  await Promise.all(allClasses.map(async ({ id }) => {
     await classes.setLoading(id, false);
 
     vkBot.addChatToState(id);
@@ -95,7 +95,7 @@ async function start() {
   console.log('\nБот запущен!'.green);
 
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades});
+    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades });
   });
 }
 

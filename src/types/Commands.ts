@@ -1,4 +1,4 @@
-import {MessageContext, ContextDefaultState, ButtonColor} from 'vk-io';
+import { MessageContext, ContextDefaultState, ButtonColor } from 'vk-io';
 
 import VKService from '../modules/VK';
 import Classes from '../modules/Classes';
@@ -11,9 +11,9 @@ import Subscription from '../modules/Subscription';
 import API from '../modules/API';
 import Grades from '../modules/Grades';
 
-import {Payload} from './VK/Payloads/Payload';
+import { Payload } from './VK/Payloads/Payload';
 
-import {MainConfig} from './Configs/MainConfig';
+import { MainConfig } from './Configs/MainConfig';
 
 export type CommandInputData = {
   vk: VKService
@@ -52,5 +52,5 @@ export type CommandOutputData = {
   showInAdditionalMenu: boolean
   showInCommandsList: boolean
   howToUse: string | null
-  execute: ({}: CommandInputData) => Promise<any>
+  execute: ({ vk, vkUser, api, args, classes, commands, events, grades, mainConfig, message, netcityAPI, schedule, statistics, subscription, utils, payload }: CommandInputData) => Promise<any>
 };

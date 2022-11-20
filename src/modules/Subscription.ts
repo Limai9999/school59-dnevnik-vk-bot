@@ -4,7 +4,7 @@ import Classes from './Classes';
 import Utils from './Utils';
 import VK from './VK';
 
-import {SubscriptionData} from '../types/Subscription/SubscriptionData';
+import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 
 class Subscription {
   vk: VK;
@@ -21,28 +21,28 @@ class Subscription {
     const classData = await this.classes.getClass(peerId);
 
     if (!classData.subscription) {
-      const newData: SubscriptionData = {active: false, endDate: 0};
+      const newData: SubscriptionData = { active: false, endDate: 0 };
       await this.updateSubscription(peerId, newData, false);
 
       return newData;
     }
 
-    const {active, endDate} = classData.subscription;
+    const { active, endDate } = classData.subscription;
 
     const isExpired = endDate! < Date.now();
     if (active && isExpired) {
-      const newData: SubscriptionData = {active: false, endDate: endDate!};
+      const newData: SubscriptionData = { active: false, endDate: endDate! };
       await this.updateSubscription(peerId, newData, false);
 
       await this.vk.sendMessage({
-        message: `⚠️ Ваша подписка истекла.\nПродлите её, если хотите продолжить пользоваться ботом.`,
+        message: '⚠️ Ваша подписка истекла.\nПродлите её, если хотите продолжить пользоваться функциями бота.',
         peerId,
       });
 
       return newData;
     }
 
-    return {active: active!, endDate: endDate!};
+    return { active: active!, endDate: endDate! };
   }
 
   async updateSubscription(peerId: number, subscription: SubscriptionData, notifyUser: boolean) {

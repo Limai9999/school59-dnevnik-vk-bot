@@ -1,12 +1,12 @@
-import {ButtonColor, Keyboard, KeyboardBuilder} from 'vk-io';
+import { ButtonColor, Keyboard, KeyboardBuilder } from 'vk-io';
 
-import {CommandInputData, CommandOutputData} from '../types/Commands';
-import {AdditionalMenuPayload} from '../types/VK/Payloads/AdditionalMenuPayload';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
+import { AdditionalMenuPayload } from '../types/VK/Payloads/AdditionalMenuPayload';
 
-import {MainKeyboard} from '../keyboards/MainKeyboard';
-import {DMMainKeyboard} from '../keyboards/DMMainKeyboard';
+import { MainKeyboard } from '../keyboards/MainKeyboard';
+import { DMMainKeyboard } from '../keyboards/DMMainKeyboard';
 
-async function command({message, vk, classes, payload, commands}: CommandInputData) {
+async function command({ message, vk, payload, commands }: CommandInputData) {
   const additionalMenuPayload = payload as AdditionalMenuPayload;
 
   if (!payload || !additionalMenuPayload.data) return;
@@ -18,32 +18,32 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
 
   if (action === 'enable') {
     keyboard = Keyboard.builder()
-        .textButton({
-          label: 'Вернуться в главное меню',
-          payload: {command: 'additionalMenu', data: {action: 'disable'}} as AdditionalMenuPayload,
-          color: Keyboard.NEGATIVE_COLOR,
-        })
-        .row();
+      .textButton({
+        label: 'Вернуться в главное меню',
+        payload: { command: 'additionalMenu', data: { action: 'disable' } } as AdditionalMenuPayload,
+        color: Keyboard.NEGATIVE_COLOR,
+      })
+      .row();
 
     const isDMChat = message.isDM;
     const isAdminChat = message.peerId === vk.config.adminChatID;
 
     let currentButtonsInRowCount = 0;
     let lastKeyboardColor: ButtonColor;
-    commands.map(({name, payload, showInAdditionalMenu, requirements: {admin, dmOnly}, keyboardData}) => {
+    commands.map(({ name, payload, showInAdditionalMenu, requirements: { admin, dmOnly }, keyboardData }) => {
       if (!showInAdditionalMenu) return;
 
       if (dmOnly && !isDMChat) return;
       if (admin && !isAdminChat) return;
 
       if (currentButtonsInRowCount >= 2 || (keyboardData && keyboardData.positionSeparatelyFromAllButton) || (keyboardData && keyboardData.color !== lastKeyboardColor)) {
-        keyboard!.row();
+        keyboard.row();
         currentButtonsInRowCount = 0;
       }
 
       const keyboardColor = (keyboardData && keyboardData.color) ? keyboardData.color : Keyboard.PRIMARY_COLOR;
 
-      keyboard!.textButton({
+      keyboard.textButton({
         label: name[0].toUpperCase() + name.slice(1),
         payload,
         color: keyboardColor,
@@ -62,7 +62,7 @@ async function command({message, vk, classes, payload, commands}: CommandInputDa
     priority: 'low',
     keyboard,
   });
-};
+}
 
 const cmd: CommandOutputData = {
   name: 'дополнительное меню',

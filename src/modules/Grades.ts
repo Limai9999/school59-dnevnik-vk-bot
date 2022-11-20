@@ -1,5 +1,4 @@
-
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 
 import API from './API';
 import Classes from './Classes';
@@ -8,11 +7,11 @@ import Utils from './Utils';
 import VK from './VK';
 import Subscription from './Subscription';
 
-import {GetTotalStudentReport} from '../types/Responses/API/grades/GetTotalStudentReport';
+import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 
-import {getGradesDebugData} from '../utils/getConfig';
+import { getGradesDebugData } from '../utils/getConfig';
 
-import {MainConfig} from '../types/Configs/MainConfig';
+import { MainConfig } from '../types/Configs/MainConfig';
 
 class Grades {
   vk: VK;
@@ -98,8 +97,8 @@ class Grades {
     if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference || !classData.totalStudentReport || !classData.totalStudentReport.status) {
       const previousReport = classData.totalStudentReport! as unknown as GetTotalStudentReport;
       const report = this.isDebug ?
-                      getGradesDebugData() :
-                      await this.netcityAPI.getTotalStudentReport(peerId);
+        getGradesDebugData() :
+        await this.netcityAPI.getTotalStudentReport(peerId);
 
       if (report.status) {
         await this.classes.setTotalStudentReport(peerId, report);
@@ -129,7 +128,7 @@ class Grades {
       }
 
       oldAverage.map((oldGrade) => {
-        const newGrade = newAverage.find(({lesson}) => lesson === oldGrade.lesson);
+        const newGrade = newAverage.find(({ lesson }) => lesson === oldGrade.lesson);
 
         // непонятно зачем это сделано, но так было в прошлой версии бота, который работал идеально
         if (!newGrade) {
@@ -148,7 +147,7 @@ class Grades {
 
       // проверка изменений во всех днях
       oldDaysData.map((oldDayData) => {
-        const newDayData = newDaysData.find(({month, day}) => month === oldDayData.month && day === oldDayData.day);
+        const newDayData = newDaysData.find(({ month, day }) => month === oldDayData.month && day === oldDayData.day);
 
         if (!newDayData) return changesList.push(`День "${oldDayData.day} ${oldDayData.month}" пропал из отчёта с оценками.`);
 
@@ -158,7 +157,7 @@ class Grades {
         const changes: string[] = [];
 
         oldLessonsWithGrades.map((oldLesson) => {
-          const newLesson = newLessonsWithGrades.find(({lesson}) => lesson === oldLesson.lesson);
+          const newLesson = newLessonsWithGrades.find(({ lesson }) => lesson === oldLesson.lesson);
           if (!newLesson) return;
 
           const oldGradesString = oldLesson.grades.join(', ');
@@ -200,7 +199,7 @@ class Grades {
       const response = await this.api.request({
         method: 'get',
         url: '/grades/getReportScreenshot',
-        data: {screenshotName},
+        data: { screenshotName },
         responseType: 'stream',
       });
       if (!response) throw new Error('Не удалось обратиться к API.');

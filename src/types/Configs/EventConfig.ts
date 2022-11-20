@@ -1,4 +1,4 @@
 export type EventConfig = {
-  enabled: boolean;
-  generalRandom: number;
-};
+  enabled: boolean
+  generalRandom: number
+}

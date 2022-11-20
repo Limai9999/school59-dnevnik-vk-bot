@@ -1,16 +1,16 @@
-import {EventInputData, EventOutputData} from '../types/Event/Events';
+import { EventInputData, EventOutputData } from '../types/Event/Events';
 
-import {Attachment} from 'vk-io';
+import { Attachment } from 'vk-io';
 import axios from 'axios';
 
-async function executeEvent({statistics, vk, message}: EventInputData) {
-  const {peerId} = message!;
+async function executeEvent({ statistics, vk, message }: EventInputData) {
+  const { peerId } = message!;
 
   const photos = await statistics.getPhotoAttachments(message!.peerId);
 
   const randomPhoto = photos[Math.floor(Math.random() * photos.length)];
 
-  const {sizes} = randomPhoto.photo;
+  const { sizes } = randomPhoto.photo;
 
   // choose size with highest height and width
   const size = sizes.reduce((prev, curr) => {
@@ -30,7 +30,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
   });
   if (!uploadResponse) return;
 
-  const {id, owner_id} = uploadResponse;
+  const { id, owner_id } = uploadResponse;
   const attachment = new Attachment({
     api: vk.api,
     type: 'photo',

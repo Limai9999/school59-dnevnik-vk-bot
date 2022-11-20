@@ -1,10 +1,10 @@
-import {Keyboard} from 'vk-io';
+import { Keyboard } from 'vk-io';
 
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-import {ConnectDMPayload} from '../types/VK/Payloads/ConnectDMPayload';
+import { ConnectDMPayload } from '../types/VK/Payloads/ConnectDMPayload';
 
-export async function command({message, vk, classes, payload}: CommandInputData) {
+export async function command({ message, vk, classes, payload }: CommandInputData) {
   let loadingMessageID = 0;
 
   const removeLoadingMessage = () => {
@@ -22,7 +22,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
 
   removeLoadingMessage();
 
-  const adminStatuses = groups.map(({id, title, admins}) => {
+  const adminStatuses = groups.map(({ id, title, admins }) => {
     const isAdmin = admins.includes(message.senderId);
 
     return {
@@ -31,7 +31,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
       isAdmin,
     };
   });
-  const whereUserIsAdmin = adminStatuses.filter(({isAdmin}) => isAdmin);
+  const whereUserIsAdmin = adminStatuses.filter(({ isAdmin }) => isAdmin);
 
   const connectDMPayload = payload as ConnectDMPayload;
   const action = connectDMPayload.data.action;
@@ -47,7 +47,7 @@ export async function command({message, vk, classes, payload}: CommandInputData)
     }
 
     const keyboard = Keyboard.builder()
-        .inline();
+      .inline();
 
     let currentButtonsInRowCount = 0;
 

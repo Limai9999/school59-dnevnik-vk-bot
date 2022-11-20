@@ -1,6 +1,6 @@
-import {EventInputData, EventOutputData} from '../types/Event/Events';
+import { EventInputData, EventOutputData } from '../types/Event/Events';
 
-async function executeEvent({statistics, vk, message, classes}: EventInputData) {
+async function executeEvent({ vk, message }: EventInputData) {
   if (!message || !message.text || message.messagePayload) return;
   const msg = message.text.toLowerCase();
 
@@ -50,7 +50,9 @@ async function executeEvent({statistics, vk, message, classes}: EventInputData) 
     if (msg.includes('задали') || msg.includes('по')) sendingMessage = homeworkList[Math.floor(Math.random() * homeworkList.length)];
     if (msg.includes('надо') || msg.includes('надобно') || msg.includes('нужно')) sendingMessage = whatNeedList[Math.floor(Math.random() * whatNeedList.length)];
     if (msg.includes('делать')) sendingMessage = whatToDoList[Math.floor(Math.random() * whatToDoList.length)];
-  } else if (msg.match(/какое/)) {}
+  } else if (msg.match(/какое/)) {
+    // todo
+  }
 
   if (!sendingMessage.length) return;
 

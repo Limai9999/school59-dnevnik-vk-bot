@@ -1,7 +1,7 @@
 import Password from '../modules/Password';
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-async function command({message, args, vk, classes, netcityAPI}: CommandInputData) {
+async function command({ message, args, vk, classes, netcityAPI }: CommandInputData) {
   const [login, inputPassword, className] = args;
 
   if (login.length < 4 || inputPassword.length < 4 || (inputPassword.length < 35 && !message.isDM)) {
@@ -35,8 +35,8 @@ async function command({message, args, vk, classes, netcityAPI}: CommandInputDat
   }
 
   const password = message.isDM ?
-        new Password(inputPassword, false).encrypt() :
-        inputPassword;
+    new Password(inputPassword, false).encrypt() :
+    inputPassword;
 
   await classes.setNetCityData(message.peerId, {
     login,
@@ -59,7 +59,7 @@ const cmd: CommandOutputData = {
   description: 'ввести данные для входа в Сетевой Город',
   payload: {
     command: 'netcity',
-    data: {action: 'netcity'},
+    data: { action: 'netcity' },
   },
   requirements: {
     admin: false,

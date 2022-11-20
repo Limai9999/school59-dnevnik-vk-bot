@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-import {GetCookiesResponse} from '../types/Responses/API/netCity/GetCookiesResponse';
-import {GetStudentDiary} from '../types/Responses/API/netCity/GetStudentDiary';
-import {InitStudentDiary} from '../types/Responses/API/netCity/InitStudentDiary';
-import {GetAnnouncementsResponse, Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
-import {DownloadAttachmentResponse} from '../types/Responses/API/netCity/DownloadAttachmentResponse';
-import {CloseSessionResponse} from '../types/Responses/API/netCity/CloseSessionResponse';
-import {GetTotalStudentReport} from '../types/Responses/API/grades/GetTotalStudentReport';
+import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
+import { GetStudentDiary } from '../types/Responses/API/netCity/GetStudentDiary';
+import { InitStudentDiary } from '../types/Responses/API/netCity/InitStudentDiary';
+import { GetAnnouncementsResponse, Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
+import { DownloadAttachmentResponse } from '../types/Responses/API/netCity/DownloadAttachmentResponse';
+import { CloseSessionResponse } from '../types/Responses/API/netCity/CloseSessionResponse';
+import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -15,7 +15,7 @@ import Password from './Password';
 import API from './API';
 import Subscription from './Subscription';
 
-import {MainConfig} from '../types/Configs/MainConfig';
+import { MainConfig } from '../types/Configs/MainConfig';
 
 interface Session extends GetCookiesResponse {
   peerId: number
@@ -64,7 +64,7 @@ class NetCityAPI {
     const credentials = await this.getCredentials(peerId);
     if (!credentials) return false;
 
-    const {login, password, className} = credentials;
+    const { login, password, className } = credentials;
 
     const autoUpdateMinutes = this.mainConfig.autoUpdateMin.netcity;
     const autoUpdateTime = 1000 * 60 * (15 + this.autoUpdateCount);
@@ -99,7 +99,7 @@ class NetCityAPI {
   }
 
   async getCredentials(peerId: number) {
-    const {netCityData, className} = await this.classes.getClass(peerId);
+    const { netCityData, className } = await this.classes.getClass(peerId);
     if (!netCityData || !className) return false;
 
     const decryptedPassword = new Password(netCityData.password!, true).decrypt();
@@ -117,8 +117,8 @@ class NetCityAPI {
 
     try {
       const request = await this.api.request({
-        url: `/netcity/getCookies`,
-        data: {login, password},
+        url: '/netcity/getCookies',
+        data: { login, password },
       });
       if (!request) throw new Error('Не удалось обратиться к API.');
 
@@ -147,7 +147,7 @@ class NetCityAPI {
         password,
         status: false,
         error: `${error}`,
-        session: {id: 0, endTime: 0},
+        session: { id: 0, endTime: 0 },
         at: '0',
         cookies: [],
       };
@@ -157,8 +157,8 @@ class NetCityAPI {
   async closeSession(sessionId: number): Promise<CloseSessionResponse> {
     try {
       const request = await this.api.request({
-        url: `/netcity/closeSession`,
-        data: {sessionId},
+        url: '/netcity/closeSession',
+        data: { sessionId },
       });
       if (!request) throw new Error('Не удалось обратиться к API.');
 
@@ -198,7 +198,7 @@ class NetCityAPI {
   }
 
   getSession(sessionId: number) {
-    const session = this.sessions.find(({session}) => session.id === sessionId);
+    const session = this.sessions.find(({ session }) => session.id === sessionId);
     return session;
   }
 
@@ -261,7 +261,7 @@ class NetCityAPI {
       const studentData = await this.initStudentDiary(sessionId);
       if (!studentData.status) return;
 
-      const {students} = studentData.data!;
+      const { students } = studentData.data!;
       const studentId = students[0].studentId;
 
       const request = await axios({
@@ -344,8 +344,8 @@ class NetCityAPI {
     try {
       const request = await this.api.request({
         method: 'post',
-        url: `/netcity/downloadAttachment`,
-        data: {sessionId, attachmentId, filename, isTest},
+        url: '/netcity/downloadAttachment',
+        data: { sessionId, attachmentId, filename, isTest },
       });
       if (!request) throw new Error('Не удалось обратиться к API.');
 
@@ -371,11 +371,11 @@ class NetCityAPI {
           status: false,
           error: 'Вы не ввели данные для Сетевого Города.',
           info: [],
-          result: {averageGrades: [], daysData: []},
+          result: { averageGrades: [], daysData: [] },
         };
       }
 
-      const {login, password} = credentials;
+      const { login, password } = credentials;
 
       const session = await this.findOrCreateSession(peerId, login, password, false);
       if (!session || !session.status) {
@@ -383,13 +383,13 @@ class NetCityAPI {
           status: false,
           error: !session.status ? `При входе в Сетевой Город произошла ошибка:\n${session.error}` : 'Вы не вошли в Сетевой Город.',
           info: [],
-          result: {averageGrades: [], daysData: []},
+          result: { averageGrades: [], daysData: [] },
         };
       }
 
       const response = await this.api.request({
         url: '/grades/getTotalStudentReport',
-        data: {sessionId: session.session.id},
+        data: { sessionId: session.session.id },
       });
       if (!response) throw new Error('Не удалось обратиться к API.');
 
@@ -401,7 +401,7 @@ class NetCityAPI {
         status: false,
         error: `${error}`,
         info: [],
-        result: {averageGrades: [], daysData: []},
+        result: { averageGrades: [], daysData: [] },
       };
     }
   }

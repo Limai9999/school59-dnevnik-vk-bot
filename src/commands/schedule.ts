@@ -1,14 +1,14 @@
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-import {Keyboard} from 'vk-io';
+import { Keyboard } from 'vk-io';
 import moment from 'moment';
 
 moment.locale('ru');
 
-import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
-import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
+import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
+import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 
-export async function command({message, vk, classes, payload, schedule, utils}: CommandInputData) {
+export async function command({ message, vk, classes, payload, schedule, utils }: CommandInputData) {
   let loadingMessageID = 0;
 
   const peerId = message.peerId;
@@ -26,15 +26,15 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
     await classes.setLoading(peerId, false);
 
     const keyboard = Keyboard.builder()
-        .inline()
-        .textButton({
-          label: 'Обновить расписание',
-          color: Keyboard.NEGATIVE_COLOR,
-          payload: {
-            command: 'schedule',
-            data: {action: 'update'},
-          } as SchedulePayload,
-        });
+      .inline()
+      .textButton({
+        label: 'Обновить расписание',
+        color: Keyboard.NEGATIVE_COLOR,
+        payload: {
+          command: 'schedule',
+          data: { action: 'update' },
+        } as SchedulePayload,
+      });
 
     return vk.sendMessage({
       message: errorMessage,
@@ -62,10 +62,10 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
       });
 
       const scheduleData = await schedule.get(peerId, isForceUpdate);
-      const {manualSchedule, netcitySchedule} = scheduleData;
+      const { manualSchedule, netcitySchedule } = scheduleData;
 
       const keyboard = Keyboard.builder()
-          .inline();
+        .inline();
 
       let resultMessage = '';
 
@@ -78,7 +78,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
         const netcityFilesStrings = netcityFiles.map((file, index) => {
           let returningString = '';
 
-          const {filename} = file;
+          const { filename } = file;
 
           let date: string | undefined;
           if (file.status) date = file.schedule!.date;
@@ -88,7 +88,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
             color: file.status ? Keyboard.PRIMARY_COLOR : Keyboard.NEGATIVE_COLOR,
             payload: {
               command: 'schedule',
-              data: {action: 'choose', filename, type: 'netcity'},
+              data: { action: 'choose', filename, type: 'netcity' },
             } as SchedulePayload,
           });
 
@@ -124,14 +124,14 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
         keyboard.row();
 
         const manualFilesStrings = newestManualFiles.map((schedule, index) => {
-          const {filename, date} = schedule.schedule!;
+          const { filename, date } = schedule.schedule!;
 
           keyboard.textButton({
             label: date || String(index + 1),
             color: Keyboard.SECONDARY_COLOR,
             payload: {
               command: 'schedule',
-              data: {action: 'choose', filename, type: 'manual'},
+              data: { action: 'choose', filename, type: 'manual' },
             } as SchedulePayload,
           });
 
@@ -158,7 +158,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
         color: Keyboard.NEGATIVE_COLOR,
         payload: {
           command: 'schedule',
-          data: {action: 'update'},
+          data: { action: 'update' },
         } as SchedulePayload,
       });
 
@@ -181,7 +181,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
       }
 
       if (scheduleData.status) {
-        const {date, schedule, totalLessons, startTime, filename, creationTime} = scheduleData.schedule!;
+        const { date, schedule, totalLessons, startTime, filename, creationTime } = scheduleData.schedule!;
 
         const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
         const totalLessonsAndStartTimeString = totalLessons === 1 ? `Всего 1 урок, начинающийся в ${startTime}.` : `Всего уроков: ${totalLessons}, начинаются в ${startTime}.`;
@@ -213,7 +213,7 @@ export async function command({message, vk, classes, payload, schedule, utils}: 
     console.log('Ошибка при отправке расписания'.red, error);
     sendError(`При получении расписания произошла ошибка:\n${error}`);
   }
-};
+}
 
 const cmd: CommandOutputData = {
   name: 'расписание',
@@ -221,7 +221,7 @@ const cmd: CommandOutputData = {
   description: 'получить расписание уроков',
   payload: {
     command: 'schedule',
-    data: {action: 'get'},
+    data: { action: 'get' },
   } as SchedulePayload,
   requirements: {
     admin: false,

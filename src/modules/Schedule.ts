@@ -1,4 +1,4 @@
-import {Keyboard} from 'vk-io';
+import { Keyboard } from 'vk-io';
 
 import VK from './VK';
 import Classes from './Classes';
@@ -7,14 +7,14 @@ import Utils from './Utils';
 import API from './API';
 import Subscription from './Subscription';
 
-import {Attachment} from '../types/Responses/API/netCity/GetAnnouncementsResponse';
-import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
-import {SaveFileResponse} from '../types/Responses/API/schedule/SaveFileResponse';
-import {CompareResponse} from '../types/Schedule/CompareResponse';
+import { Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
+import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
+import { SaveFileResponse } from '../types/Responses/API/schedule/SaveFileResponse';
+import { CompareResponse } from '../types/Schedule/CompareResponse';
 
-import {SchedulePayload} from '../types/VK/Payloads/SchedulePayload';
+import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 
-import {MainConfig} from '../types/Configs/MainConfig';
+import { MainConfig } from '../types/Configs/MainConfig';
 
 type GetScheduleWithAPI = {
   status: boolean
@@ -110,7 +110,7 @@ export default class Schedule {
       };
     }
 
-    const {login, password, className} = credentials;
+    const { login, password, className } = credentials;
 
     const session = await this.netCity.findOrCreateSession(peerId, login, password, false);
 
@@ -145,7 +145,7 @@ export default class Schedule {
       }
 
       announcementsResponse.announcements!.map((announce) => {
-        const {attachments} = announce;
+        const { attachments } = announce;
 
         const matchRegexp = /расписание|изменения|расписании/g;
         const skipRegexp = /основное|полугодие/g;
@@ -201,7 +201,7 @@ export default class Schedule {
 
   async parse(filename: string, className: string) {
     const parseScheduleResponse = await this.api.request({
-      url: `/schedule/parse`,
+      url: '/schedule/parse',
       data: {
         filename,
         className,
@@ -246,18 +246,18 @@ export default class Schedule {
     const testMode = this.mainConfig.testMode;
     const announceChat = testMode ? this.vk.config.adminChatID : peerId;
 
-    if (!newSchedule.status) return {isChanged: false};
+    if (!newSchedule.status) return { isChanged: false };
 
     const keyboard = Keyboard.builder()
-        .inline()
-        .textButton({
-          label: newSchedule.schedule!.date || 'Открыть',
-          color: isManual ? Keyboard.SECONDARY_COLOR : Keyboard.PRIMARY_COLOR,
-          payload: {
-            command: 'schedule',
-            data: {action: 'choose', filename: newSchedule.filename, type: isManual ? 'manual' : 'netcity'},
-          } as SchedulePayload,
-        });
+      .inline()
+      .textButton({
+        label: newSchedule.schedule!.date || 'Открыть',
+        color: isManual ? Keyboard.SECONDARY_COLOR : Keyboard.PRIMARY_COLOR,
+        payload: {
+          command: 'schedule',
+          data: { action: 'choose', filename: newSchedule.filename, type: isManual ? 'manual' : 'netcity' },
+        } as SchedulePayload,
+      });
 
     if (!oldSchedule || !oldSchedule.status) {
       if (announce) {
@@ -270,8 +270,8 @@ export default class Schedule {
         });
       }
 
-      return {isChanged: false, keyboard};
-    };
+      return { isChanged: false, keyboard };
+    }
 
     const oldData = oldSchedule.schedule!;
     const newData = newSchedule.schedule!;
@@ -279,7 +279,7 @@ export default class Schedule {
     const stringifiedOldSchedule = oldData.schedule.join('\n');
     const stringifiedNewSchedule = newData.schedule.join('\n');
 
-    if (stringifiedOldSchedule === stringifiedNewSchedule) return {isChanged: false, keyboard};
+    if (stringifiedOldSchedule === stringifiedNewSchedule) return { isChanged: false, keyboard };
 
     console.log(`Расписание на ${newData.date} изменилось - ${peerId}`.cyan.bgYellow);
 
@@ -296,7 +296,7 @@ export default class Schedule {
         const addedLessonsCountString = this.utils.setWordEndingBasedOnThingsCount('addedLessons', addedLessonsCount);
 
         const addedLessons: string[] = newData.objectedSchedule.map((lessonObj) => {
-          const {lesson} = lessonObj;
+          const { lesson } = lessonObj;
           if (!lesson) return false;
 
           const isExistsInOld = oldData.objectedSchedule.find((schedule) => schedule.lesson === lesson);
@@ -332,15 +332,15 @@ export default class Schedule {
       });
     }
 
-    const result = {isChanged: true, keyboard, changesList};
+    const result = { isChanged: true, keyboard, changesList };
     return result;
   }
 
   async saveFile(url: string, filename: string): Promise<boolean> {
     const response = await this.api.request({
       method: 'post',
-      url: `/schedule/saveFile`,
-      data: {filename, url},
+      url: '/schedule/saveFile',
+      data: { filename, url },
     });
     if (!response) throw new Error('Не удалось обратиться к API.');
 

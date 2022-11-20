@@ -1,31 +1,31 @@
-import {VK, KeyboardBuilder, Attachment} from 'vk-io';
-import {PhotosPhoto} from 'vk-io/lib/api/schemas/objects';
+import { VK, KeyboardBuilder, Attachment } from 'vk-io';
+import { PhotosPhoto } from 'vk-io/lib/api/schemas/objects';
 
 import FormData from 'form-data';
 import fs from 'fs';
 import axios from 'axios';
-import {Readable} from 'stream';
+import { Readable } from 'stream';
 
 import Classes from './Classes';
 import Utils from './Utils';
 
-import {VKSettings} from '../types/VK/Settings';
-import {SendMessageData} from '../types/VK/SendMessageData';
-import {VKConfig} from '../types/Configs/VKConfig';
-import {MainConfig} from '../types/Configs/MainConfig';
-import {State} from '../types/VK/State';
+import { VKSettings } from '../types/VK/Settings';
+import { SendMessageData } from '../types/VK/SendMessageData';
+import { VKConfig } from '../types/Configs/VKConfig';
+import { MainConfig } from '../types/Configs/MainConfig';
+import { State } from '../types/VK/State';
 
-import {MessagesSendResponse} from '../types/VK/Responses/MessagesSendResponse';
-import {GetUserResponse} from '../types/VK/Responses/GetUserResponse';
-import {GetChatResponse} from '../types/VK/Responses/GetChatResponse';
-import {PhotoUploadResponse} from '../types/VK/Responses/PhotoUploadResponse';
+import { MessagesSendResponse } from '../types/VK/Responses/MessagesSendResponse';
+import { GetUserResponse } from '../types/VK/Responses/GetUserResponse';
+import { GetChatResponse } from '../types/VK/Responses/GetChatResponse';
+import { PhotoUploadResponse } from '../types/VK/Responses/PhotoUploadResponse';
 
-import {CommandInputData} from '../types/Commands';
+import { CommandInputData } from '../types/Commands';
 
-import {MainKeyboard} from '../keyboards/MainKeyboard';
-import {DMMainKeyboard} from '../keyboards/DMMainKeyboard';
+import { MainKeyboard } from '../keyboards/MainKeyboard';
+import { DMMainKeyboard } from '../keyboards/DMMainKeyboard';
 
-import {getMainConfig} from '../utils/getConfig';
+import { getMainConfig } from '../utils/getConfig';
 
 type TempMessage = {
   date: number
@@ -50,7 +50,7 @@ class VkService extends VK {
 
   messages: TempMessage[];
 
-  constructor({config, classes, token, utils, isUser}: VKSettings) {
+  constructor({ config, classes, token, utils, isUser }: VKSettings) {
     super({
       token,
       language: 'ru',
@@ -62,8 +62,8 @@ class VkService extends VK {
     this.mainConfig = getMainConfig();
     this.savedKeyboards = {};
 
-    this.me = {name: '', id: 0, isUser};
-    this.state = {chats: {}};
+    this.me = { name: '', id: 0, isUser };
+    this.state = { chats: {} };
 
     this.messages = [];
   }
@@ -72,13 +72,13 @@ class VkService extends VK {
     if (!this.me.isUser) await this.updates.start();
 
     if (this.me.isUser) {
-      const {id, first_name, last_name} = await this.getMeUser();
+      const { id, first_name, last_name } = await this.getMeUser();
       const name = this.me.isUser ? `${first_name} ${last_name}` : '';
 
-      this.me = {name, id: id!, isUser: this.me.isUser};
+      this.me = { name, id: id!, isUser: this.me.isUser };
     } else {
-      const {id, name} = await this.getMeGroup();
-      this.me = {name: name!, id: id!, isUser: this.me.isUser};
+      const { id, name } = await this.getMeGroup();
+      this.me = { name: name!, id: id!, isUser: this.me.isUser };
     }
 
     console.log(`VK успешно запущено как ${this.me.name} - ${this.me.id}.`.blue);
@@ -86,8 +86,8 @@ class VkService extends VK {
     return this;
   }
 
-  async handleMessage({message}: CommandInputData) {
-    this.messages.push({message, date: Date.now()});
+  async handleMessage({ message }: CommandInputData) {
+    this.messages.push({ message, date: Date.now() });
   }
 
   async waitForMessage(fromPeerId: number, fromSenderId: number, searchFromMessageId: number): Promise<CommandInputData['message'] | null> {
@@ -97,7 +97,7 @@ class VkService extends VK {
 
       const findInterval = setInterval(() => {
         const newMessages = this.messages.filter((message) => Date.now() - message.date < 5500 && message.message.conversationMessageId! > searchFromMessageId);
-        const message = newMessages.find(({date, message}) => message.peerId === fromPeerId && message.senderId === fromSenderId);
+        const message = newMessages.find(({ date, message }) => message.peerId === fromPeerId && message.senderId === fromSenderId);
 
         if (message) {
           resolve(message.message);
@@ -128,7 +128,7 @@ class VkService extends VK {
   }
 
   async getBotPingString() {
-    const {screen_name, id} = await this.getMeGroup();
+    const { screen_name, id } = await this.getMeGroup();
     const peerType = this.me.isUser ? 'id' : 'club';
 
     return `[${peerType}${id}|@${screen_name}]`;
@@ -141,7 +141,7 @@ class VkService extends VK {
     await Promise.all(lastSentMessages.map(async (messageId) => {
       await this.removeMessage(messageId, peerId);
     }));
-  };
+  }
 
   async removeMessage(messageId: number, peerId: number) {
     try {
@@ -157,25 +157,25 @@ class VkService extends VK {
       console.log('Произошла ошибка при удалении сообщения:'.red, error);
       return false;
     }
-  };
+  }
 
   setTimeoutForMessageRemove(messageId: number, peerId: number, priority: SendMessageData['priority']) {
     if (priority === 'none') return;
 
-    const {low, medium, high} = this.config.messagePrioritiesTimeoutMinutes;
+    const { low, medium, high } = this.config.messagePrioritiesTimeoutMinutes;
 
     let timeoutMs = 1000 * 60;
 
     switch (priority) {
-      case 'low':
-        timeoutMs *= low;
-        break;
-      case 'medium':
-        timeoutMs *= medium;
-        break;
-      case 'high':
-        timeoutMs *= high;
-        break;
+    case 'low':
+      timeoutMs *= low;
+      break;
+    case 'medium':
+      timeoutMs *= medium;
+      break;
+    case 'high':
+      timeoutMs *= high;
+      break;
     }
 
     setTimeout(async () => {
@@ -183,13 +183,13 @@ class VkService extends VK {
     }, timeoutMs);
   }
 
-  async sendMessage({message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false, useAll}: SendMessageData): Promise<number> {
+  async sendMessage({ message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false, useAll }: SendMessageData): Promise<number> {
     const isPrivateMessages = this.utils.checkIfPeerIsDM(peerId);
 
     const classData = await this.classes.getClass(peerId);
 
     const lastSentMessages = classData.lastSentMessages;
-    const {maxLastSentMessages} = this.config;
+    const { maxLastSentMessages } = this.config;
 
     if (lastSentMessages.length > maxLastSentMessages && !skipLastSentCheck && !isPrivateMessages) {
       this.sendMessage({
@@ -256,7 +256,7 @@ class VkService extends VK {
         originalTitle: 'none',
       },
     };
-  };
+  }
 
   async getChatsAdmins() {
     const chats = await this.classes.getAllClasses();
@@ -267,13 +267,13 @@ class VkService extends VK {
       admins: number[]
     }
 
-    const admins: GroupAdmins[] = await Promise.all(chats.map(async ({id}) => {
+    const admins: GroupAdmins[] = await Promise.all(chats.map(async ({ id }) => {
       const chatData = await this.getChat(id);
-      if (!chatData || !chatData.chat_settings) return {id, title: 'Неизвестно', admins: []};
+      if (!chatData || !chatData.chat_settings) return { id, title: 'Неизвестно', admins: [] };
 
-      const {chat_settings: {admin_ids, owner_id, title}} = chatData;
+      const { chat_settings: { admin_ids, owner_id, title } } = chatData;
 
-      return {id, title, admins: [...admin_ids, owner_id]};
+      return { id, title, admins: [...admin_ids, owner_id] };
     }));
 
     return admins;
@@ -285,7 +285,7 @@ class VkService extends VK {
       type: 'typing',
       group_id: this.me.id,
     });
-  };
+  }
 
   async getChat(peerId: number): Promise<GetChatResponse | null> {
     const response = await this.api.messages.getConversationsById({
@@ -306,16 +306,16 @@ class VkService extends VK {
     return response[0];
   }
 
-  async uploadAndGetPhoto({photoPath, peerId, stream}: {photoPath?: string, peerId: number, stream?: Readable}) {
+  async uploadAndGetPhoto({ photoPath, peerId, stream }: {photoPath?: string, peerId: number, stream?: Readable}) {
     try {
-      const {upload_url} = await this.api.photos.getMessagesUploadServer({
+      const { upload_url } = await this.api.photos.getMessagesUploadServer({
         peer_id: peerId,
       });
 
       const formData = new FormData();
 
       if (stream) {
-        formData.append('photo', stream, {filename: 'photo.jpg'});
+        formData.append('photo', stream, { filename: 'photo.jpg' });
       } else {
         if (!photoPath) return console.log('no photo path'.red);
         formData.append('photo', fs.createReadStream(photoPath));
@@ -328,7 +328,7 @@ class VkService extends VK {
         headers: formData.getHeaders(),
       });
 
-      const {server, hash, photo}: PhotoUploadResponse = uploadResponse.data;
+      const { server, hash, photo }: PhotoUploadResponse = uploadResponse.data;
 
       const saved = await this.api.photos.saveMessagesPhoto({
         photo,
@@ -344,7 +344,7 @@ class VkService extends VK {
   }
 
   createPhotoAttachment(upload: PhotosPhoto) {
-    const {id, owner_id} = upload;
+    const { id, owner_id } = upload;
     const attachment = new Attachment({
       api: this.api,
       type: 'photo',

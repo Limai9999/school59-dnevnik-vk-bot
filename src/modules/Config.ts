@@ -1,5 +1,5 @@
 import * as path from 'path';
-import {readFileSync, writeFileSync} from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 export default class Config {
   name: string;
@@ -15,7 +15,7 @@ export default class Config {
     return JSON.parse(data);
   }
 
-  saveData(data: any, log: boolean = true): boolean {
+  saveData(data: any, log = true): boolean {
     try {
       const stringifiedData = JSON.stringify(data, null, 2);
       writeFileSync(this.path, stringifiedData);

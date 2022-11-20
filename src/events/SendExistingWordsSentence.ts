@@ -1,7 +1,7 @@
-import {EventInputData, EventOutputData} from '../types/Event/Events';
+import { EventInputData, EventOutputData } from '../types/Event/Events';
 
-async function executeEvent({statistics, vk, message}: EventInputData) {
-  const {peerId, senderId} = message!;
+async function executeEvent({ statistics, vk, message }: EventInputData) {
+  const { peerId, senderId } = message!;
 
   const messages = await statistics.getTextMessagesWithoutPayload(peerId);
   const senderMessages = messages.filter((message) => message.userId === senderId);
@@ -10,7 +10,7 @@ async function executeEvent({statistics, vk, message}: EventInputData) {
 
   let usingMessages = useSenderMessages ? senderMessages : messages;
   usingMessages = usingMessages.filter((message) => {
-    const {text, args} = message!;
+    const { text, args } = message!;
 
     return text!.length >= 10 && args!.length;
   });

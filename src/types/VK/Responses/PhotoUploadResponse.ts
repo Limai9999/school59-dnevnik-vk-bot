@@ -1,5 +1,5 @@
 export type PhotoUploadResponse = {
-  photo: string,
-  server: number,
-  hash: string,
-};
+  photo: string
+  server: number
+  hash: string
+}

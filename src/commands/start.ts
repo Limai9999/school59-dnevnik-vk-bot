@@ -1,8 +1,8 @@
-import {StartPayload} from '../types/VK/Payloads/StartPayload';
+import { StartPayload } from '../types/VK/Payloads/StartPayload';
 
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-async function command({message, vk}: CommandInputData) {
+async function command({ message, vk }: CommandInputData) {
   const msg =
   `
 Привет!

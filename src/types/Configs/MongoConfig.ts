@@ -1,3 +1,3 @@
 export type MongoConfig = {
-  url: string;
-};
+  url: string
+}

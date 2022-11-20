@@ -1,8 +1,8 @@
-import {DMMainKeyboard} from '../keyboards/DMMainKeyboard';
-import {MainKeyboard} from '../keyboards/MainKeyboard';
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { DMMainKeyboard } from '../keyboards/DMMainKeyboard';
+import { MainKeyboard } from '../keyboards/MainKeyboard';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-async function command({message, vk}: CommandInputData) {
+async function command({ message, vk }: CommandInputData) {
   const awards = [
     'плитка говна',
     'стакан чечни',
@@ -40,7 +40,7 @@ const cmd: CommandOutputData = {
   description: 'тестовая команда',
   payload: {
     command: 'ramzan',
-    data: {action: 'ramzan'},
+    data: { action: 'ramzan' },
   },
   requirements: {
     admin: false,

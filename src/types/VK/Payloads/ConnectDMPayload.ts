@@ -1,4 +1,4 @@
-import {Payload} from './Payload';
+import { Payload } from './Payload';
 
 export interface ConnectDMPayload extends Payload {
   command: 'connectDMWithChat'
@@ -7,4 +7,4 @@ export interface ConnectDMPayload extends Payload {
     chatTitle?: string
     chatId?: number
   }
-};
+}

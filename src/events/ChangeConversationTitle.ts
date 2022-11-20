@@ -1,13 +1,13 @@
-import {EventInputData, EventOutputData} from '../types/Event/Events';
+import { EventInputData, EventOutputData } from '../types/Event/Events';
 
 function getRandomArbitrary(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
 
-async function executeEvent({vk, statistics, message}: EventInputData) {
+async function executeEvent({ vk, message }: EventInputData) {
   if (!message || message.messagePayload || !message.text) return;
 
-  const {peerId, chatId} = message;
+  const { peerId, chatId } = message;
 
   const state = vk.state.chats[peerId].events;
   if (state.pendingOriginalTitle) return console.log('не удалось выполнить changeConversationTitle, т.к оригинальный title еще не вернулся'.red);

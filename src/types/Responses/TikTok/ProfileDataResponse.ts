@@ -1,4 +1,4 @@
-import {LikedVideo} from './LikedVideosResponse';
+import { LikedVideo } from './LikedVideosResponse';
 
 export type ProfileDataResponse = {
   user: {

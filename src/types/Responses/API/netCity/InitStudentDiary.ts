@@ -1,9 +1,9 @@
 export type InitStudentDiary = {
   students: [{
     studentId: number
-    nickName: string,
-    className?: any,
-    classId: number,
+    nickName: string
+    className?: any
+    classId: number
     iupGrade: number
   }]
   currentStudentId: number

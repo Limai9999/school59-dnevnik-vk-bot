@@ -10,4 +10,4 @@ export type VKConfig = {
     medium: number
     high: number
   }
-};
+}

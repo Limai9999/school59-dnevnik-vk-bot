@@ -1,7 +1,7 @@
-import {CommandInputData, CommandOutputData} from '../types/Commands';
-import {Payload} from '../types/VK/Payloads/Payload';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
+import { Payload } from '../types/VK/Payloads/Payload';
 
-async function command({message, vk, classes, args}: CommandInputData) {
+async function command({ message, vk, classes, args }: CommandInputData) {
   const [chosenIdStr] = args;
   const idNum = Number(chosenIdStr);
 
@@ -24,7 +24,7 @@ const cmd: CommandOutputData = {
   name: 'disableClassModel',
   aliases: [],
   description: 'отключить модель определенного класса',
-  payload: {command: 'disableClassModel'} as Payload,
+  payload: { command: 'disableClassModel' } as Payload,
   requirements: {
     admin: true,
     dmOnly: false,

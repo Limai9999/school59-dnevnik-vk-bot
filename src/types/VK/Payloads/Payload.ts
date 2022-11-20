@@ -1,6 +1,6 @@
 export interface Payload {
-  command: string;
+  command: string
   data?: {
     action: string
   }
-};
+}

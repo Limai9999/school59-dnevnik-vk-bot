@@ -1,12 +1,12 @@
-import {Keyboard} from 'vk-io';
+import { Keyboard } from 'vk-io';
 import moment from 'moment';
 
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-import {AdminSubscriptionManagePayload} from '../types/VK/Payloads/AdminSubscriptionManagePayload';
+import { AdminSubscriptionManagePayload } from '../types/VK/Payloads/AdminSubscriptionManagePayload';
 
-async function command({message, vk, args, payload, subscription}: CommandInputData) {
-  const {peerId, senderId} = message;
+async function command({ message, vk, args, payload, subscription }: CommandInputData) {
+  const { peerId, senderId } = message;
 
   const [giveToId] = args;
 
@@ -28,21 +28,21 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
   }
 
   const keyboard = Keyboard.builder()
-      .inline()
-      .oneTime()
-      .textButton({
-        label: 'Выдать подписку',
-        color: Keyboard.POSITIVE_COLOR,
-        payload: {command: 'manageSubscription', data: {action: 'give'}} as AdminSubscriptionManagePayload,
-      })
-      .row()
-      .textButton({
-        label: 'Забрать подписку',
-        color: Keyboard.NEGATIVE_COLOR,
-        payload: {command: 'manageSubscription', data: {action: 'takeAway'}} as AdminSubscriptionManagePayload,
-      });
+    .inline()
+    .oneTime()
+    .textButton({
+      label: 'Выдать подписку',
+      color: Keyboard.POSITIVE_COLOR,
+      payload: { command: 'manageSubscription', data: { action: 'give' } } as AdminSubscriptionManagePayload,
+    })
+    .row()
+    .textButton({
+      label: 'Забрать подписку',
+      color: Keyboard.NEGATIVE_COLOR,
+      payload: { command: 'manageSubscription', data: { action: 'takeAway' } } as AdminSubscriptionManagePayload,
+    });
 
-  const {first_name, last_name, id, screen_name} = userData;
+  const { first_name, last_name, id, screen_name } = userData;
   const userDataString = `${first_name} ${last_name} - @${screen_name}\nID: ${id}`;
 
   const lastMessageId = await vk.sendMessage({
@@ -66,12 +66,12 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
 
   if (action === 'give') {
     const howManyDaysKeyboard = Keyboard.builder()
-        .inline()
-        .textButton({label: '1'})
-        .textButton({label: '7'})
-        .textButton({label: '30'})
-        .textButton({label: '60'})
-        .textButton({label: '90'});
+      .inline()
+      .textButton({ label: '1' })
+      .textButton({ label: '7' })
+      .textButton({ label: '30' })
+      .textButton({ label: '60' })
+      .textButton({ label: '90' });
 
     const lastMessageId = await vk.sendMessage({
       peerId,
@@ -98,7 +98,7 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
     }
 
     const endDate = Date.now() + 1000 * 60 * 60 * 24 * setDays;
-    await subscription.updateSubscription(id, {active: true, endDate}, true);
+    await subscription.updateSubscription(id, { active: true, endDate }, true);
 
     const endDateString = moment(endDate).format('LLL');
 
@@ -107,7 +107,7 @@ async function command({message, vk, args, payload, subscription}: CommandInputD
       message: `Вы успешно выдали подписку пользователю ${first_name} ${last_name}.\nОна будет действовать до ${endDateString}.`,
     });
   } else {
-    await subscription.updateSubscription(id, {active: false, endDate: 0}, true);
+    await subscription.updateSubscription(id, { active: false, endDate: 0 }, true);
 
     await vk.sendMessage({
       peerId,
@@ -122,7 +122,7 @@ const cmd: CommandOutputData = {
   description: 'выдать или забрать подписку',
   payload: {
     command: 'manageSubscription',
-    data: {action: 'selectId'},
+    data: { action: 'selectId' },
   } as AdminSubscriptionManagePayload,
   requirements: {
     admin: true,

@@ -1,22 +1,22 @@
-import {GetCookiesResponse} from '../types/Responses/API/netCity/GetCookiesResponse';
+import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 
 type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
     switch (sex) {
-      case 0:
-        return `${word}(а)`;
-      case 1:
-        return `${word}а`;
-      case 2:
-        return word;
+    case 0:
+      return `${word}(а)`;
+    case 1:
+      return `${word}а`;
+    case 2:
+      return word;
     }
   }
 
   cookieArrayToString(cookieArray: GetCookiesResponse['cookies']) {
     const stringArray = cookieArray.map((cookie) => {
-      const {name, value} = cookie;
+      const { name, value } = cookie;
 
       return `${name}=${value}`;
     });
@@ -53,18 +53,18 @@ export default class Utils {
   }
 
   caseInsensitiveReplace(original: string, searchValue: string, replaceValue: string) {
-    const regexp = new RegExp('('+searchValue+')', 'gi');
+    const regexp = new RegExp('(' + searchValue + ')', 'gi');
     return original.replace(regexp, replaceValue);
   }
 
   abbreviateLessonTitle(lessonTitle: string) {
     switch (lessonTitle) {
-      case 'История России. Всеобщая история':
-        return 'История';
-      case 'Иностранный язык (английский)':
-        return 'Английский язык';
-      case 'Основы безопасности жизнедеятельности':
-        return 'ОБЖ';
+    case 'История России. Всеобщая история':
+      return 'История';
+    case 'Иностранный язык (английский)':
+      return 'Английский язык';
+    case 'Основы безопасности жизнедеятельности':
+      return 'ОБЖ';
     }
 
     return lessonTitle;

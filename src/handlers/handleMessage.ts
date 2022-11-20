@@ -1,17 +1,17 @@
-import {CommandInputData, CommandOutputData} from '../types/Commands';
-import {SubscriptionData} from '../types/Subscription/SubscriptionData';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
+import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 
-import {Payload} from '../types/VK/Payloads/Payload';
+import { Payload } from '../types/VK/Payloads/Payload';
 
-function checkCommand({command, data}: {command: CommandOutputData, data: {
+function checkCommand({ command, data }: {command: CommandOutputData, data: {
   isUserAdmin: boolean,
   isAdminChat: boolean,
   isDMChat: boolean,
   args: string[],
   subscriptionData: SubscriptionData,
 }}) {
-  const {isUserAdmin, isAdminChat, isDMChat, args, subscriptionData} = data;
-  const {requirements, name, howToUse} = command;
+  const { isUserAdmin, isAdminChat, isDMChat, args, subscriptionData } = data;
+  const { requirements, name, howToUse } = command;
 
   if (requirements.admin && !isAdminChat && !isUserAdmin) {
     return {
@@ -47,8 +47,8 @@ function checkCommand({command, data}: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades}: CommandInputData) {
-  const {text, peerId, senderId, messagePayload, id} = message;
+export default async function handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades }: CommandInputData) {
+  const { text, peerId, senderId, messagePayload, id } = message;
 
   if (message.isDM) {
     console.log(`Новое личное сообщение от ${peerId}: ${text || '<без текста>'}`.gray);
@@ -57,7 +57,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   }
 
   const classData = await classes.getClass(peerId);
-  const {handleMessages, isLoading, isDisabled} = classData;
+  const { handleMessages, isLoading, isDisabled } = classData;
 
   if (isDisabled) return;
 
@@ -73,17 +73,17 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
 
-  vk.handleMessage({message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription, api, grades});
+  vk.handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription, api, grades });
 
   let foundCommandAlias = '';
 
   const command = commands.find((cmd) => {
-    const {name, aliases, payload} = cmd;
+    const { name, aliases, payload } = cmd;
 
     let isFound = false;
 
     if (messagePayload) {
-      const {command} = messagePayload as Payload;
+      const { command } = messagePayload as Payload;
 
       if (command === payload.command) {
         isFound = true;
@@ -118,9 +118,9 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (text) {
     args = utils.caseInsensitiveReplace(text, foundCommandAlias, '')
-        .trim()
-        .split(' ')
-        .filter((arg) => arg.length);
+      .trim()
+      .split(' ')
+      .filter((arg) => arg.length);
   }
 
   // @ts-ignore
@@ -140,7 +140,7 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
 
   if (!command) return;
 
-  const {status, errorMessage} = checkCommand({command, data: {isAdminChat, isDMChat, args, subscriptionData, isUserAdmin}});
+  const { status, errorMessage } = checkCommand({ command, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin } });
 
   if (!status) {
     if (!errorMessage) return;
@@ -172,5 +172,5 @@ export default async function handleMessage({message, classes, vk, vkUser, comma
   }
 
   console.log(`В ${peerId} выполняется команда ${command.name}.`.green);
-  await command.execute({message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades});
-};
+  await command.execute({ message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades });
+}

@@ -37,7 +37,7 @@ export type WeekDay = {
 export type GetStudentDiary = {
   weekStart: string
   weekEnd: string
-  weekDays: WeekDay[],
+  weekDays: WeekDay[]
   laAssigns: []
   termName: string
   className: string

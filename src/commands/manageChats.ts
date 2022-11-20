@@ -1,20 +1,20 @@
-import {DocumentAttachment, Keyboard} from 'vk-io';
+import { DocumentAttachment, Keyboard } from 'vk-io';
 
-import {CommandInputData, CommandOutputData} from '../types/Commands';
+import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-import {ParseScheduleResponse} from '../types/Responses/API/schedule/ParseScheduleResponse';
+import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 
-import {ManageChatsPayload} from '../types/VK/Payloads/ManageChatsPayload';
+import { ManageChatsPayload } from '../types/VK/Payloads/ManageChatsPayload';
 
-async function command({message, vk, classes, payload, schedule, utils}: CommandInputData) {
+async function command({ message, vk, classes, payload, schedule, utils }: CommandInputData) {
   const manageChatsPayload = payload as ManageChatsPayload;
 
   const action = manageChatsPayload.data.action;
 
   if (action === 'getchats') {
     const allClasses = await classes.getAllClasses();
-    const allAdmins = allClasses.map(({id, connectedProfiles}) => {
-      return {id, connectedProfiles: Array.from(connectedProfiles)};
+    const allAdmins = allClasses.map(({ id, connectedProfiles }) => {
+      return { id, connectedProfiles: Array.from(connectedProfiles) };
     });
 
     const chatsWhereAdmin = allAdmins.filter((admin) => admin.connectedProfiles.includes(message.senderId));
@@ -29,7 +29,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     }
 
     const keyboard = Keyboard.builder()
-        .inline();
+      .inline();
 
     let currentButtonsInRowCount = 0;
 
@@ -40,7 +40,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
       }
 
       const chatData = await vk.getChat(chat.id);
-      const {title} = chatData!.chat_settings!;
+      const { title } = chatData!.chat_settings!;
 
       keyboard.textButton({
         label: title,
@@ -69,33 +69,33 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const classData = await classes.getClass(chosenChat);
     const chatData = await vk.getChat(chosenChat);
 
-    const {title, owner_id, members_count} = chatData!.chat_settings!;
-    const {className} = classData;
+    const { title, owner_id, members_count } = chatData!.chat_settings!;
+    const { className } = classData;
 
     const ownerData = await vk.getUser(owner_id);
-    const {first_name, last_name, id} = ownerData!;
+    const { first_name, last_name, id } = ownerData!;
 
     const ownerString = `[id${id}|${first_name} ${last_name}]`;
 
     const keyboard = Keyboard.builder()
-        .inline()
-        .textButton({
-          label: 'Опубликовать расписание',
-          payload: {
-            command: 'manageChats',
-            data: {action: 'postschedule', chatId: chosenChat, chatTitle: title},
-          } as ManageChatsPayload,
-          color: Keyboard.POSITIVE_COLOR,
-        })
-        .row()
-        .textButton({
-          label: 'Сделать объявление',
-          payload: {
-            command: 'manageChats',
-            data: {action: 'makeannouncement', chatId: chosenChat, chatTitle: title},
-          } as ManageChatsPayload,
-          color: Keyboard.PRIMARY_COLOR,
-        });
+      .inline()
+      .textButton({
+        label: 'Опубликовать расписание',
+        payload: {
+          command: 'manageChats',
+          data: { action: 'postschedule', chatId: chosenChat, chatTitle: title },
+        } as ManageChatsPayload,
+        color: Keyboard.POSITIVE_COLOR,
+      })
+      .row()
+      .textButton({
+        label: 'Сделать объявление',
+        payload: {
+          command: 'manageChats',
+          data: { action: 'makeannouncement', chatId: chosenChat, chatTitle: title },
+        } as ManageChatsPayload,
+        color: Keyboard.PRIMARY_COLOR,
+      });
 
     vk.sendMessage({
       message: `Название: ${title}, ${members_count} участников.\nКласс: ${className}\nСоздатель: ${ownerString}\n\nВыберите действие:`,
@@ -108,15 +108,15 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const chosenChat = manageChatsPayload.data.chatId!;
 
     const lastMessageId = await vk.sendMessage({
-      message: `Введите текст объявления, либо нажмите "отменить".`,
+      message: 'Введите текст объявления, либо нажмите "отменить".',
       peerId: message.peerId,
       keyboard: Keyboard.builder()
-          .oneTime()
-          .inline()
-          .textButton({
-            label: 'Отменить',
-            color: Keyboard.NEGATIVE_COLOR,
-          }),
+        .oneTime()
+        .inline()
+        .textButton({
+          label: 'Отменить',
+          color: Keyboard.NEGATIVE_COLOR,
+        }),
     });
 
     const announceMessage = await vk.waitForMessage(message.peerId, message.senderId, lastMessageId);
@@ -143,7 +143,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     }
 
     const announcerData = await vk.getUser(message.senderId);
-    const {first_name, last_name} = announcerData!;
+    const { first_name, last_name } = announcerData!;
 
     await vk.sendMessage({
       message: `${announceMessage.text}\n\n${first_name} ${last_name}`,
@@ -162,15 +162,15 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const classData = await classes.getClass(chosenChat);
 
     const lastMessageId = await vk.sendMessage({
-      message: `Отправьте .xlsx файл с расписанием в следующем сообщении, или нажмите "отменить"`,
+      message: 'Отправьте .xlsx файл с расписанием в следующем сообщении, или нажмите "отменить"',
       peerId: message.peerId,
       keyboard: Keyboard.builder()
-          .oneTime()
-          .inline()
-          .textButton({
-            label: 'Отменить',
-            color: Keyboard.NEGATIVE_COLOR,
-          }),
+        .oneTime()
+        .inline()
+        .textButton({
+          label: 'Отменить',
+          color: Keyboard.NEGATIVE_COLOR,
+        }),
     });
 
     const attachmentMessage = await vk.waitForMessage(message.peerId, message.senderId, lastMessageId);
@@ -182,7 +182,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
       });
     }
 
-    const {text, attachments} = attachmentMessage;
+    const { text, attachments } = attachmentMessage;
 
     if (text && text.toLowerCase().includes('отменить')) {
       return vk.sendMessage({
@@ -220,7 +220,7 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     const saveFileStatus = await schedule.saveFile(url, filename);
     if (!saveFileStatus) {
       return vk.sendMessage({
-        message: `Не удалось сохранить этот файл.`,
+        message: 'Не удалось сохранить этот файл.',
         peerId: message.peerId,
       });
     }
@@ -244,9 +244,9 @@ async function command({message, vk, classes, payload, schedule, utils}: Command
     await classes.setManualSchedule(chosenChat, newManualSchedule);
 
     const ownerData = await vk.getUser(message.senderId);
-    const {first_name, last_name, sex} = ownerData!;
+    const { first_name, last_name, sex } = ownerData!;
 
-    const {isChanged, keyboard, changesList} = await schedule.compare(alreadyExistingSchedule, parsedSchedule, message.peerId, false, true);
+    const { isChanged, keyboard, changesList } = await schedule.compare(alreadyExistingSchedule, parsedSchedule, message.peerId, false, true);
 
     const action = alreadyExistingSchedule && !isChanged ? 'обновил' : 'добавил';
     const genderifiedAction = utils.genderifyWord(action, sex);
@@ -287,7 +287,7 @@ const cmd: CommandOutputData = {
   description: null,
   payload: {
     command: 'manageChats',
-    data: {action: 'getchats'},
+    data: { action: 'getchats' },
   } as ManageChatsPayload,
   requirements: {
     admin: false,
