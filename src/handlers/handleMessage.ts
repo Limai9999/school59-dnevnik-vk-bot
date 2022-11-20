@@ -2,6 +2,7 @@ import { CommandInputData, CommandOutputData } from '../types/Commands';
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 
 import { Payload } from '../types/VK/Payloads/Payload';
+import handleHomework from './handleHomework';
 
 function checkCommand({ command, data }: {command: CommandOutputData, data: {
   isUserAdmin: boolean,
@@ -138,7 +139,16 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
     payload: messagePayload,
   });
 
-  if (!command) return;
+  if (!command) {
+    if (!text) return;
+    const lowerText = text.toLowerCase();
+
+    if (lowerText.startsWith('дз') || lowerText.startsWith('домашнее задание')) {
+      await handleHomework({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, args: [] });
+    }
+
+    return;
+  }
 
   const { status, errorMessage } = checkCommand({ command, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin } });
 

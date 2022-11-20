@@ -3,6 +3,7 @@ import Class from '../models/Class';
 import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
+import { ManualHomework } from '../types/Homework/ManualHomework';
 export default class Classes {
   async getClass(peerId: number) {
     let data = await Class.findOne({ id: peerId });
@@ -122,6 +123,13 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $set: { isDisabled },
+    });
+  }
+
+  async addManualHomework(peerId: number, manualHomework: ManualHomework) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $push: { manualHomework },
     });
   }
 }
