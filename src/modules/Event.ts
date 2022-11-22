@@ -23,6 +23,12 @@ class Event {
   statistics: MessageStatistics;
   schedule: Schedule;
 
+  state: {
+    lastExecutedDate: number
+    lastExecutedEvent: EventOutputData | null
+    receivedMessagesCountWithoutEventReply: number
+  };
+
   constructor({ vk, vkUser, classes, commands, statistics, schedule }: EventInputData) {
     this.config = getEventConfig();
     this.events = [];
@@ -33,6 +39,12 @@ class Event {
     this.commands = commands;
     this.statistics = statistics;
     this.schedule = schedule;
+
+    this.state = {
+      lastExecutedDate: 0,
+      lastExecutedEvent: null,
+      receivedMessagesCountWithoutEventReply: 0,
+    };
   }
 
   async init() {
@@ -40,17 +52,31 @@ class Event {
   }
 
   async executeRandomEvent(message: MessageContext<ContextDefaultState>) {
-    if (!this.executeRoulette() || message.isDM) return;
+    if (message.isDM) return;
 
-    const random = Math.random();
-    const passedEvents = this.events.filter((event) => random < event.executeProbability && !event.disabled);
-    if (!passedEvents.length) return;
+    console.log('event state', this.state.lastExecutedDate, this.state.lastExecutedEvent, this.state.receivedMessagesCountWithoutEventReply);
+
+    if (!this.executeRoulette()) return;
+
+    const lastExecutedEvent = this.state.lastExecutedEvent;
+
+    const random = this.state.receivedMessagesCountWithoutEventReply >= 15 ? 1 : Math.random();
+    const passedEvents = this.events.filter((event) => random < event.executeProbability && !event.disabled && event.name !== lastExecutedEvent?.name);
+
+    if (!passedEvents.length) {
+      this.state.receivedMessagesCountWithoutEventReply++;
+      return;
+    }
 
     const shuffledPassedEvents: EventOutputData[] = this.shuffle(passedEvents);
     const event = shuffledPassedEvents[Math.floor(Math.random() * shuffledPassedEvents.length)];
 
     try {
       console.log(`Выполняется ивент ${event.name}`.yellow);
+
+      this.state.lastExecutedDate = Date.now();
+      this.state.lastExecutedEvent = event;
+      this.state.receivedMessagesCountWithoutEventReply = 0;
 
       await event.execute({
         vk: this.vk,
@@ -70,10 +96,20 @@ class Event {
 
   executeRoulette(): boolean {
     const { enabled, generalRandom } = this.config;
-
     if (!enabled) return false;
 
-    return Math.random() < generalRandom;
+    const lastExecutedDifference = Date.now() - this.state.lastExecutedDate;
+    if (lastExecutedDifference < 1000 * 30) return false;
+
+    let willBeExecuted = Math.random() < generalRandom;
+
+    if (!willBeExecuted) {
+      this.state.receivedMessagesCountWithoutEventReply++;
+
+      if (this.state.receivedMessagesCountWithoutEventReply >= 20) willBeExecuted = true;
+    }
+
+    return willBeExecuted;
   }
 
   shuffle(array: any[]) {
