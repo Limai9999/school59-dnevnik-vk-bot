@@ -8,7 +8,7 @@ import { LoginToNetcityPayload } from '../types/VK/Payloads/LoginToNetcityPayloa
 
 import { LoginToNetcityKeyboard } from '../keyboards/LoginToNetcityKeyboard';
 
-async function command({ vk, classes, message, netcityAPI, payload }: CommandInputData) {
+async function command({ vk, classes, message, netcityAPI, payload, utils }: CommandInputData) {
   let loadingMessageID = 0;
   const peerId = message.peerId;
 
@@ -52,14 +52,8 @@ async function command({ vk, classes, message, netcityAPI, payload }: CommandInp
       peerId,
     });
 
-    const { netCityData, className } = await classes.getClass(peerId);
-    if (!netCityData || !className || !netCityData.login || !netCityData.password) {
-      return sendFinalMessage('Не введены данные для Сетевого Города или название класса.');
-    }
-
-    const decryptedPassword = new Password(netCityData.password!, true).decrypt();
-
-    const session = await netcityAPI.findOrCreateSession(peerId, netCityData.login!, decryptedPassword, !message.isDM);
+    const session = await netcityAPI.findOrCreateSession(peerId, !message.isDM);
+    if (!session) return sendFinalMessage('Не введены данные для Сетевого Города или название класса.');
 
     // console.log(`Успешно создана сессия ${netCityData.login!}`, session);
     // console.log('cookie', utils.cookieArrayToString(session.cookies));
@@ -95,6 +89,8 @@ async function command({ vk, classes, message, netcityAPI, payload }: CommandInp
       keyboard,
     });
   } else if (action === 'logout') {
+    await classes.setLoading(peerId, true);
+
     const classData = await classes.getClass(peerId);
     const sessionId = classData.netcitySessionId;
 

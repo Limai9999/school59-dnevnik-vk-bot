@@ -103,16 +103,17 @@ export default class Schedule {
 
     const classData = await this.classes.getClass(peerId);
     const credentials = await this.netCity.getCredentials(peerId);
-    if (!credentials) {
+
+    const session = await this.netCity.findOrCreateSession(peerId, false);
+
+    if (!session || !credentials) {
       return {
         status: false,
         error: 'Не введены данные для Сетевого Города или название класса.',
       };
     }
 
-    const { login, password, className } = credentials;
-
-    const session = await this.netCity.findOrCreateSession(peerId, login, password, false);
+    const { className } = credentials;
 
     if (!session.status) {
       return {
