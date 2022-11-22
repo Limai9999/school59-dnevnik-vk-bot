@@ -1,3 +1,5 @@
+import { InitStudentDiary } from './InitStudentDiary';
+
 export type Mark = {
   assignmentId: number
   studentId: number
@@ -34,11 +36,18 @@ export type WeekDay = {
   lessons: Lesson[]
 }
 
-export type GetStudentDiary = {
+export type GetStudentDiaryResponse = {
   weekStart: string
   weekEnd: string
   weekDays: WeekDay[]
   laAssigns: []
   termName: string
   className: string
+}
+
+export type GetStudentDiary = {
+  status: boolean
+  studentData?: InitStudentDiary
+  studentDiary?: GetStudentDiaryResponse
+  error?: string
 }

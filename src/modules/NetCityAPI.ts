@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
-import { GetStudentDiary } from '../types/Responses/API/netCity/GetStudentDiary';
-import { InitStudentDiary } from '../types/Responses/API/netCity/InitStudentDiary';
+import { GetStudentDiaryResponse, GetStudentDiary } from '../types/Responses/API/netCity/GetStudentDiary';
+import { InitStudentDiaryResponse, InitStudentDiary } from '../types/Responses/API/netCity/InitStudentDiary';
 import { GetAnnouncementsResponse, Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 import { DownloadAttachmentResponse } from '../types/Responses/API/netCity/DownloadAttachmentResponse';
 import { CloseSessionResponse } from '../types/Responses/API/netCity/CloseSessionResponse';
@@ -100,12 +100,12 @@ class NetCityAPI {
 
   async getCredentials(peerId: number) {
     const { netCityData, className } = await this.classes.getClass(peerId);
-    if (!netCityData || !className) return false;
+    if (!netCityData || !className || !netCityData.login || !netCityData.password) return false;
 
     const decryptedPassword = new Password(netCityData.password!, true).decrypt();
 
     return {
-      login: netCityData.login!,
+      login: netCityData.login,
       password: decryptedPassword,
       className,
     };
@@ -177,7 +177,12 @@ class NetCityAPI {
     }
   }
 
-  async findOrCreateSession(peerId: number, login: string, password: string, forceCreate: boolean): Promise<Session> {
+  async findOrCreateSession(peerId: number, forceCreate: boolean): Promise<Session | null> {
+    const credentials = await this.getCredentials(peerId);
+    if (!credentials) return null;
+
+    const { login, password } = credentials;
+
     const existingSession = this.getSessionByPeerId(peerId);
     if (existingSession && existingSession.status && !forceCreate) {
       const isEnded = existingSession.session.endTime - Date.now() < 0;
@@ -207,7 +212,7 @@ class NetCityAPI {
     return session;
   }
 
-  async initStudentDiary(sessionId: number) {
+  async initStudentDiary(sessionId: number): Promise<InitStudentDiary> {
     const session = this.getSession(sessionId);
     if (!session) {
       return {
@@ -228,7 +233,7 @@ class NetCityAPI {
         },
       });
 
-      const data = request.data as InitStudentDiary;
+      const data = request.data as InitStudentDiaryResponse;
 
       return {
         status: true,
@@ -246,7 +251,7 @@ class NetCityAPI {
     }
   }
 
-  async getStudentDiary(sessionId: number) {
+  async getStudentDiary(sessionId: number): Promise<GetStudentDiary> {
     try {
       const session = this.getSession(sessionId);
       if (!session) {
@@ -259,7 +264,12 @@ class NetCityAPI {
       const cookie = this.utils.cookieArrayToString(session.cookies);
 
       const studentData = await this.initStudentDiary(sessionId);
-      if (!studentData.status) return;
+      if (!studentData.status) {
+        return {
+          status: false,
+          error: `При получении информации об ученике произошла ошибка:\n${studentData.error}`,
+        };
+      }
 
       const { students } = studentData.data!;
       const studentId = students[0].studentId;
@@ -281,7 +291,7 @@ class NetCityAPI {
         },
       });
 
-      const studentDiary = request.data as GetStudentDiary;
+      const studentDiary = request.data as GetStudentDiaryResponse;
 
       return {
         status: true,
@@ -365,8 +375,9 @@ class NetCityAPI {
 
   async getTotalStudentReport(peerId: number): Promise<GetTotalStudentReport> {
     try {
-      const credentials = await this.getCredentials(peerId);
-      if (!credentials) {
+      const session = await this.findOrCreateSession(peerId, false);
+
+      if (!session) {
         return {
           status: false,
           error: 'Вы не ввели данные для Сетевого Города.',
@@ -375,13 +386,10 @@ class NetCityAPI {
         };
       }
 
-      const { login, password } = credentials;
-
-      const session = await this.findOrCreateSession(peerId, login, password, false);
-      if (!session || !session.status) {
+      if (!session.status) {
         return {
           status: false,
-          error: !session.status ? `При входе в Сетевой Город произошла ошибка:\n${session.error}` : 'Вы не вошли в Сетевой Город.',
+          error: `При входе в Сетевой Город произошла ошибка:\n${session.error}`,
           info: [],
           result: { averageGrades: [], daysData: [] },
         };

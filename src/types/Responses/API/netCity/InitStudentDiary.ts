@@ -1,4 +1,4 @@
-export type InitStudentDiary = {
+export type InitStudentDiaryResponse = {
   students: [{
     studentId: number
     nickName: string
@@ -17,4 +17,10 @@ export type InitStudentDiary = {
   weight: boolean
   maxMark: number
   withLaAssigns: boolean
+}
+
+export type InitStudentDiary = {
+  status: boolean
+  data?: InitStudentDiaryResponse
+  error?: string
 }
