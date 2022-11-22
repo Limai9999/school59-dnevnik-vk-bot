@@ -129,7 +129,7 @@ const cmd: CommandOutputData = {
     positionSeparatelyFromAllButton: false,
   },
   showInAdditionalMenu: true,
-  showInCommandsList: true,
+  showInCommandsList: false,
   howToUse: null,
   execute: command,
 };

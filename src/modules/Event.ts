@@ -54,7 +54,7 @@ class Event {
   async executeRandomEvent(message: MessageContext<ContextDefaultState>) {
     if (message.isDM) return;
 
-    console.log('event state', this.state.lastExecutedDate, this.state.lastExecutedEvent, this.state.receivedMessagesCountWithoutEventReply);
+    // console.log('event state', this.state.lastExecutedDate, this.state.lastExecutedEvent, this.state.receivedMessagesCountWithoutEventReply);
 
     if (!this.executeRoulette()) return;
 
