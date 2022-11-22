@@ -60,7 +60,7 @@ class Event {
 
     const lastExecutedEvent = this.state.lastExecutedEvent;
 
-    const random = this.state.receivedMessagesCountWithoutEventReply >= 15 ? 1 : Math.random();
+    const random = this.state.receivedMessagesCountWithoutEventReply >= 15 ? 0 : Math.random();
     const passedEvents = this.events.filter((event) => random < event.executeProbability && !event.disabled && event.name !== lastExecutedEvent?.name);
 
     if (!passedEvents.length) {
