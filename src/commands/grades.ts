@@ -9,6 +9,8 @@ import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
 async function command({ message, classes, vk, payload, grades, utils }: CommandInputData) {
   const peerId = message.peerId;
 
+  if (!payload) return;
+
   const gradesPayload = payload as GradesPayload;
   const action = gradesPayload.data.action;
 
@@ -19,6 +21,8 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
     return vk.removeMessage(loadingMessageID, peerId);
   };
 
+  await classes.setLoading(peerId, true);
+
   loadingMessageID = await vk.sendMessage({
     message: 'Идёт загрузка отчёта с оценками...',
     peerId,
@@ -28,6 +32,8 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 
   const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate);
   removeLoadingMessage();
+
+  await classes.setLoading(peerId, false);
 
   if (action === 'update') {
     const classData = await classes.getClass(peerId);
@@ -192,7 +198,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 const cmd: CommandOutputData = {
   name: 'оценки',
   aliases: ['grades'],
-  description: null,
+  description: 'Отчёт об оценках из Сетевого Города. Работает только по кнопкам.',
   payload: {
     command: 'grades',
     data: { action: 'update', forceUpdate: false },
