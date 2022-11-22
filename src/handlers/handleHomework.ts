@@ -6,6 +6,15 @@ import { HandleHomeworkPayload } from '../types/VK/Payloads/HandleHomeworkPayloa
 
 export default async function handleHomework({ message, classes, vk }: CommandInputData) {
   if (message.isDM) return;
+  if (!message.text) return;
+
+  const lowerText = message.text.toLowerCase();
+
+  if (lowerText.startsWith('дз') || lowerText.startsWith('домашнее задание')) {
+    if (lowerText.length < 30) return;
+  } else {
+    return;
+  }
 
   const { peerId, senderId } = message;
 
@@ -36,7 +45,7 @@ export default async function handleHomework({ message, classes, vk }: CommandIn
   if (replyPayload.data.choice === 'agree') {
     await classes.addManualHomework(peerId, {
       date: Date.now() + 1000 * 60 * 60 * 24,
-      text: message.text!,
+      text: message.text,
       messageId: message.conversationMessageId!,
     });
 
