@@ -282,7 +282,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
 }
 
 const cmd: CommandOutputData = {
-  name: 'управлять беседой',
+  name: 'управлять ботом в беседе',
   aliases: ['manageChats'],
   description: null,
   payload: {
@@ -300,7 +300,7 @@ const cmd: CommandOutputData = {
     positionSeparatelyFromAllButton: false,
   },
   showInAdditionalMenu: true,
-  showInCommandsList: true,
+  showInCommandsList: false,
   howToUse: null,
   execute: command,
 };

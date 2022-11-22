@@ -9,6 +9,8 @@ async function command({ message, args, vk, classes, netcityAPI }: CommandInputD
 
     if (!message.isDM) {
       resultMessage += ', причем пароль должен быть зашифрован командой "зашифровать пароль".';
+    } else {
+      resultMessage += '.';
     }
 
     return vk.sendMessage({
@@ -56,7 +58,7 @@ async function command({ message, args, vk, classes, netcityAPI }: CommandInputD
 const cmd: CommandOutputData = {
   name: 'сетевой город',
   aliases: ['сетевой', 'netcity', 'дневник'],
-  description: 'ввести данные для входа в Сетевой Город',
+  description: 'ввести данные для входа в Сетевой Город. Букву класса необходимо указывать такую же, что и в табличном расписании.',
   payload: {
     command: 'netcity',
     data: { action: 'netcity' },

@@ -37,7 +37,7 @@ async function command({ message, vk }: CommandInputData) {
 const cmd: CommandOutputData = {
   name: 'рамзан',
   aliases: ['ramzan', 'клавиатура'],
-  description: 'тестовая команда',
+  description: 'тестовая команда; открыть клавиатуру',
   payload: {
     command: 'ramzan',
     data: { action: 'ramzan' },

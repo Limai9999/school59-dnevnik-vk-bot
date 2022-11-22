@@ -21,10 +21,10 @@ async function command({ message, vk, classes, args }: CommandInputData) {
 }
 
 const cmd: CommandOutputData = {
-  name: 'disableClassModel',
+  name: 'disableClassDocument',
   aliases: [],
-  description: 'отключить модель определенного класса',
-  payload: { command: 'disableClassModel' } as Payload,
+  description: 'отключить класс',
+  payload: { command: 'disableClassDocument' } as Payload,
   requirements: {
     admin: true,
     dmOnly: false,

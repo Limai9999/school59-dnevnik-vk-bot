@@ -31,7 +31,7 @@ async function command({ message, args, vk }: CommandInputData) {
 const cmd: CommandOutputData = {
   name: 'зашифровать пароль',
   aliases: ['шифр', 'cipher'],
-  description: null,
+  description: 'шифрует ваш пароль для Сетевого Города, чтобы ввести данные аккаунта в беседе',
   payload: {
     command: 'cipher',
     data: { action: 'cipher' },

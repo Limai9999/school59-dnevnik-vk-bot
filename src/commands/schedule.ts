@@ -9,6 +9,8 @@ import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 
 export async function command({ message, vk, classes, payload, schedule, utils }: CommandInputData) {
+  if (!payload) return;
+
   let loadingMessageID = 0;
 
   const peerId = message.peerId;
@@ -218,7 +220,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
 const cmd: CommandOutputData = {
   name: 'расписание',
   aliases: ['получить расписание', 'schedule', 'рсп'],
-  description: 'получить расписание уроков',
+  description: 'Получить расписание уроков. Работает только по кнопкам.',
   payload: {
     command: 'schedule',
     data: { action: 'get' },
