@@ -4,7 +4,6 @@ import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseSche
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { ManualHomework } from '../types/Homework/ManualHomework';
-import { GetHomework } from '../types/Homework/GetHomework';
 export default class Classes {
   async getClass(peerId: number) {
     let data = await Class.findOne({ id: peerId });
@@ -131,20 +130,6 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $push: { manualHomework },
-    });
-  }
-
-  async setHomework(peerId: number, homework: GetHomework) {
-    const classData = await this.getClass(peerId);
-    await classData.updateOne({
-      $set: { homework },
-    });
-  }
-
-  async setLastUpdatedHomework(peerId: number, lastUpdatedHomework: number) {
-    const classData = await this.getClass(peerId);
-    await classData.updateOne({
-      $set: { lastUpdatedHomework },
     });
   }
 }

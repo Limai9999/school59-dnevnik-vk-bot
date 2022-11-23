@@ -5,7 +5,6 @@ export type MainConfig = {
   rapidApiKey: string
   autoUpdateMin: {
     netcity: number
-    homework: number
     schedule: number
     grades: number
   }

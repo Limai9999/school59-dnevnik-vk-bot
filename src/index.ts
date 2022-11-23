@@ -11,7 +11,6 @@ import VK from './modules/VK';
 import MessageStatistics from './modules/MessageStatistics';
 import Event from './modules/Event';
 import Schedule from './modules/Schedule';
-import Homework from './modules/Homework';
 import Utils from './modules/Utils';
 import NetCityAPI from './modules/NetCityAPI';
 import Subscription from './modules/Subscription';
@@ -63,7 +62,6 @@ const subscription = new Subscription(vkBot, classes, utils);
 const netcityAPI = new NetCityAPI(vkBot, classes, utils, api, subscription, mainConfig);
 const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api, subscription, mainConfig);
 const grades = new Grades(vkBot, classes, utils, netcityAPI, api, subscription, mainConfig);
-const homework = new Homework(vkBot, classes, utils, netcityAPI, subscription, mainConfig);
 
 async function start() {
   await vkBot.init();
@@ -98,7 +96,7 @@ async function start() {
   console.log('\nБот запущен!'.green);
 
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, homework });
+    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades });
   });
 }
 
