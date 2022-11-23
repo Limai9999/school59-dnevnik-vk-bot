@@ -31,11 +31,11 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
       }).row();
     }
 
-    keyboard.textButton({
-      label: 'Зачем нужна подписка?',
-      color: Keyboard.PRIMARY_COLOR,
-      payload: { command: 'subscription', data: { action: 'whatCanItDo' } } as SubscriptionPayload,
-    });
+    // keyboard.textButton({
+    //   label: 'Зачем нужна подписка?',
+    //   color: Keyboard.PRIMARY_COLOR,
+    //   payload: { command: 'subscription', data: { action: 'whatCanItDo' } } as SubscriptionPayload,
+    // });
 
     await vk.sendMessage({
       peerId,
