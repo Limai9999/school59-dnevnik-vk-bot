@@ -11,6 +11,8 @@ async function command({ message, vk, utils, classes, payload, homework }: Comma
   if (!payload) return;
   const homeworkPayload = payload as HomeworkPayload;
 
+  await homework.startAutoUpdate(peerId);
+
   if (homeworkPayload.data.action === 'get') {
     await classes.setLoading(peerId, true);
 
