@@ -78,6 +78,7 @@ async function start() {
     await netcityAPI.startSessionAutoCreating(id);
     await schedule.startAutoUpdate(id);
     await grades.startAutoUpdate(id);
+    await homework.startAutoUpdate(id);
   }));
 
   console.log(`Бот обрабатывает ${allClasses.length} чатов.`);
