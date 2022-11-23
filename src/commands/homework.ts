@@ -1,8 +1,11 @@
+import moment from 'moment';
+moment.locale('ru');
+
 import { CommandInputData, CommandOutputData } from '../types/Commands';
 
 import { HomeworkPayload } from '../types/VK/Payloads/HomeworkPayload';
 
-async function command({ message, vk, classes, netcityAPI, payload }: CommandInputData) {
+async function command({ message, vk, utils, classes, payload, homework }: CommandInputData) {
   const { peerId } = message;
 
   if (!payload) return;
@@ -24,30 +27,75 @@ async function command({ message, vk, classes, netcityAPI, payload }: CommandInp
       peerId,
     });
 
-    const session = await netcityAPI.findOrCreateSession(peerId, false);
-    if (!session) {
-      stopLoading();
-      return await vk.sendMessage({
-        message: 'Вы не ввели данные для Сетевого Города.',
-        peerId,
-        priority: 'low',
-      });
-    }
-
-    if (!session.session) {
-      stopLoading();
-      return await vk.sendMessage({
-        message: `При входе в Сетевой Город произошла ошибка:\n${session.error}`,
-        peerId,
-        priority: 'low',
-      });
-    }
-
-    const diaryData = await netcityAPI.getStudentDiary(session.session.id);
-
+    const homeworkData = await homework.getHomework(peerId, false);
     stopLoading();
 
-    console.log(diaryData);
+    if (!homeworkData.status) {
+      return await vk.sendMessage({
+        message: `При получении домашнего задания произошла ошибка:\n${homeworkData.error}`,
+        peerId,
+        priority: 'low',
+      });
+    }
+
+    const formattedHomework = homeworkData.days!.map(day => {
+      if (!day) return null;
+
+      const formattedDate = moment(day.date).format('LL');
+      const formattedLessons = day.lessons.map((lesson) => {
+        const { assignments, subjectName } = lesson;
+        if (!assignments || !assignments.length) return null;
+
+        const homework = assignments
+          .map((assignment, index) => `⠀${index + 1}. ${assignment.assignmentName}`);
+
+        return {
+          homework,
+          subjectName,
+        };
+      }).filter(lesson => lesson) as {homework: string[], subjectName: string}[];
+
+      const resultString = formattedLessons.map((lesson) => {
+        let lessonName = utils.abbreviateLessonTitle(lesson.subjectName);
+        if (lessonName === 'Английский язык') lessonName += ' [Группа Анны Фёдоровны]';
+
+        return `${lessonName}:\n${lesson.homework.join('\n')}`;
+      }).join('\n\n');
+
+      return {
+        date: formattedDate,
+        resultString,
+      };
+    });
+
+    let resultHomework = 'Домашнее задание на сегодня и завтра из Сетевого Города:\n\n';
+
+    const resultNetcityString = formattedHomework.map((homework) => {
+      if (!homework) return;
+
+      return `${homework.date}:\n${homework.resultString}`;
+    })
+      .filter(result => result)
+      .join('\n\n');
+
+    resultHomework += resultNetcityString;
+
+    const classData = await classes.getClass(peerId);
+    const manualHomework = classData.manualHomework;
+
+    const tomorrowDate = moment(Date.now() + 1000 * 60 * 60 * 24).format('L');
+    const tomorrowManualHomework = manualHomework.find((homework) => moment(homework.date).format('L') === tomorrowDate);
+
+    if (tomorrowManualHomework) {
+      resultHomework += '\n\nДомашнее задание, добавленное вручную:\n\n';
+      resultHomework += tomorrowManualHomework.text;
+    }
+
+    await vk.sendMessage({
+      message: resultHomework,
+      peerId,
+      priority: 'medium',
+    });
   }
 }
 
