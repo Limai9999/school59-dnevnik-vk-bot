@@ -109,7 +109,7 @@ class Grades {
 
       return report;
     } else {
-      return classData.totalStudentReport! as unknown as GetTotalStudentReport;
+      return classData.totalStudentReport;
     }
   }
 
