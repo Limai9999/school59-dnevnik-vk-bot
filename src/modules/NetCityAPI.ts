@@ -283,9 +283,9 @@ class NetCityAPI {
         },
         params: {
           studentId,
-          vers: '1662641927281',
+          vers: '1662641927280',
           weekEnd: '2023-05-31',
-          weekStart: '2022-11-07',
+          weekStart: '2022-09-01',
           withLaAssigns: true,
           yearId: 2,
         },
