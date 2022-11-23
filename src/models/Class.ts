@@ -1,5 +1,6 @@
 import { Document, Schema, model } from 'mongoose';
 
+import { GetHomework } from '../types/Homework/GetHomework';
 import { ManualHomework } from '../types/Homework/ManualHomework';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
@@ -28,6 +29,8 @@ export interface IClass {
   lastUpdatedTotalStudentReport: number
   isDisabled: boolean
   manualHomework: ManualHomework[]
+  homework: GetHomework
+  lastUpdatedHomework: number
 }
 
 const parsedSchedule = {
@@ -147,6 +150,17 @@ const classSchema = new Schema({
       text: String,
       messageId: Number,
     }],
+  },
+  homework: {
+    type: {
+      status: Boolean,
+      days: [Object],
+      error: String,
+    },
+  },
+  lastUpdatedHomework: {
+    type: Number,
+    default: 0,
   },
 }, {
   timestamps: true,
