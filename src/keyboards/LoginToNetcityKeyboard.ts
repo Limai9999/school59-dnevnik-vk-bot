@@ -1,6 +1,7 @@
 import { Keyboard } from 'vk-io';
 
 import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
+import { HomeworkPayload } from '../types/VK/Payloads/HomeworkPayload';
 import { LoginToNetcityPayload } from '../types/VK/Payloads/LoginToNetcityPayload';
 import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 
@@ -10,6 +11,12 @@ export const LoginToNetcityKeyboard = Keyboard.builder()
     label: 'Открыть расписание',
     color: Keyboard.POSITIVE_COLOR,
     payload: { command: 'schedule', data: { action: 'get' } } as SchedulePayload,
+  })
+  .row()
+  .textButton({
+    label: 'Посмотреть домашнее задание',
+    color: Keyboard.POSITIVE_COLOR,
+    payload: { command: 'homework', data: { action: 'get' } } as HomeworkPayload,
   })
   .row()
   .textButton({
