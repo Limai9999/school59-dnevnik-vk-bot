@@ -89,7 +89,7 @@ class Homework {
 
     const lastUpdatedDate = classData.lastUpdatedHomework;
 
-    const maxLastUpdateDifference = 1000 * 60 * 30;
+    const maxLastUpdateDifference = 1000 * 60 * 5;
     const lastUpdateDifference = Date.now() - lastUpdatedDate;
 
     if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference) {
