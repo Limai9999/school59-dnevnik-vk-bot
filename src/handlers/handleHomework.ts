@@ -21,18 +21,18 @@ export default async function handleHomework({ message, classes, vk }: CommandIn
   const keyboard = Keyboard.builder()
     .inline()
     .textButton({
-      label: 'Закрепить',
+      label: 'Сохранить',
       color: Keyboard.POSITIVE_COLOR,
       payload: { command: 'handleHomework', data: { action: 'pin', choice: 'agree' } } as HandleHomeworkPayload,
     })
     .textButton({
-      label: 'Не закреплять',
+      label: 'Не сохранять',
       color: Keyboard.NEGATIVE_COLOR,
       payload: { command: 'handleHomework', data: { action: 'pin', choice: 'disagree' } } as HandleHomeworkPayload,
     });
 
   const promptMessageId = await vk.sendMessage({
-    message: 'Сообщение определено как домашнее задание.\nЗакрепить его?',
+    message: 'В сообщении найдено домашнее задание.\nСохранить его?',
     peerId,
     keyboard,
   });
