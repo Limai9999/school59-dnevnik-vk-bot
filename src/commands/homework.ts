@@ -32,55 +32,59 @@ async function command({ message, vk, utils, classes, payload, homework }: Comma
     const homeworkData = await homework.getHomework(peerId, false);
     stopLoading();
 
-    if (!homeworkData.status) {
-      return await vk.sendMessage({
-        message: `При получении домашнего задания произошла ошибка:\n${homeworkData.error}`,
-        peerId,
-        priority: 'low',
-      });
-    }
+    let resultHomework = '';
 
-    const formattedHomework = homeworkData.days!.map(day => {
-      if (!day) return null;
+    if (homeworkData.status) {
+      const formattedHomework = homeworkData.days!.map(day => {
+        if (!day) return null;
 
-      const formattedDate = moment(day.date).format('LL');
-      const formattedLessons = day.lessons.map((lesson) => {
-        const { assignments, subjectName } = lesson;
-        if (!assignments || !assignments.length) return null;
+        const formattedDate = moment(day.date).format('LL');
+        const formattedLessons = day.lessons.map((lesson) => {
+          const { assignments, subjectName } = lesson;
+          if (!assignments || !assignments.length) return null;
 
-        const homework = assignments
-          .map((assignment, index) => `⠀${index + 1}. ${assignment.assignmentName}`);
+          const homework = assignments
+            .map((assignment) => `${assignment.assignmentName}`);
+
+          return {
+            homework,
+            subjectName,
+          };
+        }).filter(lesson => lesson) as {homework: string[], subjectName: string}[];
+
+        const resultString = formattedLessons.map((lesson) => {
+          const lessonName = utils.abbreviateLessonTitle(lesson.subjectName);
+
+          if (lesson.homework.length === 1) {
+            return `${lessonName} - ${lesson.homework[0]}`;
+          } else {
+            return `${lessonName}:\n${lesson.homework.join('\n')}`;
+          }
+        }).join('\n\n');
 
         return {
-          homework,
-          subjectName,
+          date: formattedDate,
+          resultString,
         };
-      }).filter(lesson => lesson) as {homework: string[], subjectName: string}[];
+      });
 
-      const resultString = formattedLessons.map((lesson) => {
-        let lessonName = utils.abbreviateLessonTitle(lesson.subjectName);
-        if (lessonName === 'Английский язык') lessonName += ' [Группа Анны Фёдоровны]';
+      const resultNetcityString = formattedHomework.map((homework) => {
+        if (!homework || !homework.resultString.length) return;
 
-        return `${lessonName}:\n${lesson.homework.join('\n')}`;
-      }).join('\n\n');
+        return `${homework.date}:\n${homework.resultString}`;
+      })
+        .filter(result => result)
+        .join('\n\n');
 
-      return {
-        date: formattedDate,
-        resultString,
-      };
-    });
-
-    let resultHomework = 'Домашнее задание на сегодня и завтра из Сетевого Города:\n\n';
-
-    const resultNetcityString = formattedHomework.map((homework) => {
-      if (!homework) return;
-
-      return `${homework.date}:\n${homework.resultString}`;
-    })
-      .filter(result => result)
-      .join('\n\n');
-
-    resultHomework += resultNetcityString;
+      if (resultNetcityString.length) {
+        resultHomework += 'Домашнее задание на сегодня и завтра из Сетевого Города:\n\n';
+        resultHomework += resultNetcityString;
+      } else {
+        resultHomework += 'Домашнего задания на сегодня и завтра в Сетевом Городе нет.\n\n';
+      }
+    } else {
+      resultHomework += `При получении домашнего задания произошла ошибка:\n${homeworkData.error}\n\n`;
+    }
 
     const classData = await classes.getClass(peerId);
     const manualHomework = classData.manualHomework;
@@ -90,7 +94,14 @@ async function command({ message, vk, utils, classes, payload, homework }: Comma
 
     if (tomorrowManualHomework) {
       resultHomework += '\n\nДомашнее задание, добавленное вручную:\n\n';
-      resultHomework += tomorrowManualHomework.text;
+
+      const manualHomeworkMessage = await vk.api.messages.getByConversationMessageId({
+        peer_id: peerId,
+        conversation_message_ids: tomorrowManualHomework.messageId,
+        group_id: vk.me.id,
+      });
+
+      resultHomework += manualHomeworkMessage.items[0].text!;
     }
 
     await vk.sendMessage({
