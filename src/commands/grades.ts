@@ -35,6 +35,19 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 
   await classes.setLoading(peerId, false);
 
+  const getGradesByLesson = (lessonTitle: string) => {
+    const grades: string[] = [];
+
+    report.result.daysData.map((dayData) => {
+      const selectedLesson = dayData.lessonsWithGrades.find((lessonsWithGrade) => lessonsWithGrade.lesson === lessonTitle);
+      if (!selectedLesson) return;
+
+      grades.push(...selectedLesson.grades);
+    });
+
+    return grades;
+  };
+
   if (action === 'update') {
     const classData = await classes.getClass(peerId);
 
@@ -65,19 +78,6 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       keyboard,
     });
   } else if (action === 'average') {
-    const getGradesByLesson = (lessonTitle: string) => {
-      const grades: string[] = [];
-
-      report.result.daysData.map((dayData) => {
-        const selectedLesson = dayData.lessonsWithGrades.find((lessonsWithGrade) => lessonsWithGrade.lesson === lessonTitle);
-        if (!selectedLesson) return;
-
-        grades.push(...selectedLesson.grades);
-      });
-
-      return grades;
-    };
-
     const lessonsAverages = report.result.averageGrades.map((averageGrade, index) => {
       const { lesson, average } = averageGrade;
       const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
@@ -192,6 +192,8 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       attachment,
       message: 'Полный отчёт об оценках из Сетевого Города:',
     });
+  } else if (action === 'gradesStats') {
+    // todo
   }
 }
 
