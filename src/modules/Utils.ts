@@ -1,6 +1,6 @@
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 
-type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades'
+type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
@@ -47,6 +47,31 @@ export default class Utils {
       if (thingsStr.endsWith('1')) return 'всего 1 оценка';
       if (!thingsStr[0].startsWith('1') && (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4'))) return `всего ${things} оценки`;
       return `всего ${things} оценок`;
+    }
+
+    if (type === 'grades') {
+      if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'оценка';
+      if (!thingsStr[0].startsWith('1') && (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4'))) return 'оценки';
+      return 'оценок';
+    }
+
+    if (type === 'ratedGrades') {
+      const gradeString = this.setWordEndingBasedOnThingsCount('grades', things);
+
+      if (things > 1) return `были выставлены ${gradeString}`;
+      return 'была выставлена оценка';
+    }
+
+    if (type === 'removedRatedGrades') {
+      const gradeString = this.setWordEndingBasedOnThingsCount('grades', things);
+
+      if (things > 1) return `Убраны ${gradeString}`;
+      return `Убрана ${gradeString}`;
+    }
+
+    if (type === 'changes') {
+      if (things > 1) return 'Изменения';
+      return 'Изменение';
     }
 
     return type;
