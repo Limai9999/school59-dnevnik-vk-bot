@@ -130,7 +130,6 @@ class Grades {
       oldAverage.map((oldGrade) => {
         const newGrade = newAverage.find(({ lesson }) => lesson === oldGrade.lesson);
 
-        // непонятно зачем это сделано, но так было в прошлой версии бота, который работал идеально
         if (!newGrade) {
           return changesList.push(`Предмет "${oldGrade.lesson}" был убран из отчёта.`);
         } else if (!oldGrade && newGrade) {
@@ -146,15 +145,38 @@ class Grades {
       const newDaysData = newReport.result.daysData;
 
       // проверка изменений во всех днях
-      oldDaysData.map((oldDayData) => {
-        const newDayData = newDaysData.find(({ month, day }) => month === oldDayData.month && day === oldDayData.day);
+      newDaysData.map((newDayData) => {
+        const oldDayData = oldDaysData.find(({ month, day }) => month === newDayData.month && day === newDayData.day);
 
-        if (!newDayData) return changesList.push(`День "${oldDayData.day} ${oldDayData.month}" пропал из отчёта с оценками.`);
-
-        const oldLessonsWithGrades = oldDayData.lessonsWithGrades;
         const newLessonsWithGrades = newDayData.lessonsWithGrades;
 
         const changes: string[] = [];
+        const pushChanges = (changes: string[]) => {
+          if (changes.length) {
+            const changesMessage = changes.map((change, index) => `${index + 1}. ${change}`).join('\n');
+
+            const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('changes', changes.length);
+
+            const message = `${correctedAnnouncementString} на "${newDayData.day} ${newDayData.month.toLowerCase()}":\n${changesMessage}`;
+            changesList.push(message);
+          }
+        };
+
+        if (!oldDayData) {
+          newLessonsWithGrades.map((newLesson) => {
+            const newGradesString = newLesson.grades.join(', ');
+            const gradesCount = newLesson.grades.length;
+
+            if (newGradesString.length) {
+              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('ratedGrades', gradesCount);
+              changes.push(`По предмету "${newLesson.lesson}" ${correctedAnnouncementString}: "${newGradesString}".`);
+            }
+          });
+
+          return pushChanges(changes);
+        }
+
+        const oldLessonsWithGrades = oldDayData.lessonsWithGrades;
 
         oldLessonsWithGrades.map((oldLesson) => {
           const newLesson = newLessonsWithGrades.find(({ lesson }) => lesson === oldLesson.lesson);
@@ -164,21 +186,20 @@ class Grades {
           const newGradesString = newLesson.grades.join(', ');
 
           if (oldGradesString !== newGradesString) {
+            const gradesCount = newLesson.grades.length;
             if (oldGradesString === '') {
-              changes.push(`По предмету "${newLesson.lesson}" были выставлены оценки: "${newGradesString}".`);
+              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('ratedGrades', gradesCount);
+              changes.push(`По предмету "${newLesson.lesson}" ${correctedAnnouncementString}: "${newGradesString}".`);
             } else if (newGradesString === '') {
-              changes.push(`Убраны оценки "${oldGradesString}" по предмету "${newLesson.lesson}".`);
+              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('removedRatedGrades', gradesCount);
+              changes.push(`${correctedAnnouncementString} "${oldGradesString}" по предмету "${newLesson.lesson}".`);
             } else {
               changes.push(`Оценки по предмету "${newLesson.lesson}" изменились.\nБыло: "${oldLesson.grades.length ? oldGradesString : 'без оценок'}", стало: "${newLesson.grades.length ? newGradesString : 'неизвестно'}".`);
             }
           }
         });
 
-        if (changes.length) {
-          const changesMessage = changes.map((change, index) => `${index + 1}. ${change}`).join('\n');
-          const message = `Изменения на "${newDayData.day} ${newDayData.month}":\n${changesMessage}`;
-          changesList.push(message);
-        }
+        pushChanges(changes);
       });
 
       if (changesList.length) {

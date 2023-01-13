@@ -3,7 +3,7 @@ import { Payload } from './Payload';
 export interface GradesPayload extends Payload {
   command: 'grades'
   data: {
-    action: 'update' | 'average' | 'today' | 'fullReport'
+    action: 'update' | 'average' | 'today' | 'fullReport' | 'gradesStats'
     forceUpdate?: boolean
   }
 }
