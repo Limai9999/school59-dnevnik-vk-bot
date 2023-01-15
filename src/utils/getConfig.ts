@@ -7,6 +7,7 @@ import { EventConfig } from '../types/Configs/EventConfig';
 import { TikTokConfig } from '../types/Configs/TikTokConfig';
 
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
+import { Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
 
 export function getVKConfig(): VKConfig {
   return new Config('vk.json').getData();
@@ -30,4 +31,8 @@ export function getTikTokConfig(): TikTokConfig {
 
 export function getGradesDebugData(): GetTotalStudentReport {
   return new Config('gradesDebugData.json').getData();
+}
+
+export function getScheduleDebugData(): Attachment[] {
+  return new Config('scheduleDebugData.json').getData();
 }

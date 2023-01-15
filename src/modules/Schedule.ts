@@ -14,6 +14,8 @@ import { CompareResponse } from '../types/Schedule/CompareResponse';
 
 import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 
+import { getScheduleDebugData } from '../utils/getConfig';
+
 import { MainConfig } from '../types/Configs/MainConfig';
 
 type GetScheduleWithAPI = {
@@ -125,16 +127,9 @@ export default class Schedule {
     const scheduleFiles: Attachment[] = [];
 
     if (isTest) {
-      scheduleFiles.push({
-        id: 0,
-        name: 'расписание на 4 октября.xlsx',
-        originalFileName: 'расписание на 4 октября.xlsx',
-      });
-      scheduleFiles.push({
-        id: 1,
-        name: 'расписание на 5 октября.xlsx',
-        originalFileName: 'расписание на 5 октября.xlsx',
-      });
+      const debugAttachments = getScheduleDebugData();
+
+      scheduleFiles.push(...debugAttachments);
     } else {
       const announcementsResponse = await this.netCity.getAnnouncements(session.session.id);
 
@@ -160,15 +155,15 @@ export default class Schedule {
       });
     }
 
-    await this.classes.setLastUpdatedScheduleDate(peerId, Date.now());
-
     if (!scheduleFiles.length) {
-      await this.classes.setSchedule(peerId, []);
+      // await this.classes.setSchedule(peerId, []);
 
       return {
         status: true,
         schedule: [],
       };
+    } else {
+      await this.classes.setLastUpdatedScheduleDate(peerId, Date.now());
     }
 
     const parsedSchedule: ParseScheduleResponse[] = await Promise.all(scheduleFiles.map(async (file) => {
