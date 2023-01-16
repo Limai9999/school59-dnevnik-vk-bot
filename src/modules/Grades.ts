@@ -91,7 +91,7 @@ class Grades {
 
     const lastUpdatedDate = classData.lastUpdatedTotalStudentReport;
 
-    const maxLastUpdateDifference = 1000 * 60 * 30;
+    const maxLastUpdateDifference = 1000 * 60 * 15;
     const lastUpdateDifference = Date.now() - lastUpdatedDate;
 
     if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference || !classData.totalStudentReport || !classData.totalStudentReport.status) {
