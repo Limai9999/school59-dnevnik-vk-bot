@@ -110,6 +110,8 @@ export default class Utils {
       case 'декабрь':
         return 'декабря';
     }
+
+    return month;
   }
 
   caseInsensitiveReplace(original: string, searchValue: string, replaceValue: string) {
