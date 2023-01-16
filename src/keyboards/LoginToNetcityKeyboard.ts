@@ -8,21 +8,21 @@ import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 export const LoginToNetcityKeyboard = Keyboard.builder()
   .inline()
   .textButton({
-    label: 'Открыть расписание',
+    label: 'Получить отчёт об оценках',
     color: Keyboard.POSITIVE_COLOR,
+    payload: { command: 'grades', data: { action: 'update', forceUpdate: false } } as GradesPayload,
+  })
+  .row()
+  .textButton({
+    label: 'Открыть расписание',
+    color: Keyboard.PRIMARY_COLOR,
     payload: { command: 'schedule', data: { action: 'get' } } as SchedulePayload,
   })
   .row()
   .textButton({
-    label: 'Посмотреть домашнее задание',
-    color: Keyboard.POSITIVE_COLOR,
+    label: 'Домашнее задание',
+    color: Keyboard.PRIMARY_COLOR,
     payload: { command: 'homework', data: { action: 'get' } } as HomeworkPayload,
-  })
-  .row()
-  .textButton({
-    label: 'Узнать оценки',
-    color: Keyboard.SECONDARY_COLOR,
-    payload: { command: 'grades', data: { action: 'update', forceUpdate: false } } as GradesPayload,
   })
   .row()
   .textButton({
