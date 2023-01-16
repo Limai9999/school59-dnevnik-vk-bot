@@ -156,8 +156,10 @@ class Grades {
             const changesMessage = changes.map((change, index) => `${index + 1}. ${change}`).join('\n');
 
             const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('changes', changes.length);
+            const lowerCasedMonth = newDayData.month.toLowerCase();
+            const fixedMonthString = this.utils.fixMonthString(lowerCasedMonth);
 
-            const message = `${correctedAnnouncementString} на "${newDayData.day} ${newDayData.month.toLowerCase()}":\n${changesMessage}`;
+            const message = `${correctedAnnouncementString} на ${newDayData.day} ${fixedMonthString}:\n${changesMessage}`;
             changesList.push(message);
           }
         };
@@ -205,8 +207,10 @@ class Grades {
       if (changesList.length) {
         const changesMessage = changesList.map((change, index) => `${index + 1}) ${change}`).join('\n\n');
 
+        const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('changesHappened', changesList.length);
+
         await this.vk.sendMessage({
-          message: `В отчёте об оценках произошло ${changesList.length} изменений:\n\n${changesMessage}`,
+          message: `В отчёте об оценках произошло ${changesList.length} ${correctedAnnouncementString}:\n\n${changesMessage}`,
           peerId,
         });
       }

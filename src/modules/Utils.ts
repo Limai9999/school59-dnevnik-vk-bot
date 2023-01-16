@@ -1,16 +1,16 @@
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 
-type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes'
+type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
     switch (sex) {
-    case 0:
-      return `${word}(а)`;
-    case 1:
-      return `${word}а`;
-    case 2:
-      return word;
+      case 0:
+        return `${word}(а)`;
+      case 1:
+        return `${word}а`;
+      case 2:
+        return word;
     }
   }
 
@@ -74,7 +74,42 @@ export default class Utils {
       return 'Изменение';
     }
 
+    if (type === 'changesHappened') {
+      if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'изменение';
+      if (!thingsStr[0].startsWith('1') && (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4'))) return 'изменения';
+      return 'изменений';
+    }
+
     return type;
+  }
+
+  fixMonthString(month: string) {
+    switch (month) {
+      case 'январь':
+        return 'января';
+      case 'февраль':
+        return 'февраля';
+      case 'март':
+        return 'марта';
+      case 'апрель':
+        return 'апреля';
+      case 'май':
+        return 'мая';
+      case 'июнь':
+        return 'июня';
+      case 'июль':
+        return 'июля';
+      case 'август':
+        return 'августа';
+      case 'сентябрь':
+        return 'сентября';
+      case 'октябрь':
+        return 'октября';
+      case 'ноябрь':
+        return 'ноября';
+      case 'декабрь':
+        return 'декабря';
+    }
   }
 
   caseInsensitiveReplace(original: string, searchValue: string, replaceValue: string) {
@@ -84,12 +119,12 @@ export default class Utils {
 
   abbreviateLessonTitle(lessonTitle: string) {
     switch (lessonTitle) {
-    case 'История России. Всеобщая история':
-      return 'История';
-    case 'Иностранный язык (английский)':
-      return 'Английский язык';
-    case 'Основы безопасности жизнедеятельности':
-      return 'ОБЖ';
+      case 'История России. Всеобщая история':
+        return 'История';
+      case 'Иностранный язык (английский)':
+        return 'Английский язык';
+      case 'Основы безопасности жизнедеятельности':
+        return 'ОБЖ';
     }
 
     return lessonTitle;
