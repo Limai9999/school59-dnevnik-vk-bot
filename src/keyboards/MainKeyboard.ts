@@ -15,7 +15,7 @@ export const MainKeyboard = Keyboard.builder()
   //   payload: { command: 'homework', data: { action: 'get' } } as HomeworkPayload,
   //   color: Keyboard.POSITIVE_COLOR,
   // })
-  // .row()
+  .row()
   .textButton({
     label: 'Дополнительно',
     payload: { command: 'additionalMenu', data: { action: 'enable' } } as AdditionalMenuPayload,
