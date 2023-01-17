@@ -67,7 +67,7 @@ class NetCityAPI {
     const { login, password, className } = credentials;
 
     const autoUpdateMinutes = this.mainConfig.autoUpdateMin.netcity;
-    const autoUpdateTime = 1000 * 60 * (15 + this.autoUpdateCount);
+    const autoUpdateTime = 1000 * 60 * (autoUpdateMinutes + this.autoUpdateCount);
 
     let autoUpdateInterval: NodeJS.Timer | null = null;
 
