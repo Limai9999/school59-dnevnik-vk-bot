@@ -5,7 +5,7 @@ import Classes from '../modules/Classes';
 import MessageStatisticsService from '../modules/MessageStatistics';
 import Event from '../modules/Event';
 import Schedule from '../modules/Schedule';
-import Homework from '../modules/Homework';
+// import Homework from '../modules/Homework';
 import Utils from '../modules/Utils';
 import NetCityAPI from '../modules/NetCityAPI';
 import Subscription from '../modules/Subscription';
@@ -28,7 +28,7 @@ export type CommandInputData = {
   events: Event;
   schedule: Schedule
   grades: Grades
-  homework: Homework
+  // homework: Homework
   utils: Utils
   netcityAPI: NetCityAPI
   mainConfig: MainConfig
