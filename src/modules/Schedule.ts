@@ -271,8 +271,10 @@ export default class Schedule {
 
     if (oldSchedule.status) return { isChanged: false, keyboard };
 
-    const oldData = oldSchedule.schedule!;
-    const newData = newSchedule.schedule!;
+    const oldData = oldSchedule.schedule;
+    const newData = newSchedule.schedule;
+
+    if (!oldData || !newData) return { isChanged: false, keyboard };
 
     const stringifiedOldSchedule = oldData.schedule.join('\n');
     const stringifiedNewSchedule = newData.schedule.join('\n');
