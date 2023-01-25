@@ -240,7 +240,7 @@ export default class Schedule {
 
   async compare(oldSchedule: ParseScheduleResponse | undefined, newSchedule: ParseScheduleResponse, peerId: number, announce: boolean, isManual: boolean): Promise<CompareResponse> {
     const testMode = this.mainConfig.testMode;
-    const announceChat = testMode ? this.vk.config.adminChatID : peerId;
+    const announceChat = peerId;
 
     if (!newSchedule.status) return { isChanged: false };
 
@@ -279,39 +279,23 @@ export default class Schedule {
 
     console.log(`Расписание на ${newData.date} изменилось - ${peerId}`.cyan.bgYellow);
 
-    // console.log('old', oldSchedule);
-    // console.log('new', newSchedule);
-
     const changesList: string[] = [];
 
     if (oldData.totalLessons !== newData.totalLessons) {
       const isAdded = newData.totalLessons > oldData.totalLessons;
 
       if (isAdded) {
-        const addedLessonsCount = newData.totalLessons - oldData.totalLessons;
-        const addedLessonsCountString = this.utils.setWordEndingBasedOnThingsCount('addedLessons', addedLessonsCount);
-
-        const addedLessons: string[] = newData.objectedSchedule.map((lessonObj) => {
-          const { lesson } = lessonObj;
-          if (!lesson) return false;
-
-          const isExistsInOld = oldData.objectedSchedule.find((schedule) => schedule.lesson === lesson);
-          if (isExistsInOld) return false;
-
-          return lesson;
-        }).filter((lesson) => lesson) as string[];
-
-        const addedLessonsString = addedLessons.join(', ');
-
-        // console.log(1111, {addedLessonsCount, addedLessonsCountString, addedLessonsString});
-
-        changesList.push(`${addedLessonsCountString}: ${addedLessonsString}`);
+        const addedCount = newData.totalLessons - oldData.totalLessons;
+        changesList.push(`Добавилось ${addedCount} уроков.`);
+      } else {
+        const removedCount = oldData.totalLessons - newData.totalLessons;
+        changesList.push(`Убрано ${removedCount} уроков.`);
       }
     }
 
     if (announce) {
       const changesStrings = changesList.map((change, index) => {
-        return `${index + 1} - ${change}`;
+        return `${index + 1}. ${change}`;
       });
 
       let resultMessage = `Расписание на ${newSchedule.schedule!.date} изменилось.`;
