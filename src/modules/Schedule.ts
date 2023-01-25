@@ -269,6 +269,8 @@ export default class Schedule {
       return { isChanged: false, keyboard };
     }
 
+    if (oldSchedule.status) return { isChanged: false, keyboard };
+
     const oldData = oldSchedule.schedule!;
     const newData = newSchedule.schedule!;
 
