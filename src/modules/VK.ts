@@ -228,7 +228,7 @@ class VkService extends VK {
 
     try {
       const response = await this.api.messages.send({
-        message: useAll ? `@all,\n${message}` : message,
+        message: useAll && !isPrivateMessages ? `@all,\n${message}` : message,
         peer_ids: peerId,
         random_id: Math.floor(Math.random() * 10000) * Date.now(),
         attachment,
