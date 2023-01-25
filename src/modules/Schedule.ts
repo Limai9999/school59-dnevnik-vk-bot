@@ -255,7 +255,7 @@ export default class Schedule {
         } as SchedulePayload,
       });
 
-    if (!oldSchedule || !oldSchedule.status) {
+    if (!oldSchedule) {
       if (announce) {
         const dateString = newSchedule.schedule!.date ? `с расписанием на ${newSchedule.schedule!.date}` : 'с неизвестным расписанием';
 
