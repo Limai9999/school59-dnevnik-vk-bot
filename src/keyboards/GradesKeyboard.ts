@@ -1,6 +1,7 @@
 import { Keyboard } from 'vk-io';
 
 import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
+import { PastMandatoryTasksPayload } from '../types/VK/Payloads/PastMandatoryTasksPayload';
 
 export const GradesKeyboard = Keyboard.builder()
   .inline()
@@ -8,6 +9,12 @@ export const GradesKeyboard = Keyboard.builder()
     label: 'Полный отчёт',
     color: Keyboard.POSITIVE_COLOR,
     payload: { command: 'grades', data: { action: 'fullReport' } } as GradesPayload,
+  })
+  .row()
+  .textButton({
+    label: 'Просроченные задания',
+    payload: { command: 'pastMandatoryTasks', data: { action: 'choice' } } as PastMandatoryTasksPayload,
+    color: Keyboard.NEGATIVE_COLOR,
   })
   .row()
   .textButton({

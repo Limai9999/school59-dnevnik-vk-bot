@@ -1,4 +1,5 @@
 import axios from 'axios';
+import moment from 'moment';
 
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 import { GetStudentDiaryResponse, GetStudentDiary } from '../types/Responses/API/netCity/GetStudentDiary';
@@ -8,6 +9,8 @@ import { DownloadAttachmentResponse } from '../types/Responses/API/netCity/Downl
 import { CloseSessionResponse } from '../types/Responses/API/netCity/CloseSessionResponse';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { GetPastMandatoryResponse, GetPastMandatory } from '../types/Responses/API/netCity/GetPostMandatory';
+import { GetAssignmentTypesResponse, GetAssignmentTypes } from '../types/Responses/API/netCity/GetAssignmentTypes';
+import { GetAssignDataResponse, GetAssignData } from '../types/Responses/API/netCity/GetAssignData';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -308,7 +311,104 @@ class NetCityAPI {
     }
   }
 
-  async getPastMandatory(sessionId: number): Promise<GetPastMandatory> {
+  async getPastMandatory(sessionId: number, isOnlyCurrentQuarter: boolean): Promise<GetPastMandatory> {
+    try {
+      const session = this.getSession(sessionId);
+      if (!session) {
+        return {
+          status: false,
+          error: 'Не удалось найти сессию Сетевого Города.',
+        };
+      }
+
+      const cookie = this.utils.cookieArrayToString(session.cookies);
+
+      const studentData = await this.initStudentDiary(sessionId);
+      if (!studentData.status) {
+        return {
+          status: false,
+          error: `При получении информации об ученике произошла ошибка:\n${studentData.error}`,
+        };
+      }
+
+      const { students } = studentData.data!;
+      const studentId = students[0].studentId;
+
+      const weekStart = moment(studentData.data!.weekStart).format('YYYY-MM-DD');
+      const weekEnd = moment(studentData.data!.weekStart).add(7, 'days').format('YYYY-MM-DD');
+
+      const request = await axios({
+        method: 'get',
+        url: 'https://dnevnik.school59-ekb.ru/webapi/student/diary/pastMandatory',
+        headers: {
+          cookie,
+          at: session.at,
+        },
+        params: {
+          studentId,
+          yearId: 2,
+          weekStart: isOnlyCurrentQuarter ? weekStart : null,
+          weekEnd: isOnlyCurrentQuarter ? weekEnd : null,
+        },
+      });
+
+      const pastMandatory = request.data as GetPastMandatoryResponse;
+
+      return {
+        status: true,
+        pastMandatory,
+      };
+    } catch (error) {
+      console.log('getPastMandatory ошибка'.red, error);
+
+      return {
+        status: false,
+        error: `${error}`,
+      };
+    }
+  }
+
+  async getAssignmentTypes(sessionId: number): Promise<GetAssignmentTypes> {
+    try {
+      const session = this.getSession(sessionId);
+      if (!session) {
+        return {
+          status: false,
+          error: 'Не удалось найти сессию Сетевого Города.',
+        };
+      }
+
+      const cookie = this.utils.cookieArrayToString(session.cookies);
+
+      const request = await axios({
+        method: 'get',
+        url: 'https://dnevnik.school59-ekb.ru/webapi/grade/assignment/types',
+        headers: {
+          cookie,
+          at: session.at,
+        },
+        params: {
+          all: true,
+        },
+      });
+
+      const assignmentTypes = request.data as GetAssignmentTypesResponse;
+
+      return {
+        status: true,
+        assignmentTypes,
+      };
+    } catch (error) {
+      console.log('getAssignmentTypes ошибка'.red, error);
+
+      return {
+        status: false,
+        error: `${error}`,
+      };
+    }
+  }
+
+  async getAssignData(sessionId: number, assignId: number): Promise<GetAssignData> {
     try {
       const session = this.getSession(sessionId);
       if (!session) {
@@ -333,25 +433,24 @@ class NetCityAPI {
 
       const request = await axios({
         method: 'get',
-        url: 'https://dnevnik.school59-ekb.ru/webapi/student/diary/pastMandatory',
+        url: `https://dnevnik.school59-ekb.ru/webapi/student/diary/assigns/${assignId}`,
         headers: {
           cookie,
           at: session.at,
         },
         params: {
           studentId,
-          yearId: 2,
         },
       });
 
-      const pastMandatory = request.data as GetPastMandatoryResponse;
+      const assignData = request.data as GetAssignDataResponse;
 
       return {
         status: true,
-        pastMandatory,
+        assignData,
       };
     } catch (error) {
-      console.log('getPastMandatory ошибка'.red, error);
+      console.log('getAssignData ошибка'.red, error);
 
       return {
         status: false,
