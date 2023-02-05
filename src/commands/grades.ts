@@ -6,7 +6,7 @@ import { CommandInputData, CommandOutputData } from '../types/Commands';
 
 import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
 
-async function command({ message, classes, vk, payload, grades, utils }: CommandInputData) {
+async function command({ message, classes, vk, payload, grades, utils, netcityAPI }: CommandInputData) {
   const peerId = message.peerId;
 
   if (!payload) return;
@@ -60,21 +60,60 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 
     const studentInfo = report.info.join('\n');
 
+    type MarksObject = {
+      [key: string]: number
+    }
+
+    const marks: MarksObject = {
+      '5': 0,
+      '4': 0,
+      '3': 0,
+      '2': 0,
+    };
+
     let totalGrades = 0;
     report.result.daysData.map((day) => {
       day.lessonsWithGrades.map((lessonWithGrade) => {
         totalGrades += lessonWithGrade.grades.length;
+
+        lessonWithGrade.grades.map((grade) => {
+          marks[grade]++;
+        });
       });
     });
 
-    const totalGradesString = `Всего оценок: ${totalGrades}`;
+    let pastMandatoryString = '';
+
+    const session = await netcityAPI.findOrCreateSession(peerId, false);
+
+    if (session) {
+      const pastMandatoryResponse = await netcityAPI.getPastMandatory(session.session.id);
+      if (pastMandatoryResponse.error) {
+        pastMandatoryString = '⚠️ Не удалось получить список просроченных заданий.\n\n';
+      } else {
+        const { pastMandatory } = pastMandatoryResponse;
+
+        const count = pastMandatory!.length;
+        const lessonsString = pastMandatory!.map((lesson, index) => {
+          const { dueDate, subjectName, assignmentName } = lesson;
+          const date = moment(dueDate).calendar();
+          return `${index + 1}. ${subjectName} | ${assignmentName} (${date})`;
+        });
+
+        const fixedTasksCountString = utils.setWordEndingBasedOnThingsCount('pastMandatoryTasks', count);
+
+        pastMandatoryString = `⚠️ У вас ${count} ${fixedTasksCountString}:\n${lessonsString.join('\n')}\n\n`;
+      }
+    }
+
+    const totalGradesString = `Всего оценок - ${totalGrades}:\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}`;
     const lastUpdatedString = `Обновлен: ${moment(classData.lastUpdatedTotalStudentReport).fromNow()}`;
 
     const keyboard = GradesKeyboard;
 
     await vk.sendMessage({
       peerId,
-      message: `Отчёт об оценках:\n${lastUpdatedString}\n\n${studentInfo}\n\n${totalGradesString}\n\nВыберите действие:`,
+      message: `Отчёт об оценках:\n${lastUpdatedString}\n\n${studentInfo}\n\n${pastMandatoryString}${totalGradesString}\n\nВыберите действие:`,
       keyboard,
     });
   } else if (action === 'average') {
