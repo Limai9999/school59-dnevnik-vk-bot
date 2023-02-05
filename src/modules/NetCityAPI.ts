@@ -7,6 +7,7 @@ import { GetAnnouncementsResponse, Attachment } from '../types/Responses/API/net
 import { DownloadAttachmentResponse } from '../types/Responses/API/netCity/DownloadAttachmentResponse';
 import { CloseSessionResponse } from '../types/Responses/API/netCity/CloseSessionResponse';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
+import { GetPastMandatoryResponse, GetPastMandatory } from '../types/Responses/API/netCity/GetPostMandatory';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -16,7 +17,6 @@ import API from './API';
 import Subscription from './Subscription';
 
 import { MainConfig } from '../types/Configs/MainConfig';
-
 interface Session extends GetCookiesResponse {
   peerId: number
 }
@@ -300,6 +300,58 @@ class NetCityAPI {
       };
     } catch (error) {
       console.log('GetStudentDiary ошибка'.red, error);
+
+      return {
+        status: false,
+        error: `${error}`,
+      };
+    }
+  }
+
+  async getPastMandatory(sessionId: number): Promise<GetPastMandatory> {
+    try {
+      const session = this.getSession(sessionId);
+      if (!session) {
+        return {
+          status: false,
+          error: 'Не удалось найти сессию Сетевого Города.',
+        };
+      }
+
+      const cookie = this.utils.cookieArrayToString(session.cookies);
+
+      const studentData = await this.initStudentDiary(sessionId);
+      if (!studentData.status) {
+        return {
+          status: false,
+          error: `При получении информации об ученике произошла ошибка:\n${studentData.error}`,
+        };
+      }
+
+      const { students } = studentData.data!;
+      const studentId = students[0].studentId;
+
+      const request = await axios({
+        method: 'get',
+        url: 'https://dnevnik.school59-ekb.ru/webapi/student/diary/pastMandatory',
+        headers: {
+          cookie,
+          at: session.at,
+        },
+        params: {
+          studentId,
+          yearId: 2,
+        },
+      });
+
+      const pastMandatory = request.data as GetPastMandatoryResponse;
+
+      return {
+        status: true,
+        pastMandatory,
+      };
+    } catch (error) {
+      console.log('getPastMandatory ошибка'.red, error);
 
       return {
         status: false,

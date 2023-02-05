@@ -1,6 +1,6 @@
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 
-type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened'
+type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened' | 'pastMandatoryTasks'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
@@ -78,6 +78,12 @@ export default class Utils {
       if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'изменение';
       if (!thingsStr[0].startsWith('1') && (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4'))) return 'изменения';
       return 'изменений';
+    }
+
+    if (type === 'pastMandatoryTasks') {
+      if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'просроченное задание';
+      if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return 'просроченных задания';
+      return 'просроченных заданий';
     }
 
     return type;
