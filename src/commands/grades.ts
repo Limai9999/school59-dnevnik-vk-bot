@@ -92,17 +92,18 @@ async function command({ message, classes, vk, payload, grades, utils, netcityAP
         pastMandatoryString = '⚠️ Не удалось получить список просроченных заданий.\n\n';
       } else {
         const { pastMandatory } = pastMandatoryResponse;
+        if (pastMandatory!.length) {
+          const count = pastMandatory!.length;
+          const lessonsString = pastMandatory!.map((lesson, index) => {
+            const { dueDate, subjectName, assignmentName } = lesson;
+            const date = moment(dueDate).calendar();
+            return `${index + 1}. ${subjectName} | ${assignmentName} (${date})`;
+          });
 
-        const count = pastMandatory!.length;
-        const lessonsString = pastMandatory!.map((lesson, index) => {
-          const { dueDate, subjectName, assignmentName } = lesson;
-          const date = moment(dueDate).calendar();
-          return `${index + 1}. ${subjectName} | ${assignmentName} (${date})`;
-        });
+          const fixedTasksCountString = utils.setWordEndingBasedOnThingsCount('pastMandatoryTasks', count);
 
-        const fixedTasksCountString = utils.setWordEndingBasedOnThingsCount('pastMandatoryTasks', count);
-
-        pastMandatoryString = `⚠️ У вас ${count} ${fixedTasksCountString}:\n${lessonsString.join('\n')}\n\n`;
+          pastMandatoryString = `⚠️ У вас ${count} ${fixedTasksCountString}:\n${lessonsString.join('\n')}\n\n`;
+        }
       }
     }
 
