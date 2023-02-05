@@ -187,6 +187,16 @@ export default class Schedule {
       return parsedSchedule;
     }));
 
+    const oldSchedule = classData.schedule;
+    const newScheduleArray: ParseScheduleResponse[] = [];
+
+    parsedSchedule.map((newSchedule) => {
+      const isExistsInOld = oldSchedule.find((old) => old.filename === newSchedule.filename);
+      if (isExistsInOld && !newSchedule.status) return;
+
+      newScheduleArray.push(newSchedule);
+    });
+
     await this.classes.setSchedule(peerId, parsedSchedule);
 
     return {
