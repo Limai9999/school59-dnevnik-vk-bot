@@ -4,6 +4,7 @@ import { GetHomework } from '../types/Homework/GetHomework';
 import { ManualHomework } from '../types/Homework/ManualHomework';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
+import { Note } from '../types/Note/Note';
 
 export interface IClass {
   id: number
@@ -31,6 +32,7 @@ export interface IClass {
   manualHomework: ManualHomework[]
   homework: GetHomework
   lastUpdatedHomework: number
+  notes: Note[]
 }
 
 const parsedSchedule = {
@@ -161,6 +163,12 @@ const classSchema = new Schema({
   lastUpdatedHomework: {
     type: Number,
     default: 0,
+  },
+  notes: {
+    type: [{
+      filename: String,
+      noteText: String,
+    }],
   },
 }, {
   timestamps: true,

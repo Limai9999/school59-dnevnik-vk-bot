@@ -104,7 +104,7 @@ class VkService extends VK {
           clearInterval(findInterval);
           clearTimeout(stopTimeout);
         }
-      }, 2500);
+      }, 1500);
 
       stopTimeout = setTimeout(() => {
         clearInterval(findInterval);

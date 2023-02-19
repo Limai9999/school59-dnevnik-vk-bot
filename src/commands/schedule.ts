@@ -189,8 +189,11 @@ export async function command({ message, vk, classes, payload, schedule, utils }
         const totalLessonsAndStartTimeString = totalLessons === 1 ? `Всего 1 урок, начинающийся в ${startTime}.` : `Всего уроков: ${totalLessons}, начинаются в ${startTime}.`;
         const dateString = date ? `Расписание на ${date}` : filename;
 
+        const note = classData.notes.find((notes) => notes.filename === filename);
+        const noteString = note ? `⚠️ Заметка: ${note.noteText}\n\n` : '';
+
         vk.sendMessage({
-          message: `${dateString}\n\n${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${creationTimeString}`,
+          message: `${dateString}\n\n${noteString}${totalLessonsAndStartTimeString}\n\n${schedule.join('\n')}\n\n${creationTimeString}`,
           peerId,
           priority: 'high',
         });

@@ -5,6 +5,7 @@ import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { ManualHomework } from '../types/Homework/ManualHomework';
 import { GetHomework } from '../types/Homework/GetHomework';
+import { Note } from '../types/Note/Note';
 export default class Classes {
   async getClass(peerId: number) {
     let data = await Class.findOne({ id: peerId });
@@ -145,6 +146,23 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $set: { lastUpdatedHomework },
+    });
+  }
+
+  async addNote(peerId: number, note: Note) {
+    const classData = await this.getClass(peerId);
+
+    const notes = classData.notes;
+    const isAlreadyExists = notes.find((currentNote) => currentNote.filename === note.filename);
+
+    if (isAlreadyExists) {
+      isAlreadyExists.noteText = note.noteText;
+    } else {
+      notes.push(note);
+    }
+
+    await classData.updateOne({
+      $set: { notes },
     });
   }
 }

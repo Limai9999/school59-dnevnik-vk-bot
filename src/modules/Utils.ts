@@ -1,6 +1,6 @@
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 
-type setWordEndingType = 'scheduleFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened' | 'pastMandatoryTasks'
+type setWordEndingType = 'scheduleFiles' | 'foundFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened' | 'pastMandatoryTasks'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
@@ -35,6 +35,12 @@ export default class Utils {
       if (thingsStr.endsWith('1')) return 'Скачан 1 файл';
       if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return `Скачано ${things} файла`;
       return `Скачано ${things} файлов`;
+    }
+
+    if (type === 'foundFiles') {
+      if (thingsStr.endsWith('1')) return 'найден 1 файл';
+      if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return `найдено ${things} файла`;
+      return `найдено ${things} файлов`;
     }
 
     if (type === 'addedLessons') {
