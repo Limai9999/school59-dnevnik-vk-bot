@@ -122,7 +122,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
 }
 
 const cmd: CommandOutputData = {
-  name: 'заметка',
+  name: 'Добавить заметку',
   aliases: ['note'],
   description: 'прикрепить заметку к определённому расписанию',
   payload: {
