@@ -173,14 +173,14 @@ export default class Schedule {
         return {
           status: false,
           error: downloadStatus.error,
-          filename: file.name,
+          filename: downloadStatus.filename,
         } as ParseScheduleResponse;
       }
 
-      const parsedSchedule = await this.parse(file.name, className);
+      const parsedSchedule = await this.parse(downloadStatus.filename, className);
 
       if (parsedSchedule.status) {
-        const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === file.name) as ParseScheduleResponse | undefined;
+        const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === downloadStatus.filename) as ParseScheduleResponse | undefined;
         this.compare(oldSchedule, parsedSchedule, peerId, true, false);
       }
 
