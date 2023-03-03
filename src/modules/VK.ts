@@ -269,9 +269,9 @@ class VkService extends VK {
 
     const admins: GroupAdmins[] = await Promise.all(chats.map(async ({ id }) => {
       const chatData = await this.getChat(id);
-      if (!chatData || !chatData.chat_settings) return { id, title: 'Неизвестно', admins: [] };
+      if (!chatData || !chatData.items[0].chat_settings) return { id, title: 'Неизвестно', admins: [] };
 
-      const { chat_settings: { admin_ids, owner_id, title } } = chatData;
+      const { items: [{ chat_settings: { admin_ids, owner_id, title } }] } = chatData;
 
       return { id, title, admins: [...admin_ids, owner_id] };
     }));
@@ -290,16 +290,18 @@ class VkService extends VK {
   async getChat(peerId: number): Promise<GetChatResponse | null> {
     const response = await this.api.messages.getConversationsById({
       peer_ids: peerId,
+      fields: ['bdate', 'screen_name', 'city', 'photo_max_orig', 'first_name', 'last_name'],
+      extended: true,
     });
     if (!response || !response.items || !response.items.length) return null;
 
-    return response.items[0] as unknown as GetChatResponse;
+    return response as unknown as GetChatResponse;
   }
 
   async getUser(userIdOrUsername: number | string): Promise<GetUserResponse | null> {
     const response = await this.api.users.get({
       user_ids: [userIdOrUsername],
-      fields: ['bdate', 'screen_name', 'city', 'sex'],
+      fields: ['bdate', 'screen_name', 'city', 'sex', 'photo_max_orig'],
     });
     if (!response.length) return null;
 

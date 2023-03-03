@@ -5,6 +5,7 @@ import { ManualHomework } from '../types/Homework/ManualHomework';
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 import { Note } from '../types/Note/Note';
+import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 
 export interface IClass {
   id: number
@@ -22,10 +23,7 @@ export interface IClass {
   handleMessages: boolean
   connectedProfiles: number[]
   netcitySessionId: number
-  subscription: {
-    active: boolean
-    endDate: number
-  }
+  subscription: SubscriptionData
   totalStudentReport: GetTotalStudentReport
   lastUpdatedTotalStudentReport: number
   isDisabled: boolean
@@ -131,6 +129,7 @@ const classSchema = new Schema({
   },
   subscription: {
     type: {
+      peerId: Number,
       active: Boolean,
       endDate: Number,
     },

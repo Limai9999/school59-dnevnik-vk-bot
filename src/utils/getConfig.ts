@@ -5,6 +5,7 @@ import { MongoConfig } from '../types/Configs/MongoConfig';
 import { MainConfig } from '../types/Configs/MainConfig';
 import { EventConfig } from '../types/Configs/EventConfig';
 import { TikTokConfig } from '../types/Configs/TikTokConfig';
+import { ServerConfig } from '../types/Configs/ServerConfig';
 
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
@@ -35,4 +36,8 @@ export function getGradesDebugData(): GetTotalStudentReport {
 
 export function getScheduleDebugData(): Attachment[] {
   return new Config('scheduleDebugData.json').getData();
+}
+
+export function getServerConfig(): ServerConfig {
+  return new Config('server.json').getData();
 }

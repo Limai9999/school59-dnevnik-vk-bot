@@ -40,7 +40,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
       }
 
       const chatData = await vk.getChat(chat.id);
-      const { title } = chatData!.chat_settings!;
+      const { title } = chatData!.items[0].chat_settings!;
 
       keyboard.textButton({
         label: title,
@@ -69,7 +69,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
     const classData = await classes.getClass(chosenChat);
     const chatData = await vk.getChat(chosenChat);
 
-    const { title, owner_id, members_count } = chatData!.chat_settings!;
+    const { title, owner_id, members_count } = chatData!.items[0].chat_settings!;
     const { className } = classData;
 
     const ownerData = await vk.getUser(owner_id);

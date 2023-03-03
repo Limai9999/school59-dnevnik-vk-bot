@@ -18,6 +18,8 @@ import Subscription from './modules/Subscription';
 import API from './modules/API';
 import Grades from './modules/Grades';
 
+import Server from './server/app';
+
 import { getVKConfig, getMongoDBConfig, getMainConfig } from './utils/getConfig';
 import getCommands from './utils/getCommands';
 
@@ -94,6 +96,9 @@ async function start() {
     schedule,
   });
   await events.init();
+
+  const server = new Server(vkBot, classes, utils, netcityAPI, api, subscription, statistics, events, schedule, grades);
+  await server.run();
 
   console.log('\nБот запущен!'.green);
 

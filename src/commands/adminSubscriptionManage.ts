@@ -98,7 +98,7 @@ async function command({ message, vk, args, payload, subscription }: CommandInpu
     }
 
     const endDate = Date.now() + 1000 * 60 * 60 * 24 * setDays;
-    await subscription.updateSubscription(id, { active: true, endDate }, true);
+    await subscription.updateSubscription(id, { peerId, active: true, endDate }, true);
 
     const endDateString = moment(endDate).format('LLL');
 
@@ -107,7 +107,7 @@ async function command({ message, vk, args, payload, subscription }: CommandInpu
       message: `Вы успешно выдали подписку пользователю ${first_name} ${last_name}.\nОна будет действовать до ${endDateString}.`,
     });
   } else {
-    await subscription.updateSubscription(id, { active: false, endDate: 0 }, true);
+    await subscription.updateSubscription(id, { peerId, active: false, endDate: 0 }, true);
 
     await vk.sendMessage({
       peerId,

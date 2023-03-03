@@ -1,4 +1,6 @@
-export type GetChatResponse = {
+import { GetUserResponse } from './GetUserResponse';
+
+interface IChatItem {
   can_write: {
     allowed: boolean
   }
@@ -25,6 +27,13 @@ export type GetChatResponse = {
     owner_id: number
     state: string
     title: string
+    photo?: {
+      photo_50: string
+      photo_100: string
+      photo_200: string
+      is_default_photo: false
+      is_default_call_photo: false
+    }
   }
   current_keyboard: {
     author_id: number
@@ -54,4 +63,19 @@ export type GetChatResponse = {
     major_id: number
     minor_id: number
   }
+}
+
+interface IChatGroup {
+  id: number
+  is_closed: number
+  name: string
+  photo_max_orig: string
+  screen_name: string
+  type: string
+}
+
+export type GetChatResponse = {
+  items: IChatItem[]
+  groups: IChatGroup[]
+  profiles: GetUserResponse
 }

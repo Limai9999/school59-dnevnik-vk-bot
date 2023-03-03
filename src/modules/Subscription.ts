@@ -17,11 +17,13 @@ class Subscription {
     this.utils = utils;
   }
 
-  async checkSubscription(peerId: number): Promise<SubscriptionData> {
+  async checkSubscription(peerId: number, doActions = true): Promise<SubscriptionData> {
     const classData = await this.classes.getClass(peerId);
 
     if (!classData.subscription) {
-      const newData: SubscriptionData = { active: false, endDate: 0 };
+      const newData: SubscriptionData = { peerId, active: false, endDate: 0 };
+      if (!doActions) return newData;
+
       await this.updateSubscription(peerId, newData, false);
 
       return newData;
@@ -31,7 +33,7 @@ class Subscription {
 
     const isExpired = endDate! < Date.now();
     if (active && isExpired) {
-      const newData: SubscriptionData = { active: false, endDate: endDate! };
+      const newData: SubscriptionData = { peerId, active: false, endDate: endDate! };
       await this.updateSubscription(peerId, newData, false);
 
       await this.vk.sendMessage({
@@ -42,7 +44,7 @@ class Subscription {
       return newData;
     }
 
-    return { active: active!, endDate: endDate! };
+    return { peerId, active: active!, endDate: endDate! };
   }
 
   async updateSubscription(peerId: number, subscription: SubscriptionData, notifyUser: boolean) {
@@ -59,6 +61,22 @@ class Subscription {
     }
 
     console.log(`Подписка в ${peerId} была обновлена. Теперь она ${subscription.active ? 'активна' : 'неактивна'}.`.yellow);
+  }
+
+  async getSubscriptions(): Promise<SubscriptionData[]> {
+    const classes = await this.classes.getAllClasses();
+
+    const onlyDMs: number[] = classes.map((classData) => {
+      const isDM = this.utils.checkIfPeerIsDM(classData.id);
+      if (isDM) return classData.id;
+    }).filter((id) => id);
+
+    const subscriptions = await Promise.all(onlyDMs.map(async (userId) => {
+      const subscriptionData = await this.checkSubscription(userId);
+      return subscriptionData;
+    }));
+
+    return subscriptions;
   }
 }
 
