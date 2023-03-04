@@ -167,15 +167,15 @@ class VkService extends VK {
     let timeoutMs = 1000 * 60;
 
     switch (priority) {
-    case 'low':
-      timeoutMs *= low;
-      break;
-    case 'medium':
-      timeoutMs *= medium;
-      break;
-    case 'high':
-      timeoutMs *= high;
-      break;
+      case 'low':
+        timeoutMs *= low;
+        break;
+      case 'medium':
+        timeoutMs *= medium;
+        break;
+      case 'high':
+        timeoutMs *= high;
+        break;
     }
 
     setTimeout(async () => {
