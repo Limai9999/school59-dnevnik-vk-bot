@@ -143,4 +143,11 @@ export default class Utils {
 
     return lessonTitle;
   }
+
+  formatLinkToUsername(link: string) {
+    return link
+      .replace('https://', '')
+      .replace('vk.com', '')
+      .replaceAll('/', '');
+  }
 }

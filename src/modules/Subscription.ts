@@ -61,6 +61,8 @@ class Subscription {
     }
 
     console.log(`Подписка в ${peerId} была обновлена. Теперь она ${subscription.active ? 'активна' : 'неактивна'}.`.yellow);
+
+    return subscription;
   }
 
   async getSubscriptions(): Promise<SubscriptionData[]> {
