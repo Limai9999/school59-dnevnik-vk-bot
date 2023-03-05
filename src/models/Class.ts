@@ -11,8 +11,8 @@ export interface IClass {
   id: number
   className: string
   netCityData: {
-    login: string
-    password: string
+    login: string | null
+    password: string | null
   }
   schedule: ParseScheduleResponse[]
   manualSchedule: ParseScheduleResponse[]

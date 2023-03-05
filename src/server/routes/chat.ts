@@ -3,7 +3,7 @@ import express from 'express';
 import { verifyKey } from '../middlewares/verifyKey';
 
 import { DefaultRequestData } from '../types/DefaultRequestData';
-import { GetChatResponse } from '../types/Responses/GetChatResponse';
+import { GetChatInformationResponse } from '../types/Responses/GetChatInformationResponse';
 
 import Password from '../../modules/Password';
 
@@ -33,12 +33,22 @@ router.post('/information', verifyKey, async (reqDef, res) => {
     const owner = await vk.getUser(chat_settings.owner_id);
     const className = classData.className;
 
-    const netcity: GetChatResponse['netcity'] = {
-      login: classData.netCityData.login,
-      password: new Password(classData.netCityData.password, true).decrypt(),
+    let password: string | null = '';
+
+    const netCityData = !classData.netCityData ? { login: null, password: null } : classData.netCityData;
+
+    try {
+      password = new Password(netCityData.password!, true).decrypt();
+    } catch (error) {
+      password = netCityData.password;
+    }
+
+    const netcity: GetChatInformationResponse['netcity'] = {
+      login: netCityData.login,
+      password,
     };
 
-    const information: GetChatResponse = {
+    const information: GetChatInformationResponse = {
       peerId: peer.id,
       membersCount: chat_settings.members_count,
       savedMessages,

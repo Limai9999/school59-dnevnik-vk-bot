@@ -14,6 +14,7 @@ import Grades from '../modules/Grades';
 
 import chatRoutes from './routes/chat';
 import subscriptionRoutes from './routes/subscription';
+import userRoutes from './routes/user';
 
 import { getServerConfig } from '../utils/getConfig';
 const config = getServerConfig();
@@ -70,6 +71,7 @@ class Server {
     // Routes
     app.use('/api/chat', chatRoutes);
     app.use('/api/subscription', subscriptionRoutes);
+    app.use('/api/user', userRoutes);
 
     // Start server
     app.listen(config.port, () => {

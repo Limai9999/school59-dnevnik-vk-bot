@@ -2,7 +2,7 @@ import { IClass } from '../../../models/Class';
 
 import { GetUserResponse } from '../../../types/VK/Responses/GetUserResponse';
 
-export interface GetChatResponse {
+export interface GetChatInformationResponse {
   peerId: number
   membersCount: number
   savedMessages: number
