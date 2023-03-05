@@ -1,5 +1,6 @@
 export type MainConfig = {
   testMode: boolean
+  onlyAPIMode: boolean
   APIUrl: string
   secretKey: string
   rapidApiKey: string

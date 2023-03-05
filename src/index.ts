@@ -102,6 +102,7 @@ async function start() {
 
   console.log('\nБот запущен!'.green);
 
+  if (mainConfig.onlyAPIMode) return console.log('Входящие сообщения не будут обрабатываться, т.к включён режим "только API".');
   vkBot.updates.on('message_new', (message) => {
     handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades });
   });
