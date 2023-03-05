@@ -27,6 +27,19 @@ class MessageStatistics {
 
     return photoMessages;
   }
+
+  async getMessagesCount(peerId: number) {
+    const messages = await MessagesDB.find({ peerId });
+    return messages.length;
+  }
+
+  async getLastMessageText(peerId: number): Promise<{id: number, text: string}> {
+    const newestMessage = await MessagesDB.findOne({ peerId }, {}, { sort: { 'created_at': -1 } });
+    if (!newestMessage) return { id: 0, text: '<< неизвестно >>' };
+
+    const text = newestMessage.text ? newestMessage.text : '<< вложение >>';
+    return { id: newestMessage.messageId, text };
+  }
 }
 
 export default MessageStatistics;
