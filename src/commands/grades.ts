@@ -139,6 +139,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
         }
       } else {
         roundedAverage = null;
+        marks[splittedAverage[0]]++;
       }
 
       const isCertified = lessonGrades.length >= 1;
