@@ -93,6 +93,22 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       keyboard,
     });
   } else if (action === 'average') {
+    type MarksObject = {
+      [key: string]: number
+    }
+
+    const marks: MarksObject = {
+      'unCertified': 0,
+      'notSure': 0,
+      '5': 0,
+      '4': 0,
+      '3': 0,
+      '2': 0,
+      '1': 0,
+    };
+
+    const averages: number[] = [];
+
     const lessonsAverages = report.result.averageGrades.map((averageGrade, index) => {
       const { lesson, average } = averageGrade;
       const abbreviatedLessonTitle = utils.abbreviateLessonTitle(lesson);
@@ -104,6 +120,8 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       const integer = Number(splittedAverage[0]);
       const averageNum = Number(average.replace(',', '.'));
 
+      averages.push(averageNum);
+
       let roundedAverage: string | number | null = null;
 
       if (splittedAverage.length === 2) {
@@ -111,16 +129,20 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 
         if (onlyFraction > 0.60) {
           roundedAverage = integer + 1;
+          marks[roundedAverage]++;
         } else if (onlyFraction >= 0.60) {
           roundedAverage = `между ${integer} и ${integer + 1}`;
+          marks['notSure']++;
         } else if (onlyFraction < 0.60) {
           roundedAverage = integer;
+          marks[roundedAverage]++;
         }
       } else {
         roundedAverage = null;
       }
 
       const isCertified = lessonGrades.length >= 1;
+      if (!isCertified) marks['unCertified']++;
 
       const lessonTotalGradesString = utils.setWordEndingBasedOnThingsCount('totalGrades', lessonGrades.length);
 
@@ -133,7 +155,11 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       return `${index + 1}. ${abbreviatedLessonTitle}\n${isNoGrades ? 'Нет оценок' : `Балл ${averageNum}`}\n${isCertifiedString}${roundedAverageString}`;
     });
 
-    const resultMessage = lessonsAverages.join('\n\n');
+    const averageOfAverages = averages.reduce((a, b) => a + b, 0) / averages.length;
+
+    const summarizedData = `Общий средний балл: ${averageOfAverages.toFixed(2)}\n\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}, коллов: ${marks['1']}${marks['notSure'] ? `, нет точных данных: ${marks['notSure']}.` : '.'}\n\n${marks['unCertified'] > 0 ? `Не аттестован по ${marks['unCertified']} предметам ❌` : 'Аттестован по всем предметам ✅'}`;
+
+    const resultMessage = `Информация о среднем балле:\n\n${summarizedData}\n\n${lessonsAverages.join('\n\n')}`;
 
     await vk.sendMessage({
       peerId,
