@@ -120,7 +120,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       const integer = Number(splittedAverage[0]);
       const averageNum = Number(average.replace(',', '.'));
 
-      averages.push(averageNum);
+      averages.push(integer);
 
       let roundedAverage: string | number | null = null;
 
