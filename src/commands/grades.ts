@@ -120,8 +120,6 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       const integer = Number(splittedAverage[0]);
       const averageNum = Number(average.replace(',', '.'));
 
-      averages.push(integer);
-
       let roundedAverage: string | number | null = null;
 
       if (splittedAverage.length === 2) {
@@ -140,6 +138,10 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       } else {
         roundedAverage = null;
         marks[splittedAverage[0]]++;
+      }
+
+      if (typeof roundedAverage !== 'string' && roundedAverage) {
+        averages.push(roundedAverage);
       }
 
       const isCertified = lessonGrades.length >= 1;
