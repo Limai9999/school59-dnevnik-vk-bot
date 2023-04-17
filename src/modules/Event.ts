@@ -11,6 +11,7 @@ import VkService from './VK';
 import Classes from './Classes';
 import MessageStatistics from './MessageStatistics';
 import Schedule from './Schedule';
+import ChatGPT from './ChatGPT';
 
 class Event {
   config: EventConfig;
@@ -22,6 +23,7 @@ class Event {
   commands: CommandOutputData[];
   statistics: MessageStatistics;
   schedule: Schedule;
+  chatGPT: ChatGPT;
 
   state: {
     lastExecutedDate: number
@@ -29,7 +31,7 @@ class Event {
     receivedMessagesCountWithoutEventReply: number
   };
 
-  constructor({ vk, vkUser, classes, commands, statistics, schedule }: EventInputData) {
+  constructor({ vk, vkUser, classes, commands, statistics, schedule, chatGPT }: EventInputData) {
     this.config = getEventConfig();
     this.events = [];
 
@@ -39,6 +41,7 @@ class Event {
     this.commands = commands;
     this.statistics = statistics;
     this.schedule = schedule;
+    this.chatGPT = chatGPT;
 
     this.state = {
       lastExecutedDate: 0,
@@ -85,6 +88,7 @@ class Event {
         commands: this.commands,
         statistics: this.statistics,
         schedule: this.schedule,
+        chatGPT: this.chatGPT,
         message,
       });
 

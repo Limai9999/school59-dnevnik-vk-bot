@@ -15,6 +15,7 @@ import Grades from '../modules/Grades';
 import { Payload } from './VK/Payloads/Payload';
 
 import { MainConfig } from './Configs/MainConfig';
+import ChatGPT from '../modules/ChatGPT';
 
 export type CommandInputData = {
   vk: VKService
@@ -34,6 +35,7 @@ export type CommandInputData = {
   mainConfig: MainConfig
   subscription: Subscription
   api: API
+  chatGPT: ChatGPT
 };
 
 export type CommandOutputData = {

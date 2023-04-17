@@ -3,6 +3,7 @@ import Classes from '../../modules/Classes';
 import MessageStatistics from '../../modules/MessageStatistics';
 import Schedule from '../../modules/Schedule';
 import VkService from '../../modules/VK';
+import ChatGPT from '../../modules/ChatGPT';
 import { CommandOutputData } from '../Commands';
 
 export type EventInputData = {
@@ -12,6 +13,7 @@ export type EventInputData = {
   commands: CommandOutputData[]
   statistics: MessageStatistics
   schedule: Schedule
+  chatGPT: ChatGPT
   message?: MessageContext<ContextDefaultState>
 };
 

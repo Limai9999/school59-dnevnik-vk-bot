@@ -48,7 +48,7 @@ function checkCommand({ command, data }: {command: CommandOutputData, data: {
   };
 }
 
-export default async function handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades }: CommandInputData) {
+export default async function handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT }: CommandInputData) {
   const { text, peerId, senderId, messagePayload, id } = message;
 
   if (message.isDM) {
@@ -74,7 +74,7 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
 
-  vk.handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription, api, grades });
+  vk.handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, args: [], utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT });
 
   let foundCommandAlias = '';
 
@@ -140,7 +140,7 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
   });
 
   if (!command) {
-    await handleHomework({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, args: [] });
+    await handleHomework({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, args: [], chatGPT });
     return;
   }
 
@@ -176,5 +176,5 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
   }
 
   console.log(`В ${peerId} выполняется команда ${command.name}.`.green);
-  await command.execute({ message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades });
+  await command.execute({ message, vk, vkUser, classes, args, commands, payload: messagePayload, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT });
 }

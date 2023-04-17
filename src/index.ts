@@ -17,6 +17,7 @@ import NetCityAPI from './modules/NetCityAPI';
 import Subscription from './modules/Subscription';
 import API from './modules/API';
 import Grades from './modules/Grades';
+import ChatGPT from './modules/ChatGPT';
 
 import Server from './server/app';
 
@@ -42,6 +43,7 @@ const classes = new Classes();
 const statistics = new MessageStatistics();
 const utils = new Utils();
 const api = new API();
+const chatGPT = new ChatGPT(mainConfig.chatGPTKey);
 
 const VKConfig = getVKConfig();
 
@@ -94,6 +96,7 @@ async function start() {
     commands,
     statistics,
     schedule,
+    chatGPT,
   });
   await events.init();
 
@@ -104,7 +107,7 @@ async function start() {
 
   if (mainConfig.onlyAPIMode) return console.log('Входящие сообщения не будут обрабатываться, т.к включён режим "только API".');
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades });
+    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT });
   });
 }
 

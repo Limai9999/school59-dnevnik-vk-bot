@@ -4,6 +4,7 @@ export type MainConfig = {
   APIUrl: string
   secretKey: string
   rapidApiKey: string
+  chatGPTKey: string
   autoUpdateMin: {
     netcity: number
     homework: number
