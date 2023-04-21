@@ -29,29 +29,40 @@ async function command({ message, vk, payload, commands }: CommandInputData) {
     const isAdminChat = message.peerId === vk.config.adminChatID;
 
     let currentButtonsInRowCount = 0;
-    let lastKeyboardColor: ButtonColor;
-    commands.map(({ name, payload, showInAdditionalMenu, requirements: { admin, dmOnly }, keyboardData }) => {
-      if (!showInAdditionalMenu) return;
 
-      if (dmOnly && !isDMChat) return;
-      if (admin && !isAdminChat) return;
-
-      if (currentButtonsInRowCount >= 2 || (keyboardData && keyboardData.positionSeparatelyFromAllButton) || (keyboardData && keyboardData.color !== lastKeyboardColor)) {
-        keyboard.row();
-        currentButtonsInRowCount = 0;
-      }
-
-      const keyboardColor = (keyboardData && keyboardData.color) ? keyboardData.color : Keyboard.PRIMARY_COLOR;
-
-      keyboard.textButton({
-        label: name[0].toUpperCase() + name.slice(1),
-        payload,
-        color: keyboardColor,
-      });
-
-      lastKeyboardColor = keyboardColor;
-      currentButtonsInRowCount++;
+    const defaultCommands = commands.filter((cmd) => {
+      return !cmd.keyboardData?.positionSeparatelyFromAllButton;
     });
+    const separatelyPositionedCommands = commands.filter((cmd) => {
+      return cmd.keyboardData?.positionSeparatelyFromAllButton;
+    });
+
+    const applyCommands = (commands: CommandOutputData[]) => {
+      commands.map(({ name, payload, showInAdditionalMenu, requirements: { admin, dmOnly }, keyboardData }) => {
+        if (!showInAdditionalMenu) return;
+
+        if (dmOnly && !isDMChat) return;
+        if (admin && !isAdminChat) return;
+
+        if (currentButtonsInRowCount >= 2 || (keyboardData && keyboardData.positionSeparatelyFromAllButton)) {
+          keyboard.row();
+          currentButtonsInRowCount = 0;
+        }
+
+        const keyboardColor = (keyboardData && keyboardData.color) ? keyboardData.color : Keyboard.PRIMARY_COLOR;
+
+        keyboard.textButton({
+          label: name[0].toUpperCase() + name.slice(1),
+          payload,
+          color: keyboardColor,
+        });
+
+        currentButtonsInRowCount++;
+      });
+    };
+
+    applyCommands(defaultCommands);
+    applyCommands(separatelyPositionedCommands);
   } else {
     keyboard = message.isDM ? DMMainKeyboard : MainKeyboard;
   }
