@@ -47,6 +47,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
         keyboard: MainKeyboard,
       });
       isConversationStopped = true;
+      chatGPT.clearChatSession(peerId);
       return;
     }
     if (!waitedMessage.text) {
@@ -64,6 +65,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
     const waitedMessage = await localWaitForMessage(lastMsgId);
     if (!waitedMessage) {
       isConversationStopped = true;
+      chatGPT.clearChatSession(peerId);
       continue;
     }
 
@@ -77,6 +79,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
         });
 
         isConversationStopped = true;
+        chatGPT.clearChatSession(peerId);
         return;
       }
     }
