@@ -1,14 +1,24 @@
 import { ContextDefaultState, MessageContext } from 'vk-io';
 
-import { Configuration, OpenAIApi } from 'openai';
+import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai';
 
+interface ISession {
+  peerId: number
+  messages: ChatCompletionRequestMessage[]
+}
 class ChatGPT extends OpenAIApi {
+  sessions: {
+    [peerId: number]: ISession;
+  };
+
   constructor(apiKey: string) {
     const configuration = new Configuration({
       apiKey,
     });
 
     super(configuration);
+
+    this.sessions = {};
   }
 
   async generateRandomAnswerMessage(message: MessageContext<ContextDefaultState>): Promise<string | undefined> {
@@ -39,22 +49,57 @@ ${message.text}
     }
   }
 
-  async askQuestion(question: string, username: string): Promise<string | undefined> {
+  async askQuestion(question: string, session: ISession, username: string): Promise<string | undefined> {
+    if (!session.messages.length) {
+      session.messages.push({
+        role: 'user',
+        content:
+        `
+Тебе пишут сообщение через чат-бота. Ты и есть этот бот, под названием Chechnya LTD.
+
+Имя пользователя, написавшего сообщение: ${username}.
+Сообщение пользователя: ${question}.
+        `,
+      });
+    } else {
+      session.messages.push({
+        role: 'user',
+        content: question,
+      });
+    }
+
     try {
       const response = await this.createChatCompletion({
         model: 'gpt-3.5-turbo',
         temperature: 0.5,
-        messages: [{
-          role: 'user',
-          content: `Тебе задают вопрос. Имя человека задавшего вопрос: "${username}". Рекомендуется обратиться по имени. Вопрос: ${question}`,
-        }],
+        messages: session.messages,
       });
+
+      session.messages.push(response.data.choices[0].message!);
 
       return response.data.choices[0].message?.content;
     } catch (error) {
       console.log('generateRandomAnswerMessage error', error);
       return;
     }
+  }
+
+  createChatSession(peerId: number): ISession {
+    this.sessions[peerId] = {
+      peerId,
+      messages: [],
+    };
+
+    return this.sessions[peerId];
+  }
+
+  clearChatSession(peerId: number): boolean {
+    this.sessions[peerId] = {
+      peerId,
+      messages: [],
+    };
+
+    return true;
   }
 }
 

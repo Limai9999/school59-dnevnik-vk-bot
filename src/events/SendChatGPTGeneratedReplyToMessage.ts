@@ -17,7 +17,7 @@ async function executeEvent({ vk, message, chatGPT }: EventInputData) {
 const evt: EventOutputData = {
   name: 'sendChatGPTGeneratedReplyToMessage',
   disabled: false,
-  executeProbability: 0.40,
+  executeProbability: 0.42,
   execute: executeEvent,
 };
 
