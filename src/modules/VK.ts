@@ -90,7 +90,7 @@ class VkService extends VK {
     this.messages.push({ message, date: Date.now() });
   }
 
-  async waitForMessage(fromPeerId: number, fromSenderId: number, searchFromMessageId: number): Promise<CommandInputData['message'] | null> {
+  async waitForMessage(fromPeerId: number, fromSenderId: number, searchFromMessageId: number, waitingTime = 5): Promise<CommandInputData['message'] | null> {
     return new Promise((resolve) => {
       // eslint-disable-next-line prefer-const
       let stopTimeout: NodeJS.Timer;
@@ -109,7 +109,7 @@ class VkService extends VK {
       stopTimeout = setTimeout(() => {
         clearInterval(findInterval);
         resolve(null);
-      }, 1000 * 60 * 5);
+      }, 1000 * 60 * waitingTime);
     });
   }
 

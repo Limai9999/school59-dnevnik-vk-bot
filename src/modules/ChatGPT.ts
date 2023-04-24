@@ -2,6 +2,9 @@ import { ContextDefaultState, MessageContext } from 'vk-io';
 
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from 'openai';
 
+import { AskQuestionResponse } from '../types/ChatGPT/AskQuestionResponse';
+import { ChatCompletionError } from '../types/ChatGPT/ChatCompletionError';
+
 interface ISession {
   peerId: number
   messages: ChatCompletionRequestMessage[]
@@ -49,7 +52,7 @@ ${message.text}
     }
   }
 
-  async askQuestion(question: string, session: ISession, username: string): Promise<string | undefined> {
+  async askQuestion(question: string, session: ISession, username: string): Promise<AskQuestionResponse> {
     if (!session.messages.length) {
       session.messages.push({
         role: 'user',
@@ -73,14 +76,31 @@ ${message.text}
         model: 'gpt-3.5-turbo',
         temperature: 0.5,
         messages: session.messages,
+      }, {
+        validateStatus: () => true,
       });
+
+      if (response.status !== 200) {
+        const erroredData = response.data as unknown as ChatCompletionError;
+
+        return {
+          status: false,
+          error: erroredData.error.message,
+        };
+      }
 
       session.messages.push(response.data.choices[0].message!);
 
-      return response.data.choices[0].message?.content;
+      return {
+        status: true,
+        choice: response.data.choices[0],
+      };
     } catch (error) {
       console.log('generateRandomAnswerMessage error', error);
-      return;
+      return {
+        status: false,
+        error: `${error}`,
+      };
     }
   }
 

@@ -39,7 +39,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
   });
 
   const localWaitForMessage = async (lastMsgId: number) => {
-    const waitedMessage = await vk.waitForMessage(peerId, peerId, lastMsgId);
+    const waitedMessage = await vk.waitForMessage(peerId, peerId, lastMsgId, 15);
     if (!waitedMessage) {
       await vk.sendMessage({
         message: 'Я не дождался вашего вопроса. Сессия завершена.',
@@ -73,7 +73,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
       const payload = waitedMessage.messagePayload as AskQuestionPayload;
       if (payload.command === 'askQuestion' && payload.data.action === 'closeSession') {
         await vk.sendMessage({
-          message: 'Сессия завершена... Вы возвращены в главное меню.',
+          message: 'Сессия завершена. Вы возвращены в главное меню.',
           peerId,
           keyboard: MainKeyboard,
         });
@@ -104,9 +104,9 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
     const response = await chatGPT.askQuestion(waitedMessage.text!, session, username);
     await vk.removeMessage(loadingMsgId, peerId);
 
-    if (!response) {
+    if (!response.status) {
       lastMsgId = await vk.sendMessage({
-        message: 'Не удалось обработать ваш вопрос. Попробуйте ещё раз.',
+        message: `Не удалось обработать ваш вопрос. Попробуйте ещё раз.\n\nОшибка: ${response.error}`,
         peerId,
         keyboard: sessionKeyboard,
       });
@@ -114,7 +114,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
     }
 
     lastMsgId = await vk.sendMessage({
-      message: response,
+      message: response.choice!.message!.content,
       peerId,
       keyboard: sessionKeyboard,
     });
