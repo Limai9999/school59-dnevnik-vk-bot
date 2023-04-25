@@ -3,7 +3,7 @@ import { Keyboard } from 'vk-io';
 import { CommandInputData, CommandOutputData } from '../types/Commands';
 import { AskQuestionPayload } from '../types/VK/Payloads/AskQuestionPayload';
 
-import { MainKeyboard } from '../keyboards/MainKeyboard';
+import { DMMainKeyboard } from '../keyboards/DMMainKeyboard';
 
 async function command({ message, vk, utils, chatGPT }: CommandInputData) {
   const payload = message.messagePayload as AskQuestionPayload;
@@ -44,7 +44,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
       await vk.sendMessage({
         message: 'Я не дождался вашего вопроса. Сессия завершена.',
         peerId,
-        keyboard: MainKeyboard,
+        keyboard: DMMainKeyboard,
       });
       isConversationStopped = true;
       chatGPT.clearChatSession(peerId);
@@ -75,7 +75,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
         await vk.sendMessage({
           message: 'Сессия завершена. Вы возвращены в главное меню.',
           peerId,
-          keyboard: MainKeyboard,
+          keyboard: DMMainKeyboard,
         });
 
         isConversationStopped = true;
