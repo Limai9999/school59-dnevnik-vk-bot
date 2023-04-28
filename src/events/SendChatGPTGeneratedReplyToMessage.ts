@@ -6,11 +6,14 @@ async function executeEvent({ vk, message, chatGPT }: EventInputData) {
   const response = await chatGPT.generateRandomAnswerMessage(message);
   if (!response) return;
 
+  const senderMessageId = message.conversationMessageId;
+
   await vk.sendMessage({
     peerId: message.peerId,
     message: response,
     priority: 'none',
     skipLastSentCheck: true,
+    replyTo: senderMessageId,
   });
 }
 

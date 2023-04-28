@@ -8,4 +8,5 @@ export type SendMessageData = {
   skipLastSentCheck?: boolean
   priority?: 'none' | 'low' | 'medium' | 'high'
   useAll?: boolean
+  replyTo?: number
 }

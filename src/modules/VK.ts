@@ -26,6 +26,7 @@ import { MainKeyboard } from '../keyboards/MainKeyboard';
 import { DMMainKeyboard } from '../keyboards/DMMainKeyboard';
 
 import { getMainConfig } from '../utils/getConfig';
+import { SendMessageForward } from '../types/VK/SendMessageForward';
 
 type TempMessage = {
   date: number
@@ -183,7 +184,7 @@ class VkService extends VK {
     }, timeoutMs);
   }
 
-  async sendMessage({ message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false, useAll }: SendMessageData): Promise<number> {
+  async sendMessage({ message, peerId, keyboard, attachment, priority = 'none', skipLastSentCheck = false, useAll, replyTo }: SendMessageData): Promise<number> {
     const isPrivateMessages = this.utils.checkIfPeerIsDM(peerId);
 
     const classData = await this.classes.getClass(peerId);
@@ -227,6 +228,12 @@ class VkService extends VK {
     }
 
     try {
+      const useReply = replyTo ? {
+        peer_id: peerId,
+        is_reply: true,
+        conversation_message_ids: replyTo,
+      } as SendMessageForward : null;
+
       const response = await this.api.messages.send({
         message: useAll && !isPrivateMessages ? `@all,\n${message}` : message,
         peer_ids: peerId,
@@ -234,6 +241,7 @@ class VkService extends VK {
         attachment,
         dont_parse_links: true,
         keyboard: usingKeyboard,
+        forward: useReply ? JSON.stringify(useReply) : undefined,
       }) as unknown as MessagesSendResponse;
 
       const messageId = response[0].conversation_message_id;
