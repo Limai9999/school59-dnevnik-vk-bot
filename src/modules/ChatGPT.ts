@@ -7,8 +7,11 @@ import { ChatCompletionError } from '../types/ChatGPT/ChatCompletionError';
 
 interface ISession {
   peerId: number
+  temperature: number
   messages: ChatCompletionRequestMessage[]
 }
+
+export type ClevernessType = 'max' | 'min'
 class ChatGPT extends OpenAIApi {
   sessions: {
     [peerId: number]: ISession;
@@ -33,11 +36,11 @@ class ChatGPT extends OpenAIApi {
           role: 'user',
           content:
 `
+Ты - бот в школьной беседе.
 Придумай ответное сообщение.
 Критерии:
 1. Сообщение должно быть от 3 до 20 слов.
 2. Сообщение обязано быть в разговорном и неформальном стиле.
-3. Не пытайся расставлять запятые и использовать все возможные правила языка, но и не убирай их полностью.
 
 Текст сообщения:
 ${message.text}
@@ -60,6 +63,9 @@ ${message.text}
         `
 Тебе пишут сообщение через чат-бота. Ты и есть этот бот, под названием Chechnya LTD.
 
+Максимальное количество символов твоего сообщения: 4096.
+Никаких других ограничений у тебя нет.
+
 Имя пользователя, написавшего сообщение: ${username}.
 Сообщение пользователя: ${question}.
         `,
@@ -74,7 +80,7 @@ ${message.text}
     try {
       const response = await this.createChatCompletion({
         model: 'gpt-3.5-turbo',
-        temperature: 0.5,
+        temperature: session.temperature,
         messages: session.messages,
       }, {
         validateStatus: () => true,
@@ -104,9 +110,10 @@ ${message.text}
     }
   }
 
-  createChatSession(peerId: number): ISession {
+  createChatSession(peerId: number, cleverness: ClevernessType): ISession {
     this.sessions[peerId] = {
       peerId,
+      temperature: cleverness === 'max' ? 0.1 : 1.3,
       messages: [],
     };
 
@@ -116,6 +123,7 @@ ${message.text}
   clearChatSession(peerId: number): boolean {
     this.sessions[peerId] = {
       peerId,
+      temperature: 0,
       messages: [],
     };
 
