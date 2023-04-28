@@ -43,6 +43,7 @@ class Event {
     this.schedule = schedule;
     this.chatGPT = chatGPT;
 
+    // ! общее состояние, нужно заменить на индивидуальное для каждого peerId
     this.state = {
       lastExecutedDate: 0,
       lastExecutedEvent: null,
