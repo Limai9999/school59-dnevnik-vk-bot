@@ -54,6 +54,30 @@ class Event {
     this.events = await getEvents();
   }
 
+  async executeEventByName(message: MessageContext<ContextDefaultState>, eventName: string): Promise<boolean> {
+    const event = this.events.find((evt) => evt.name === eventName);
+    if (!event) return false;
+
+    console.log(`Выполняется ивент ${event.name} (запущено вручную)`.yellow);
+
+    try {
+      await event.execute({
+        vk: this.vk,
+        vkUser: this.vkUser,
+        classes: this.classes,
+        commands: this.commands,
+        statistics: this.statistics,
+        schedule: this.schedule,
+        chatGPT: this.chatGPT,
+        message,
+      });
+
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async executeRandomEvent(message: MessageContext<ContextDefaultState>) {
     if (message.isDM) return;
 
