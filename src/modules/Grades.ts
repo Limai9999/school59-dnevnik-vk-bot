@@ -41,7 +41,8 @@ class Grades {
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
 
-    this.isDebug = this.vk.mainConfig.testMode;
+    // this.isDebug = this.vk.mainConfig.testMode;
+    this.isDebug = false;
   }
 
   async startAutoUpdate(peerId: number) {

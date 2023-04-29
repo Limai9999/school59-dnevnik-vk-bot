@@ -2,7 +2,7 @@ export type VKConfig = {
   bot_token: string
   user_token: string
   id: number
-  adminUserID: number
+  adminUserIDs: number[]
   adminChatID: number
   maxLastSentMessages: number
   messagePrioritiesTimeoutMinutes: {

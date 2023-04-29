@@ -69,7 +69,7 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
   if (!handleMessages) return console.log(`Получено сообщение в беседе ${peerId}, но оно не будет обрабатываться, т.к обработка сообщений в данный момент отключена.`.yellow);
 
   const isAdminChat = peerId === vk.config.adminChatID;
-  const isUserAdmin = senderId === vk.config.adminUserID;
+  const isUserAdmin = vk.config.adminUserIDs.includes(senderId);
   const isDMChat = message.isDM;
 
   if (!isLoading && !isDMChat) events.executeRandomEvent(message);
@@ -167,7 +167,7 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
     });
   }
 
-  if (mainConfig.testMode && (peerId !== vk.config.adminChatID && senderId !== vk.config.adminUserID)) {
+  if (mainConfig.testMode && (!isAdminChat && !isUserAdmin)) {
     return vk.sendMessage({
       message: 'Бот временно отключён, попробуйте позже.',
       peerId: message.peerId,

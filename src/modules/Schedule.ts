@@ -37,6 +37,8 @@ export default class Schedule {
   autoUpdatePeerIds: number[];
   autoUpdateCount: number;
 
+  isDebug: boolean;
+
   constructor(vk: VK, classes: Classes, netCity: NetCityAPI, utils: Utils, api: API, subscription: Subscription, mainConfig: MainConfig) {
     this.vk = vk;
     this.classes = classes;
@@ -49,6 +51,9 @@ export default class Schedule {
 
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
+
+    // this.isDebug = this.mainConfig.testMode;
+    this.isDebug = false;
   }
 
   async startAutoUpdate(peerId: number) {
@@ -101,8 +106,6 @@ export default class Schedule {
   }
 
   async getWithAPI(peerId: number): Promise<GetScheduleWithAPI> {
-    const isTest = this.mainConfig.testMode;
-
     const classData = await this.classes.getClass(peerId);
     const credentials = await this.netCity.getCredentials(peerId);
 
@@ -126,7 +129,7 @@ export default class Schedule {
 
     const scheduleFiles: Attachment[] = [];
 
-    if (isTest) {
+    if (this.isDebug) {
       const debugAttachments = getScheduleDebugData();
 
       scheduleFiles.push(...debugAttachments);
@@ -167,7 +170,7 @@ export default class Schedule {
     }
 
     const parsedSchedule: ParseScheduleResponse[] = await Promise.all(scheduleFiles.map(async (file) => {
-      const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file, isTest);
+      const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file, this.isDebug);
 
       if (!downloadStatus.status) {
         return {
