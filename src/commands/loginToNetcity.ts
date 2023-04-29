@@ -53,14 +53,14 @@ async function command({ vk, classes, message, netcityAPI, payload, utils }: Com
     });
 
     const session = await netcityAPI.findOrCreateSession(peerId, !message.isDM);
-    if (!session) return sendFinalMessage('Не введены данные для Сетевого Города или название класса.');
+    if (!session) return sendFinalMessage('Не введены данные для Сетевого Города или название класса.\nПросмотрите список команд, чтобы узнать, как ввести данные.');
 
     // console.log(`Успешно создана сессия ${netCityData.login!}`, session);
     // console.log('cookie', utils.cookieArrayToString(session.cookies));
 
     if (!session.status) {
       console.log('loginToNetcity error'.red, session);
-      return sendFinalMessage(`Не удалось войти в Сетевой Город, ошибка:\n${session.error!}`);
+      return sendFinalMessage(`Не удалось войти в Сетевой Город, ошибка:\n${session.error!}`, true);
     }
 
     await classes.setNetCitySessionId(peerId, session.session.id);
@@ -103,7 +103,7 @@ async function command({ vk, classes, message, netcityAPI, payload, utils }: Com
 
     const closeStatus = await netcityAPI.closeSession(sessionId!);
 
-    const msg = closeStatus.status ? 'Вы успешно вышли из Сетевого Города.' : `Не удалось выйти из Сетевого Города, ошибка:\n${closeStatus.message!}`;
+    const msg = closeStatus.status ? 'Вы успешно вышли из Сетевого Города.' : `Не удалось выйти из Сетевого Города, ошибка:\n${closeStatus.message!}\n\nВ любом случае, сессия уже закрыта полностью, попробуйте войти снова.`;
 
     await classes.setLoading(peerId, false);
 
