@@ -80,6 +80,26 @@ class Subscription {
 
     return subscriptions;
   }
+
+  async remindForSubscription(peerId: number): Promise<boolean> {
+    try {
+      const subscription = await this.checkSubscription(peerId);
+
+      if (subscription.active) {
+        // TODO: *
+        return true;
+      } else {
+        await this.vk.sendMessage({
+          message: 'Привет! Не забыл про меня? Ты и вправду стал пользоваться Сетевым Городом для получения расписания и оценок? Это же слишком долго и не удобно!\n\nПодключи подписку за 40 рублей на месяц и получай автоматическую информацию об обновлениях в оценках и расписании.',
+          peerId,
+        });
+
+        return true;
+      }
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 export default Subscription;

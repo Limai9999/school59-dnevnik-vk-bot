@@ -83,4 +83,30 @@ router.post('/remove', verifyKey, async (reqDef, res) => {
   }
 });
 
+router.post('/remind', verifyKey, async (reqDef, res) => {
+  try {
+    const req = reqDef as DefaultRequestData;
+
+    const { peerId } = req.body as { peerId: number };
+    if (!peerId) {
+      return res.json({ status: false, message: 'Не передан peerId' });
+    }
+
+    const { vk, subscription } = req.app.locals;
+
+    const user = await vk.getUser(peerId);
+    if (!user) {
+      return res.json({ status: false, message: 'Такого пользователя не существует' });
+    }
+
+    const remindStatus = await subscription.remindForSubscription(peerId);
+
+    return res.json({ status: remindStatus, message: remindStatus ? 'Успешное напоминание.' : 'Не удалось напомнить о продлении подписки.' });
+  } catch (error) {
+    console.log(error);
+    return res.json({ status: false, message: 'Ошибка сервера' });
+  }
+});
+
+
 export default router;
