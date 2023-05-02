@@ -52,8 +52,8 @@ export default class Schedule {
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
 
-    // this.isDebug = this.mainConfig.testMode;
-    this.isDebug = false;
+    this.isDebug = this.mainConfig.testMode;
+    // this.isDebug = false;
   }
 
   async startAutoUpdate(peerId: number) {
@@ -159,8 +159,6 @@ export default class Schedule {
     }
 
     if (!scheduleFiles.length) {
-      // await this.classes.setSchedule(peerId, []);
-
       return {
         status: true,
         schedule: [],
@@ -195,7 +193,7 @@ export default class Schedule {
 
     parsedSchedule.map((newSchedule) => {
       const isExistsInOld = oldSchedule.find((old) => old.filename === newSchedule.filename);
-      if (isExistsInOld && !newSchedule.status) return;
+      if (isExistsInOld && !newSchedule.status) return isExistsInOld;
 
       newScheduleArray.push(newSchedule);
     });

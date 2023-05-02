@@ -11,10 +11,13 @@ class Subscription {
   classes: Classes;
   utils: Utils;
 
-  constructor(vk: VK, classes: Classes, utils: Utils) {
+  setupUserFeatures: (peerId: number) => Promise<void>;
+
+  constructor(vk: VK, classes: Classes, utils: Utils, setupUserFeatures: (peerId: number) => Promise<void>) {
     this.vk = vk;
     this.classes = classes;
     this.utils = utils;
+    this.setupUserFeatures = setupUserFeatures;
   }
 
   async checkSubscription(peerId: number, doActions = true): Promise<SubscriptionData> {
@@ -61,6 +64,8 @@ class Subscription {
     }
 
     console.log(`Подписка в ${peerId} была обновлена. Теперь она ${subscription.active ? 'активна' : 'неактивна'}.`.yellow);
+
+    subscription.active ? await this.setupUserFeatures(peerId) : null;
 
     return subscription;
   }
