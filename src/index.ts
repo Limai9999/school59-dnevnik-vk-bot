@@ -62,7 +62,18 @@ const vkUser = new VK({
   isUser: true,
 });
 
-const subscription = new Subscription(vkBot, classes, utils);
+const setupUserFeatures = async (peerId: number) => {
+  await classes.setLoading(peerId, false);
+
+  vkBot.addChatToState(peerId);
+
+  await netcityAPI.startSessionAutoCreating(peerId);
+  await schedule.startAutoUpdate(peerId);
+  await grades.startAutoUpdate(peerId);
+  // await homework.startAutoUpdate(id);
+};
+
+const subscription = new Subscription(vkBot, classes, utils, setupUserFeatures);
 
 const netcityAPI = new NetCityAPI(vkBot, classes, utils, api, subscription, mainConfig);
 const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api, subscription, mainConfig);
@@ -75,14 +86,7 @@ async function start() {
 
   const allClasses = await classes.getAllClasses();
   await Promise.all(allClasses.map(async ({ id }) => {
-    await classes.setLoading(id, false);
-
-    vkBot.addChatToState(id);
-
-    await netcityAPI.startSessionAutoCreating(id);
-    await schedule.startAutoUpdate(id);
-    await grades.startAutoUpdate(id);
-    // await homework.startAutoUpdate(id);
+    await setupUserFeatures(id);
   }));
 
   console.log(`Бот обрабатывает ${allClasses.length} чатов.`);

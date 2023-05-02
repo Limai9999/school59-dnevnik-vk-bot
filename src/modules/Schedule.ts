@@ -52,8 +52,8 @@ export default class Schedule {
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
 
-    this.isDebug = this.mainConfig.testMode;
-    // this.isDebug = false;
+    // this.isDebug = this.mainConfig.testMode;
+    this.isDebug = false;
   }
 
   async startAutoUpdate(peerId: number) {
