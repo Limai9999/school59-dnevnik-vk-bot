@@ -224,6 +224,8 @@ class NetCityAPI {
       };
     }
 
+    const classData = await this.classes.getClass(session.peerId);
+
     const cookie = this.utils.cookieArrayToString(session.cookies);
 
     try {
@@ -237,6 +239,17 @@ class NetCityAPI {
       });
 
       const data = request.data as InitStudentDiaryResponse;
+
+      const isRealUserNameSetup = !!classData.realUserName;
+
+      const { students } = data;
+      const { nickName } = students[0];
+
+      await this.classes.setRealUserName(session.peerId, nickName);
+
+      if (!isRealUserNameSetup) {
+        console.log('УСПЕШНО НАЙДЕНО И УСТАНОВЛЕНО НАСТОЯЩЕЕ ИМЯ ПОЛЬЗОВАТЕЛЯ (ВПЕРВЫЕ)'.bgGreen, session.peerId, nickName);
+      }
 
       return {
         status: true,

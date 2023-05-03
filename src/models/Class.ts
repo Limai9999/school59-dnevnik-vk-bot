@@ -31,6 +31,7 @@ export interface IClass {
   homework: GetHomework
   lastUpdatedHomework: number
   notes: Note[]
+  realUserName?: string
 }
 
 const parsedSchedule = {
@@ -168,6 +169,9 @@ const classSchema = new Schema({
       filename: String,
       noteText: String,
     }],
+  },
+  realUserName: {
+    type: String,
   },
 }, {
   timestamps: true,

@@ -12,7 +12,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
   const { peerId, senderId } = message;
 
   const userData = await vk.getUser(peerId);
-  const { first_name, last_name, sex } = userData!;
+  const { sex } = userData!;
 
   const askForClevernessKeyboard = Keyboard.builder()
     .inline()
@@ -53,7 +53,9 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
   }
 
   const session = chatGPT.createChatSession(peerId, clevernessPayload.data.cleverness);
-  const username = `${first_name} ${last_name}`;
+  const username = await vk.getRealUserName(peerId) || '* пользователь';
+  const firstName = username.split(' ')[1];
+
   let isConversationStopped = false;
   let lastMsgId = 0;
 
@@ -67,7 +69,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
   const randomMessages = [
     'О чём вы хотите спросить?',
     'Что вам хочется узнать?',
-    `О чём хочет узнать ${utils.genderifyWord('наш', sex)} ${first_name}?`,
+    `О чём хочет узнать ${utils.genderifyWord('наш', sex)} ${firstName}?`,
   ];
 
   lastMsgId = await vk.sendMessage({

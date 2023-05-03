@@ -165,4 +165,11 @@ export default class Classes {
       $set: { notes },
     });
   }
+
+  async setRealUserName(peerId: number, realUserName: string) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: { realUserName },
+    });
+  }
 }

@@ -366,6 +366,17 @@ class VkService extends VK {
 
     return attachment;
   }
+
+  async getRealUserName(peerId: number): Promise<string | null> {
+    if (!this.utils.checkIfPeerIsDM(peerId)) return null;
+
+    const user = await this.getUser(peerId);
+    const classData = await this.classes.getClass(peerId);
+
+    if (!classData.realUserName && !user) return null;
+
+    return classData.realUserName ? classData.realUserName : `${user!.first_name} ${user!.last_name}`;
+  }
 }
 
 export default VkService;
