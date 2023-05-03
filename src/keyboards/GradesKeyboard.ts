@@ -10,6 +10,11 @@ export const GradesKeyboard = Keyboard.builder()
     color: Keyboard.POSITIVE_COLOR,
     payload: { command: 'grades', data: { action: 'fullReport' } } as GradesPayload,
   })
+  .textButton({
+    label: 'За четверть',
+    color: Keyboard.POSITIVE_COLOR,
+    payload: { command: 'grades', data: { action: 'quarter' } } as GradesPayload,
+  })
   .row()
   .textButton({
     label: 'Просроченные задания',
@@ -18,18 +23,13 @@ export const GradesKeyboard = Keyboard.builder()
   })
   .row()
   .textButton({
-    label: 'За сегодня',
+    label: 'Недавнее',
     color: Keyboard.PRIMARY_COLOR,
-    payload: { command: 'grades', data: { action: 'today' } } as GradesPayload,
-  })
-  .textButton({
-    label: 'Средний балл',
-    color: Keyboard.PRIMARY_COLOR,
-    payload: { command: 'grades', data: { action: 'average' } } as GradesPayload,
+    payload: { command: 'grades', data: { action: 'recently' } } as GradesPayload,
   })
   .row()
   .textButton({
-    label: 'Обновить',
+    label: 'Обновить данные',
     color: Keyboard.NEGATIVE_COLOR,
     payload: { command: 'grades', data: { action: 'update', forceUpdate: true } } as GradesPayload,
   });

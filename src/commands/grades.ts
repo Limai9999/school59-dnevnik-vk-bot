@@ -92,7 +92,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       message: `Отчёт об оценках:\n${lastUpdatedString}\n\n${studentInfo}\n\n${totalGradesString}\n\nВыберите действие:`,
       keyboard,
     });
-  } else if (action === 'average') {
+  } else if (action === 'quarter') {
     type MarksObject = {
       [key: string]: number
     }
@@ -154,21 +154,22 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
         'Не аттестован ❌' + (isNoGrades ? '' : `, ${lessonTotalGradesString}`);
 
       const roundedAverageString = roundedAverage && isCertified ? `\nОжидаемая оценка за четверть: ${roundedAverage}` : '';
+      const lessonGradesString = utils.setWordEndingBasedOnThingsCount('grades', lessonGrades.length);
 
-      return `${index + 1}. ${abbreviatedLessonTitle}\n${isNoGrades ? 'Нет оценок' : `Балл ${averageNum}`}\n${isCertifiedString}${roundedAverageString}`;
+      return `${index + 1}. ${abbreviatedLessonTitle}\n${isNoGrades ? 'Нет оценок' : `Балл ${averageNum} — ${lessonGrades.length} ${lessonGradesString}.`}\n${isCertifiedString}${roundedAverageString}`;
     });
 
     const averageOfAverages = averages.reduce((a, b) => a + b, 0) / averages.length;
 
     const summarizedData = `Общий средний балл: ${averageOfAverages.toFixed(2)}\n\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}, коллов: ${marks['1']}${marks['notSure'] ? `, нет точных данных: ${marks['notSure']}.` : '.'}\n\n${marks['unCertified'] > 0 ? `Не аттестован по ${marks['unCertified']} предметам ❌` : 'Аттестован по всем предметам ✅'}`;
 
-    const resultMessage = `Информация о среднем балле:\n\n${summarizedData}\n\n${lessonsAverages.join('\n\n')}`;
+    const resultMessage = `Информация об оценках за четверть:\n\n${summarizedData}\n\n${lessonsAverages.join('\n\n')}`;
 
     await vk.sendMessage({
       peerId,
       message: resultMessage,
     });
-  } else if (action === 'today') {
+  } else if (action === 'recently') {
     const todayGrades = report.result.daysData.pop();
     if (!todayGrades) {
       return vk.sendMessage({
@@ -182,7 +183,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
     let resultMessage = '';
 
     if (lessonsWithGrades.length) {
-      resultMessage = `Оценки за ${day} ${month.toLowerCase()}:\n\n`;
+      resultMessage = `Оценки за ${day} ${month.toLowerCase()} — последний доступный день в отчёте:\n\n`;
 
       lessonsWithGrades.map((lessonWithGrade) => {
         const { lesson, grades } = lessonWithGrade;

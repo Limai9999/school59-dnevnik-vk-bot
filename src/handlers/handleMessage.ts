@@ -1,10 +1,12 @@
+import VkService from '../modules/VK';
+
 import { CommandInputData, CommandOutputData } from '../types/Commands';
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 
 import { Payload } from '../types/VK/Payloads/Payload';
 import handleHomework from './handleHomework';
 
-function checkCommand({ command, data }: {command: CommandOutputData, data: {
+function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: VkService, data: {
   isUserAdmin: boolean,
   isAdminChat: boolean,
   isDMChat: boolean,
@@ -24,7 +26,7 @@ function checkCommand({ command, data }: {command: CommandOutputData, data: {
   if (requirements.paidSubscription && isDMChat && !subscriptionData.active) {
     return {
       status: false,
-      errorMessage: 'Для использования этой команды необходимо оплатить подписку.',
+      errorMessage: `Для использования этой команды необходимо иметь активную подписку.\n\nОбратитесь к [id${vk.config.adminUserIDs[0]}|администратору].`,
     };
   }
 
@@ -144,7 +146,7 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
     return;
   }
 
-  const { status, errorMessage } = checkCommand({ command, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin } });
+  const { status, errorMessage } = checkCommand({ command, vk, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin } });
 
   if (!status) {
     if (!errorMessage) return;
