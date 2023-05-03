@@ -1,6 +1,6 @@
 export type ParseScheduleResponse = {
   status: boolean
-  filename: string
+  filename?: string
   error?: string
   schedule?: {
     distant: boolean

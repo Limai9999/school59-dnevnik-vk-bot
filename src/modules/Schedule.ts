@@ -88,7 +88,7 @@ export default class Schedule {
 
       const data = await this.getWithAPI(peerId);
 
-      const peerType = isDM ? 'У пользователя' : 'В беседе';
+      const peerType = isDM ? 'у пользователя' : 'в беседе';
 
       if (data.status) {
         console.log(`${peerType} ${peerId} успешно обновлено расписание.`.cyan);
@@ -192,13 +192,15 @@ export default class Schedule {
     const newScheduleArray: ParseScheduleResponse[] = [];
 
     parsedSchedule.map((newSchedule) => {
+      if (!newSchedule.filename) return;
+
       const isExistsInOld = oldSchedule.find((old) => old.filename === newSchedule.filename);
       if (isExistsInOld && !newSchedule.status) return isExistsInOld;
 
       newScheduleArray.push(newSchedule);
     });
 
-    await this.classes.setSchedule(peerId, parsedSchedule);
+    if (parsedSchedule.length) await this.classes.setSchedule(peerId, parsedSchedule);
 
     return {
       status: true,
