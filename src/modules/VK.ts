@@ -91,7 +91,7 @@ class VkService extends VK {
     this.messages.push({ message, date: Date.now() });
   }
 
-  async waitForMessage(fromPeerId: number, fromSenderId: number, searchFromMessageId: number, waitingTime = 5): Promise<CommandInputData['message'] | null> {
+  async waitForMessage(fromPeerId: number, fromSenderId: number, searchFromMessageId: number, waitingMinutes = 5): Promise<CommandInputData['message'] | null> {
     return new Promise((resolve) => {
       // eslint-disable-next-line prefer-const
       let stopTimeout: NodeJS.Timer;
@@ -110,7 +110,7 @@ class VkService extends VK {
       stopTimeout = setTimeout(() => {
         clearInterval(findInterval);
         resolve(null);
-      }, 1000 * 60 * waitingTime);
+      }, 1000 * 60 * waitingMinutes);
     });
   }
 
@@ -367,15 +367,18 @@ class VkService extends VK {
     return attachment;
   }
 
-  async getRealUserName(peerId: number): Promise<string | null> {
-    if (!this.utils.checkIfPeerIsDM(peerId)) return null;
+  async getRealUserName(peerId: number): Promise<string> {
+    if (!this.utils.checkIfPeerIsDM(peerId)) return 'пользователь';
 
     const user = await this.getUser(peerId);
-    const classData = await this.classes.getClass(peerId);
+    const { realUserName } = await this.classes.getClass(peerId);
 
-    if (!classData.realUserName && !user) return null;
+    // Нафасов Александр --> Александр Нафасов
+    const realName = realUserName ? `${realUserName.split(' ').reverse().join(' ')}` : null;
 
-    return classData.realUserName ? classData.realUserName : `${user!.first_name} ${user!.last_name}`;
+    if (!realName && !user) return 'пользователь';
+
+    return realName ? realName : `${user!.first_name} ${user!.last_name}`;
   }
 }
 

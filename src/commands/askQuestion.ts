@@ -54,7 +54,7 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
 
   const session = chatGPT.createChatSession(peerId, clevernessPayload.data.cleverness);
   const username = await vk.getRealUserName(peerId) || '* пользователь';
-  const firstName = username.split(' ')[1];
+  const firstName = username.split(' ')[0];
 
   let isConversationStopped = false;
   let lastMsgId = 0;
