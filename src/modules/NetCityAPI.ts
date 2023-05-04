@@ -138,6 +138,8 @@ class NetCityAPI {
         setTimeout(() => {
           this.closeSession(session.session.id);
         }, endTime);
+
+        await this.initStudentDiary(session.session.id);
       }
 
       return session;
