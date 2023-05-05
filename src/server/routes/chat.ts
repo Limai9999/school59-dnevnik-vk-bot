@@ -69,9 +69,9 @@ router.post('/information', verifyKey, async (reqDef, res) => {
 router.get('/list', verifyKey, async (reqDef, res) => {
   try {
     const req = reqDef as DefaultRequestData;
-    const { vk, classes } = req.app.locals;
+    const { vk, classes, utils } = req.app.locals;
 
-    const chats = await classes.getAllClasses();
+    const chats = (await classes.getAllClasses()).filter((cls) => !utils.checkIfPeerIsDM(cls.id));
 
     const chatList = await Promise.all(chats.map(async (chat) => {
       const chatData = await vk.getChat(chat.id);
