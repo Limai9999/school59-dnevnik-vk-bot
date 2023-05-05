@@ -20,7 +20,7 @@ import API from './API';
 import Subscription from './Subscription';
 
 import { MainConfig } from '../types/Configs/MainConfig';
-interface Session extends GetCookiesResponse {
+export interface Session extends GetCookiesResponse {
   peerId: number
 }
 
