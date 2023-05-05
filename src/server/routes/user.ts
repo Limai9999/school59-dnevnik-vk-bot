@@ -19,7 +19,7 @@ router.post('/information', verifyKey, async (reqDef, res) => {
       return res.json({ status: false, message: 'Не передан userId' });
     }
 
-    const { vk, subscription, classes } = req.app.locals;
+    const { vk, subscription, classes, netcityAPI } = req.app.locals;
 
     const classData = await classes.getClass(userId);
     const userData = await vk.getUser(userId);
@@ -39,18 +39,24 @@ router.post('/information', verifyKey, async (reqDef, res) => {
       password = netCityData.password;
     }
 
-    const netcity: GetUserInformationResponse['netcity'] = {
-      login: netCityData.login,
-      password,
-    };
-
     const subscriptionData = await subscription.checkSubscription(userId, false);
+    const netCitySession = netcityAPI.getSessionByPeerId(userId);
+    const realUserName = await vk.getRealUserName(userId);
 
     const information: GetUserInformationResponse = {
       user: userData,
-      netcity,
+      netcity: {
+        login: netCityData.login,
+        password,
+        session: netCitySession || null,
+      },
       className,
       subscription: subscriptionData,
+      realUserName,
+      schoolEndFeature: {
+        survey9thClassStatus: classData.survey9thClassStatus,
+        surveyGIAExams: classData.surveyGIAExams,
+      },
     };
 
     return res.json({ status: true, message: 'Получение информации о пользователе успешно', information });
