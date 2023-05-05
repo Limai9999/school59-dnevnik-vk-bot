@@ -1,5 +1,7 @@
 import { Application, Request } from 'express';
 
+import { CommandOutputData } from '../../types/Commands';
+
 import Classes from '../../modules/Classes';
 import Utils from '../../modules/Utils';
 import NetCityAPI from '../../modules/NetCityAPI';
@@ -10,21 +12,26 @@ import MessageStatistics from '../../modules/MessageStatistics';
 import Event from '../../modules/Event';
 import Schedule from '../../modules/Schedule';
 import Grades from '../../modules/Grades';
+import ChatGPT from '../../modules/ChatGPT';
+import SchoolEndFeature from '../../modules/SchoolEndFeature';
 
 export type AppLocals = {
-  vk: VK;
-  classes: Classes;
+  vk: VK
+  classes: Classes
   statistics: MessageStatistics;
-  event: Event;
-  schedule: Schedule;
-  grades: Grades;
-  utils: Utils;
-  netcityAPI: NetCityAPI;
-  api: API;
-  subscription: Subscription;
+  events: Event
+  schedule: Schedule
+  grades: Grades
+  utils: Utils
+  netcityAPI: NetCityAPI
+  api: API
+  subscription: Subscription
+  commands: CommandOutputData[]
+  chatGPT: ChatGPT
+  schoolEndFeature: SchoolEndFeature
 }
 
-interface ApplicationLocals extends Application {
+export interface ApplicationLocals extends Application {
   locals: AppLocals
 }
 

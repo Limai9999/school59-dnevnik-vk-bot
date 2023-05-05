@@ -18,6 +18,7 @@ import Subscription from './modules/Subscription';
 import API from './modules/API';
 import Grades from './modules/Grades';
 import ChatGPT from './modules/ChatGPT';
+import SchoolEndFeature from './modules/SchoolEndFeature';
 
 import Server from './server/app';
 
@@ -43,6 +44,7 @@ const classes = new Classes();
 const statistics = new MessageStatistics();
 const utils = new Utils();
 const api = new API();
+
 const chatGPT = new ChatGPT(mainConfig.chatGPTKey);
 
 const VKConfig = getVKConfig();
@@ -61,6 +63,8 @@ const vkUser = new VK({
   classes,
   isUser: true,
 });
+
+const schoolEndFeature = new SchoolEndFeature(vkBot, classes, utils);
 
 const setupUserFeatures = async (peerId: number) => {
   await classes.setLoading(peerId, false);
@@ -104,14 +108,14 @@ async function start() {
   });
   await events.init();
 
-  const server = new Server(vkBot, classes, utils, netcityAPI, api, subscription, statistics, events, schedule, grades);
+  const server = new Server({ vk: vkBot, classes, utils, netcityAPI, api, subscription, statistics, events, schedule, grades, chatGPT, commands, schoolEndFeature });
   await server.run();
 
   console.log('\nБот запущен!'.green);
 
   if (mainConfig.onlyAPIMode) return console.log('Входящие сообщения не будут обрабатываться, т.к включён режим "только API".');
   vkBot.updates.on('message_new', (message) => {
-    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT });
+    handleMessage({ message, vk: vkBot, vkUser, classes, args: [], commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT, schoolEndFeature });
   });
 }
 

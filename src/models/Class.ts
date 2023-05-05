@@ -6,6 +6,7 @@ import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStu
 import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 import { Note } from '../types/Note/Note';
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
+import { GIAExam } from '../types/SchoolEndFeature/GIASubjects';
 
 export interface IClass {
   id: number
@@ -32,6 +33,8 @@ export interface IClass {
   lastUpdatedHomework: number
   notes: Note[]
   realUserName?: string
+  survey9thClassStatus: 'leaving' | 'staying' | null
+  surveyGIAExams: GIAExam[]
 }
 
 const parsedSchedule = {
@@ -172,6 +175,13 @@ const classSchema = new Schema({
   },
   realUserName: {
     type: String,
+  },
+  survey9thClassStatus: {
+    type: String,
+  },
+  surveyGIAExams: {
+    type: Array,
+    default: [],
   },
 }, {
   timestamps: true,

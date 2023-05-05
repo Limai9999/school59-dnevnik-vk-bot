@@ -6,6 +6,7 @@ import { MainConfig } from '../types/Configs/MainConfig';
 import { EventConfig } from '../types/Configs/EventConfig';
 import { TikTokConfig } from '../types/Configs/TikTokConfig';
 import { ServerConfig } from '../types/Configs/ServerConfig';
+import { GIAExamsDataConfig } from '../types/Configs/GIAExamsDataConfig';
 
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 import { Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
@@ -40,4 +41,8 @@ export function getScheduleDebugData(): Attachment[] {
 
 export function getServerConfig(): ServerConfig {
   return new Config('server.json').getData();
+}
+
+export function getGIAExamsDataConfig(): GIAExamsDataConfig {
+  return new Config('GIAExamsData.json').getData();
 }

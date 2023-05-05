@@ -11,11 +11,12 @@ import NetCityAPI from '../modules/NetCityAPI';
 import Subscription from '../modules/Subscription';
 import API from '../modules/API';
 import Grades from '../modules/Grades';
+import ChatGPT from '../modules/ChatGPT';
+import SchoolEndFeature from '../modules/SchoolEndFeature';
 
 import { Payload } from './VK/Payloads/Payload';
 
 import { MainConfig } from './Configs/MainConfig';
-import ChatGPT from '../modules/ChatGPT';
 
 export type CommandInputData = {
   vk: VKService
@@ -36,6 +37,7 @@ export type CommandInputData = {
   subscription: Subscription
   api: API
   chatGPT: ChatGPT
+  schoolEndFeature: SchoolEndFeature
 };
 
 export type CommandOutputData = {
