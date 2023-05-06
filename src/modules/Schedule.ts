@@ -52,8 +52,8 @@ export default class Schedule {
     this.autoUpdatePeerIds = [];
     this.autoUpdateCount = 0;
 
-    // this.isDebug = this.mainConfig.testMode;
-    this.isDebug = false;
+    this.isDebug = this.mainConfig.testMode;
+    // this.isDebug = false;
   }
 
   async startAutoUpdate(peerId: number) {
@@ -200,11 +200,11 @@ export default class Schedule {
       newScheduleArray.push(newSchedule);
     });
 
-    if (parsedSchedule.length) await this.classes.setSchedule(peerId, parsedSchedule);
+    if (newScheduleArray.length) await this.classes.setSchedule(peerId, newScheduleArray);
 
     return {
       status: true,
-      schedule: parsedSchedule,
+      schedule: newScheduleArray,
     };
   }
 
