@@ -237,8 +237,6 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       attachment,
       message: 'Полный отчёт об оценках из Сетевого Города:',
     });
-  } else if (action === 'gradesStats') {
-    // todo
   }
 }
 
