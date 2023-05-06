@@ -169,17 +169,17 @@ export default class SchoolEndFeature {
         }
 
         if (answerPayload.data.action === 'chooseSubject') {
-          if (chosenExams.length >= 4) {
-            await this.vk.sendMessage({
-              message: 'Вы уже выбрали 4 предмета - максимально кол-во экзаменов.\nУберите лишнее, чтобы выбрать другие предметы.',
-              peerId,
-            });
-            continue;
-          }
-
           const chosenExamData = this.GIAExamsData.find((exam) => exam.subject === answerPayload.data.subjectName!)!;
 
           if (answerPayload.data.include) {
+            if (chosenExams.length >= 4) {
+              await this.vk.sendMessage({
+                message: 'Вы уже выбрали 4 предмета - максимально кол-во экзаменов.\nУберите лишнее, чтобы выбрать другие предметы.',
+                peerId,
+              });
+              continue;
+            }
+
             chosenExams.push(chosenExamData);
           } else {
             chosenExams = chosenExams.filter((exam) => exam.subject !== answerPayload.data.subjectName);
