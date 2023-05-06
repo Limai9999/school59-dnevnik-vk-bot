@@ -187,4 +187,11 @@ export default class Classes {
       $set: { surveyGIAExams },
     });
   }
+
+  async setEndingMessage(peerId: number, endingMessage: string) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: { endingMessage },
+    });
+  }
 }

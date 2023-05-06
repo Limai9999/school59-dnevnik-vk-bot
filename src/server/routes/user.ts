@@ -66,4 +66,27 @@ router.post('/information', verifyKey, async (reqDef, res) => {
   }
 });
 
+router.post('/send', verifyKey, async (reqDef, res) => {
+  try {
+    const req = reqDef as DefaultRequestData;
+
+    const { userId, message } = req.body as { userId: number | null, message: string | null };
+    if (!userId || !message) {
+      return res.json({ status: false, message: 'Не передан userId или message' });
+    }
+
+    const { vk } = req.app.locals;
+
+    await vk.sendMessage({
+      peerId: userId,
+      message,
+    });
+
+    return res.json({ status: true, message: 'Сообщение отправлено' });
+  } catch (error) {
+    console.log(error);
+    return res.json({ status: false, message: 'Ошибка сервера' });
+  }
+});
+
 export default router;

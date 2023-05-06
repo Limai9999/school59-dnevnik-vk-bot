@@ -67,6 +67,7 @@ const vkUser = new VK({
 const schoolEndFeature = new SchoolEndFeature(vkBot, classes, utils);
 
 const setupUserFeatures = async (peerId: number) => {
+  if (mainConfig.onlyAPIMode) return console.log('setupUserFeatures не будет выполняться, т.к включён режим "только API"');
   await classes.setLoading(peerId, false);
 
   vkBot.addChatToState(peerId);

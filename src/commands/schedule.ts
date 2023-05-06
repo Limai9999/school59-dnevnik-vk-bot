@@ -14,6 +14,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
   let loadingMessageID = 0;
 
   const peerId = message.peerId;
+  const classData = await classes.getClass(peerId);
 
   await schedule.startAutoUpdate(peerId);
 
@@ -51,6 +52,20 @@ export async function command({ message, vk, classes, payload, schedule, utils }
   try {
     const schedulePayload = payload as SchedulePayload;
     const action = schedulePayload.data.action;
+
+    if (schedulePayload.data.filename === 'schoolEndFeature') {
+      const endingMessage = classData.endingMessage;
+      if (!endingMessage) return console.log('НЕ УДАЛОСЬ ОТПРАВИТЬ КОНЕЧНОЕ СООБЩЕНИЕ, Т.К ЕГО НЕТ.'.bgRed);
+
+      await vk.sendMessage({
+        message: endingMessage,
+        peerId,
+      });
+
+      await classes.setLoading(peerId, false);
+
+      return;
+    }
 
     const maxFileLifeTime = 1000 * 60 * 60 * 24 * 2;
 

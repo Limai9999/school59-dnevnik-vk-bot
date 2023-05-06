@@ -8,6 +8,7 @@ import { ExamsSurveyPayload, SchoolEndFeature9thClassSurveyPayload } from '../ty
 import { SurveyResponse } from '../types/SchoolEndFeature/SurveyResponse';
 import { GIAExam } from '../types/SchoolEndFeature/GIASubjects';
 import { GIAExamsDataConfig } from '../types/Configs/GIAExamsDataConfig';
+import { EndingMessageResponse } from '../types/SchoolEndFeature/EndingMessageResponse';
 
 import { getGIAExamsDataConfig } from '../utils/getConfig';
 
@@ -206,6 +207,27 @@ export default class SchoolEndFeature {
 
     return {
       status: true,
+    };
+  }
+
+  async makeEndingMessage(peerId: number): Promise<EndingMessageResponse> {
+    const user = await this.vk.getUser(peerId);
+    if (!user) {
+      return {
+        status: false,
+        error: 'Пользователь не найден.',
+      };
+    }
+
+    const realName = await this.vk.getRealUserName(peerId);
+    const firstName = realName.split(' ')[0];
+
+    // TODO: придумать конечные сообщения
+    const message = firstName + ' Конечное сообщение';
+
+    return {
+      status: true,
+      message,
     };
   }
 }

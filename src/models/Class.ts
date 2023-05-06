@@ -35,6 +35,7 @@ export interface IClass {
   realUserName?: string
   survey9thClassStatus: 'leaving' | 'staying' | null
   surveyGIAExams: GIAExam[]
+  endingMessage?: string
 }
 
 const parsedSchedule = {
@@ -182,6 +183,9 @@ const classSchema = new Schema({
   surveyGIAExams: {
     type: Array,
     default: [],
+  },
+  endingMessage: {
+    type: String,
   },
 }, {
   timestamps: true,
