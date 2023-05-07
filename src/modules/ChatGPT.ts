@@ -113,7 +113,7 @@ ${message.text}
   createChatSession(peerId: number, cleverness: ClevernessType): ISession {
     this.sessions[peerId] = {
       peerId,
-      temperature: cleverness === 'max' ? 0.1 : 1.3,
+      temperature: cleverness === 'max' ? 0.3 : 1,
       messages: [],
     };
 
