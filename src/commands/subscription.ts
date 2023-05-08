@@ -7,8 +7,6 @@ import { SubscriptionPayload } from '../types/VK/Payloads/SubscriptionPayload';
 import { PreviewCommandPayload } from '../types/VK/Payloads/PreviewCommandPayload';
 
 async function command({ message, vk, subscription, payload }: CommandInputData) {
-  if (!payload) return;
-
   const { peerId } = message;
 
   const subscriptionPayload = payload as SubscriptionPayload;
@@ -108,6 +106,7 @@ const cmd: CommandOutputData = {
     dmOnly: true,
     args: 0,
     paidSubscription: false,
+    payloadOnly: true,
   },
   keyboardData: {
     color: Keyboard.POSITIVE_COLOR,

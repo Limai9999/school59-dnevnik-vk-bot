@@ -8,7 +8,6 @@
 // async function command({ message, vk, utils, classes, payload, homework }: CommandInputData) {
 //   const { peerId } = message;
 
-//   if (!payload) return;
 //   const homeworkPayload = payload as HomeworkPayload;
 
 //   await homework.startAutoUpdate(peerId);
@@ -115,7 +114,7 @@
 // const cmd: CommandOutputData = {
 //   name: 'домашнее задание',
 //   aliases: [],
-//   description: 'Показывает домашнее задание, заданное на сегодняшний и завтрашний день. Работает только по кнопкам.',
+//   description: 'Показывает домашнее задание, заданное на сегодняшний и завтрашний день.',
 //   payload: {
 //     command: 'homework',
 //     data: { action: 'get' },
@@ -125,6 +124,7 @@
 //     dmOnly: false,
 //     args: 0,
 //     paidSubscription: false,
+//     payloadOnly: true,
 //   },
 //   showInAdditionalMenu: false,
 //   showInCommandsList: true,

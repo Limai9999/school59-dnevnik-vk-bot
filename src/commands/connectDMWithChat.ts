@@ -123,6 +123,7 @@ const cmd: CommandOutputData = {
     dmOnly: true,
     args: 0,
     paidSubscription: false,
+    payloadOnly: true,
   },
   keyboardData: {
     color: Keyboard.PRIMARY_COLOR,

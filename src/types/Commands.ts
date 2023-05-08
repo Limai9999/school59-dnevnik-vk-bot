@@ -50,6 +50,7 @@ export type CommandOutputData = {
     dmOnly: boolean
     args: number
     paidSubscription: boolean
+    payloadOnly: boolean
   }
   keyboardData?: {
     color: ButtonColor,

@@ -9,8 +9,6 @@ import { DMMainKeyboard } from '../keyboards/DMMainKeyboard';
 async function command({ message, vk, payload, commands }: CommandInputData) {
   const additionalMenuPayload = payload as AdditionalMenuPayload;
 
-  if (!payload || !additionalMenuPayload.data) return;
-
   const action = additionalMenuPayload.data.action;
   const actionString = action === 'enable' ? 'открыто' : 'закрыто';
 
@@ -76,7 +74,7 @@ async function command({ message, vk, payload, commands }: CommandInputData) {
 }
 
 const cmd: CommandOutputData = {
-  name: 'дополнительное меню',
+  name: 'Дополнительное меню',
   aliases: ['дополнительно', 'additional menu'],
   description: 'включить дополнительное меню',
   payload: {
@@ -90,6 +88,7 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 0,
     paidSubscription: false,
+    payloadOnly: true,
   },
   showInCommandsList: false,
   showInAdditionalMenu: false,

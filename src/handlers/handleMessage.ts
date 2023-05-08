@@ -12,8 +12,9 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
   isDMChat: boolean,
   args: string[],
   subscriptionData: SubscriptionData,
+  hasMessagePayload: boolean,
 }}) {
-  const { isUserAdmin, isAdminChat, isDMChat, args, subscriptionData } = data;
+  const { isUserAdmin, isAdminChat, isDMChat, args, subscriptionData, hasMessagePayload } = data;
   const { requirements, name, howToUse } = command;
 
   if (requirements.admin && !isAdminChat && !isUserAdmin) {
@@ -37,6 +38,13 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
     };
   }
 
+  if (requirements.payloadOnly && !hasMessagePayload) {
+    return {
+      status: false,
+      errorMessage: 'Эта команда работает только по кнопкам.',
+    };
+  }
+
   if (requirements.args > args.length) {
     return {
       status: false,
@@ -51,7 +59,7 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
 }
 
 export default async function handleMessage({ message, classes, vk, vkUser, commands, statistics, events, schedule, utils, netcityAPI, mainConfig, subscription, api, grades, chatGPT, schoolEndFeature }: CommandInputData) {
-  const { text, peerId, senderId, messagePayload, id } = message;
+  const { text, peerId, senderId, messagePayload, id, hasMessagePayload } = message;
 
   if (message.isDM) {
     console.log(`Новое личное сообщение от ${peerId}: ${text || '<без текста>'}`.gray);
@@ -146,7 +154,7 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
     return;
   }
 
-  const { status, errorMessage } = checkCommand({ command, vk, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin } });
+  const { status, errorMessage } = checkCommand({ command, vk, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin, hasMessagePayload } });
 
   if (!status) {
     if (!errorMessage) return;

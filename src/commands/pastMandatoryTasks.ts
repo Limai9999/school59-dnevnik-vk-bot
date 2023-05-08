@@ -6,8 +6,6 @@ import { PastMandatoryTasksPayload } from '../types/VK/Payloads/PastMandatoryTas
 import { PastMandatoryTasksKeyboard } from '../keyboards/PastMandatoryTasksKeyboard';
 
 async function command({ message, vk, payload, utils, netcityAPI }: CommandInputData) {
-  if (!payload) return;
-
   const peerId = message.peerId;
   const manageChatsPayload = payload as PastMandatoryTasksPayload;
   const action = manageChatsPayload.data.action;
@@ -110,6 +108,7 @@ const cmd: CommandOutputData = {
     dmOnly: true,
     args: 0,
     paidSubscription: true,
+    payloadOnly: true,
   },
   showInAdditionalMenu: false,
   showInCommandsList: true,

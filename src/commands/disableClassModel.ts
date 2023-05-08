@@ -30,6 +30,7 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 1,
     paidSubscription: false,
+    payloadOnly: false,
   },
   showInAdditionalMenu: false,
   showInCommandsList: true,

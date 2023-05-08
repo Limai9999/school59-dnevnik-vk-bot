@@ -9,8 +9,6 @@ import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
 async function command({ message, classes, vk, payload, grades, utils }: CommandInputData) {
   const peerId = message.peerId;
 
-  if (!payload) return;
-
   const gradesPayload = payload as GradesPayload;
   const action = gradesPayload.data.action;
 
@@ -243,7 +241,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 const cmd: CommandOutputData = {
   name: 'оценки',
   aliases: ['grades'],
-  description: 'Отчёт об оценках из Сетевого Города. Работает только по кнопкам.',
+  description: 'Отчёт об оценках из Сетевого Города.',
   payload: {
     command: 'grades',
     data: { action: 'update', forceUpdate: false },
@@ -253,6 +251,7 @@ const cmd: CommandOutputData = {
     dmOnly: true,
     args: 0,
     paidSubscription: true,
+    payloadOnly: true,
   },
   keyboardData: {
     color: Keyboard.POSITIVE_COLOR,

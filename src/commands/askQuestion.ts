@@ -175,6 +175,7 @@ const cmd: CommandOutputData = {
     dmOnly: true,
     args: 0,
     paidSubscription: true,
+    payloadOnly: true,
   },
   showInAdditionalMenu: true,
   showInCommandsList: true,

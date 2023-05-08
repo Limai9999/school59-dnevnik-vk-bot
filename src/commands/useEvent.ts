@@ -42,6 +42,7 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 0,
     paidSubscription: false,
+    payloadOnly: true,
   },
   showInAdditionalMenu: false,
   showInCommandsList: true,

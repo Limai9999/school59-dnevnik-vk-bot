@@ -6,8 +6,6 @@ import { NotePayload } from '../types/VK/Payloads/NotePayload';
 import { Note } from '../types/Note/Note';
 
 async function command({ message, vk, classes, payload, schedule, utils }: CommandInputData) {
-  if (!payload) return;
-
   const notePayload = payload as NotePayload;
   const action = notePayload.data.action;
 
@@ -134,6 +132,7 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 0,
     paidSubscription: false,
+    payloadOnly: true,
   },
   showInAdditionalMenu: true,
   showInCommandsList: true,

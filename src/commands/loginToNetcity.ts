@@ -2,8 +2,6 @@ import { Keyboard } from 'vk-io';
 
 import { CommandInputData, CommandOutputData } from '../types/Commands';
 
-import Password from '../modules/Password';
-
 import { LoginToNetcityPayload } from '../types/VK/Payloads/LoginToNetcityPayload';
 
 import { LoginToNetcityKeyboard } from '../keyboards/LoginToNetcityKeyboard';
@@ -44,7 +42,7 @@ async function command({ vk, classes, message, netcityAPI, payload, utils }: Com
     });
   };
 
-  if (!loginToNetcityPayload || action === 'login') {
+  if (action === 'login') {
     await classes.setLoading(peerId, true);
 
     loadingMessageID = await vk.sendMessage({
@@ -127,6 +125,7 @@ const cmd: CommandOutputData = {
     dmOnly: false,
     args: 0,
     paidSubscription: true,
+    payloadOnly: true,
   },
   keyboardData: {
     color: Keyboard.POSITIVE_COLOR,
