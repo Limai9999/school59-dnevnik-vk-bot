@@ -41,7 +41,7 @@ async function command({ message, vk, commands }: CommandInputData) {
 
       emoji += '📥';
     }
-    if (paidSubscription) {
+    if (paidSubscription && dmOnly) {
       if (!meaningsShowed.paidSubscription) {
         addMeaningMessage('💸 - требуется активная подписка');
         meaningsShowed.paidSubscription = true;
