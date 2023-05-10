@@ -24,7 +24,7 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
     exam.startTime.map((startTime) => {
       startTime > Date.now() ?
         isPassed = true :
-        isPassed = false;
+        null;
     });
 
     if (isPassed) exams.push(exam);
