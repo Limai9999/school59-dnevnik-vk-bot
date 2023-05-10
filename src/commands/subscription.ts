@@ -88,7 +88,7 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
   } else if (action === 'subscribe') {
     await vk.sendMessage({
       peerId: message.peerId,
-      message: `Эта команда еще не реализована до конца, но если вы хотите оплатить подписку, обратитесь к [id${vk.config.adminUserIDs[0]}|администратору].\n\nСтоимость подписки: 40 рублей/месяц.`,
+      message: `Эта команда еще не реализована до конца, но если вы хотите оплатить подписку, обратитесь к ${vk.getAdminLinkString('администратору')}.\n\nСтоимость подписки: 40 рублей/месяц.`,
     });
   }
 }

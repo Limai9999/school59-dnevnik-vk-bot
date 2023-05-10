@@ -27,7 +27,7 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
   if (requirements.paidSubscription && isDMChat && !subscriptionData.active) {
     return {
       status: false,
-      errorMessage: `Для использования этой команды необходимо иметь активную подписку.\n\nОбратитесь к [id${vk.config.adminUserIDs[0]}|администратору].`,
+      errorMessage: `Для использования этой команды необходимо иметь активную подписку.\n\nОбратитесь к ${vk.getAdminLinkString('администратору')}.`,
     };
   }
 

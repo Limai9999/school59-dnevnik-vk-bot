@@ -380,6 +380,10 @@ class VkService extends VK {
 
     return realName ? realName : `${user!.first_name} ${user!.last_name}`;
   }
+
+  getAdminLinkString(adminWord: string): string {
+    return `[id${this.config.adminUserIDs[0]}|${adminWord}]`;
+  }
 }
 
 export default VkService;
