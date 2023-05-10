@@ -142,8 +142,8 @@ export default class SchoolEndFeature {
           kbRowButtons++;
         });
 
-        // TODO: ending based on things count
-        const message = (!chosenExams.length ? 'Пока что вы не выбрали ни одного предмета.' : `Вы выбрали ${chosenExams.length} предметов.`);
+        const subjectsString = this.utils.setWordEndingBasedOnThingsCount('subjectsCount', chosenExams.length);
+        const message = (!chosenExams.length ? 'Пока что вы не выбрали ни одного предмета.' : `Вы выбрали ${chosenExams.length} ${subjectsString}.`);
         const askMessageId = await this.vk.sendMessage({
           message,
           peerId,

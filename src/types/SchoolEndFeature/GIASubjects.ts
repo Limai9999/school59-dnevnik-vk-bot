@@ -14,4 +14,6 @@ export type GIASubject =
 export interface GIAExam {
   subject: GIASubject
   startTime: number[]
+  isMain: boolean
+  duration: string
 }

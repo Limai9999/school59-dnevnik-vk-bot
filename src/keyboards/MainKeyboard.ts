@@ -3,11 +3,17 @@ import { Keyboard } from 'vk-io';
 import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 // import { HomeworkPayload } from '../types/VK/Payloads/HomeworkPayload';
 import { AdditionalMenuPayload } from '../types/VK/Payloads/AdditionalMenuPayload';
+import { GIAExamsSchedulePayload } from '../types/VK/Payloads/GIAExamsSchedulePayload';
 
 export const MainKeyboard = Keyboard.builder()
   .textButton({
     label: 'Расписание',
     payload: { command: 'schedule', data: { action: 'get' } } as SchedulePayload,
+    color: Keyboard.POSITIVE_COLOR,
+  })
+  .textButton({
+    label: 'Экзамены',
+    payload: { command: 'GIAExamsSchedule', data: { action: 'get' } } as GIAExamsSchedulePayload,
     color: Keyboard.POSITIVE_COLOR,
   })
   // .textButton({

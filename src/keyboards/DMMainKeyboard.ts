@@ -3,11 +3,17 @@ import { Keyboard } from 'vk-io';
 import { AdditionalMenuPayload } from '../types/VK/Payloads/AdditionalMenuPayload';
 import { LoginToNetcityPayload } from '../types/VK/Payloads/LoginToNetcityPayload';
 import { SubscriptionPayload } from '../types/VK/Payloads/SubscriptionPayload';
+import { GIAExamsSchedulePayload } from '../types/VK/Payloads/GIAExamsSchedulePayload';
 
 export const DMMainKeyboard = Keyboard.builder()
   .textButton({
     label: 'Войти в Сетевой Город',
     payload: { command: 'loginToNetcity', data: { action: 'login' } } as LoginToNetcityPayload,
+    color: Keyboard.PRIMARY_COLOR,
+  })
+  .textButton({
+    label: 'Экзамены',
+    payload: { command: 'GIAExamsSchedule', data: { action: 'get' } } as GIAExamsSchedulePayload,
     color: Keyboard.PRIMARY_COLOR,
   })
   .row()

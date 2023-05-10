@@ -1,6 +1,6 @@
 import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
 
-type setWordEndingType = 'scheduleFiles' | 'foundFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened' | 'pastMandatoryTasks'
+type setWordEndingType = 'scheduleFiles' | 'foundFiles' | 'addedLessons' | 'totalGrades' | 'ratedGrades' | 'removedRatedGrades' | 'grades' | 'changes' | 'changesHappened' | 'pastMandatoryTasks' | 'examsCount' | 'subjectsCount'
 
 export default class Utils {
   genderifyWord(word: string, sex: number) {
@@ -90,6 +90,18 @@ export default class Utils {
       if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'просроченное задание';
       if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return 'просроченных задания';
       return 'просроченных заданий';
+    }
+
+    if (type === 'examsCount') {
+      if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'экзамен';
+      if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return 'экзамена';
+      return 'экзаменов';
+    }
+
+    if (type === 'subjectsCount') {
+      if ((things === 1 || things >= 21) && thingsStr.endsWith('1')) return 'предмет';
+      if (thingsStr.endsWith('2') || thingsStr.endsWith('3') || thingsStr.endsWith('4')) return 'предмета';
+      return 'предметов';
     }
 
     return type;
