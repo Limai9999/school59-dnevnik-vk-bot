@@ -114,6 +114,14 @@ class Grades {
     }
   }
 
+  async getReportStudentTotalMarks(peerId: number) {
+    const report = await this.netcityAPI.getReportStudentTotalMarks(peerId);
+
+    if (report.status) await this.classes.setReportStudentTotalMarks(peerId, report);
+
+    return report;
+  }
+
   async compare(peerId: number, oldReport: GetTotalStudentReport, newReport: GetTotalStudentReport) {
     try {
       const changesList: string[] = [];

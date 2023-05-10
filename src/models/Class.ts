@@ -7,6 +7,7 @@ import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseSche
 import { Note } from '../types/Note/Note';
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 import { GIAExam } from '../types/SchoolEndFeature/GIASubjects';
+import { ReportStudentTotalMarks } from '../types/Responses/API/grades/ReportStudentTotalMarks';
 
 export interface IClass {
   id: number
@@ -26,6 +27,7 @@ export interface IClass {
   netcitySessionId: number
   subscription: SubscriptionData
   totalStudentReport: GetTotalStudentReport
+  reportStudentTotalMarks: ReportStudentTotalMarks
   lastUpdatedTotalStudentReport: number
   isDisabled: boolean
   manualHomework: ManualHomework[]
@@ -77,6 +79,12 @@ const totalStudentReport = {
       average: String,
     }],
   },
+  screenshot: String,
+};
+
+const reportStudentTotalMarks = {
+  status: Boolean,
+  error: String,
   screenshot: String,
 };
 
@@ -141,6 +149,9 @@ const classSchema = new Schema({
   },
   totalStudentReport: {
     type: totalStudentReport,
+  },
+  reportStudentTotalMarks: {
+    type: reportStudentTotalMarks,
   },
   lastUpdatedTotalStudentReport: {
     type: Number,

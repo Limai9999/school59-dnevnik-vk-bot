@@ -11,6 +11,7 @@ import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStu
 import { GetPastMandatoryResponse, GetPastMandatory } from '../types/Responses/API/netCity/GetPostMandatory';
 import { GetAssignmentTypesResponse, GetAssignmentTypes } from '../types/Responses/API/netCity/GetAssignmentTypes';
 import { GetAssignDataResponse, GetAssignData } from '../types/Responses/API/netCity/GetAssignData';
+import { ReportStudentTotalMarks } from '../types/Responses/API/grades/ReportStudentTotalMarks';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -20,6 +21,7 @@ import API from './API';
 import Subscription from './Subscription';
 
 import { MainConfig } from '../types/Configs/MainConfig';
+
 export interface Session extends GetCookiesResponse {
   peerId: number
 }
@@ -576,6 +578,41 @@ class NetCityAPI {
         error: `${error}`,
         info: [],
         result: { averageGrades: [], daysData: [] },
+      };
+    }
+  }
+
+  async getReportStudentTotalMarks(peerId: number): Promise<ReportStudentTotalMarks> {
+    try {
+      const session = await this.findOrCreateSession(peerId, false);
+
+      if (!session) {
+        return {
+          status: false,
+          error: 'Вы не ввели данные для Сетевого Города.',
+        };
+      }
+
+      if (!session.status) {
+        return {
+          status: false,
+          error: `При входе в Сетевой Город произошла ошибка:\n${session.error}`,
+        };
+      }
+
+      const response = await this.api.request({
+        url: '/grades/getReportStudentTotalMarks',
+        data: { sessionId: session.session.id },
+      });
+      if (!response) throw new Error('Не удалось обратиться к API.');
+
+      const data = response.data as ReportStudentTotalMarks;
+
+      return data;
+    } catch (error) {
+      return {
+        status: false,
+        error: `${error}`,
       };
     }
   }

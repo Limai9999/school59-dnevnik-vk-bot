@@ -14,8 +14,14 @@ export const LoginToNetcityKeyboard = Keyboard.builder()
   })
   .row()
   .textButton({
-    label: 'Открыть расписание',
+    label: 'Итоговые оценки',
     color: Keyboard.PRIMARY_COLOR,
+    payload: { command: 'grades', data: { action: 'final' } } as GradesPayload,
+  })
+  .row()
+  .textButton({
+    label: 'Открыть расписание',
+    color: Keyboard.SECONDARY_COLOR,
     payload: { command: 'schedule', data: { action: 'get' } } as SchedulePayload,
   })
   // .row()

@@ -7,6 +7,7 @@ import { ManualHomework } from '../types/Homework/ManualHomework';
 import { GetHomework } from '../types/Homework/GetHomework';
 import { Note } from '../types/Note/Note';
 import { GIAExam } from '../types/SchoolEndFeature/GIASubjects';
+import { ReportStudentTotalMarks } from '../types/Responses/API/grades/ReportStudentTotalMarks';
 export default class Classes {
   async getClass(peerId: number) {
     let data = await Class.findOne({ id: peerId });
@@ -112,6 +113,13 @@ export default class Classes {
     const classData = await this.getClass(peerId);
     await classData.updateOne({
       $set: { totalStudentReport },
+    });
+  }
+
+  async setReportStudentTotalMarks(peerId: number, reportStudentTotalMarks: ReportStudentTotalMarks) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: { reportStudentTotalMarks },
     });
   }
 
