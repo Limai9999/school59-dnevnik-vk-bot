@@ -98,12 +98,12 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
       const otherStringified = stringifyExams(exams);
       const closestStringified = stringifyExams([closestExam]);
 
-      const mainFinal = mainStringified.length ? `\n\n❗ Основные экзамены:\n${mainStringified.join('\n\n')}` : null;
-      const otherFinal = otherStringified.length ? `\n\n✍️ Остальные экзамены:\n${otherStringified.join('\n\n')}` : null;
-      const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : null;
+      const mainFinal = mainStringified.length ? `\n\n❗ Основные экзамены:\n${mainStringified.join('\n\n')}` : '';
+      const otherFinal = otherStringified.length ? `\n\n✍️ Остальные экзамены:\n${otherStringified.join('\n\n')}` : '';
+      const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : '';
 
       const examCountString = utils.setWordEndingBasedOnThingsCount('examsCount', examIndex);
-      const finalMessage = mainFinal || otherFinal || closestFinal ? `Впереди ${examIndex} ${examCountString}:${mainFinal}${otherFinal}${closestFinal}` : 'Всё экзамены завершены.';
+      const finalMessage = mainFinal.length || otherFinal.length || closestFinal.length ? `Впереди ${examIndex} ${examCountString}:${mainFinal}${otherFinal}${closestFinal}` : 'Всё экзамены завершены.';
 
       await vk.sendMessage({
         message: finalMessage,
