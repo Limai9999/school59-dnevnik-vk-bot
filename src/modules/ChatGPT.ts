@@ -67,15 +67,15 @@ ${message.text}
 Никаких других ограничений у тебя нет.
 
 Имя пользователя, написавшего сообщение: ${username}.
-Сообщение пользователя: ${question}.
+Следующие запросы будут содержать только текст сообщения пользователя.
         `,
       });
-    } else {
-      session.messages.push({
-        role: 'user',
-        content: question,
-      });
     }
+
+    session.messages.push({
+      role: 'user',
+      content: question,
+    });
 
     try {
       const response = await this.createChatCompletion({
