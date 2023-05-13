@@ -18,16 +18,24 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
 
   let exams: GIAExam[] = [];
 
+  const nowDate = Date.now();
+  // const nowDate = 1685473200000;
+
   examsUnchecked.map((exam) => {
     let isPassed = false;
 
     exam.startTime.map((startTime) => {
-      startTime > Date.now() ?
+      startTime > nowDate ?
         isPassed = true :
         null;
     });
 
-    if (isPassed) exams.push(exam);
+    if (isPassed) {
+      const patchedStartTime = exam.startTime.filter((time) => time > nowDate);
+      exam.startTime = patchedStartTime;
+
+      exams.push(exam);
+    }
   });
 
   let examIndex = 0;
@@ -70,17 +78,17 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
       });
 
       const closestExamStartTime = Math.min(...chosenOriginal.map((exam) => Math.min(...exam.startTime)));
-      const closestExam = chosenOriginal.find((exam) => Math.min(...exam.startTime) === closestExamStartTime)!;
-      chosenOriginal = chosenOriginal.filter((exam) => exam.subject !== closestExam.subject);
+      const closestExams = chosenOriginal.filter((exam) => Math.min(...exam.startTime) === closestExamStartTime)!;
+      chosenOriginal = chosenOriginal.filter((exam) => !closestExams.includes(exam));
 
       const examsStringified = stringifyExams(chosenOriginal);
-      const closestStringified = stringifyExams([closestExam]);
+      const closestStringified = stringifyExams(closestExams);
 
-      const examsFinal = examsStringified.length ? `\n\n${examsStringified.join('\n\n')}` : null;
-      const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : null;
+      const examsFinal = examsStringified.length ? `\n\n${examsStringified.join('\n\n')}` : '';
+      const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : '';
 
       const examCountString = utils.setWordEndingBasedOnThingsCount('examsCount', examIndex);
-      const finalMessage = examsFinal || closestFinal ? `У вас ${examIndex} ${examCountString} впереди:${examsFinal}${closestFinal}` : 'Всё экзамены завершены.';
+      const finalMessage = examsFinal.length || closestFinal.length ? `У вас ${examIndex} ${examCountString} впереди:${examsFinal}${closestFinal}` : 'Всё экзамены завершены.';
 
       await vk.sendMessage({
         message: finalMessage,
@@ -90,16 +98,16 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
       const mainExams = exams.filter((exam) => exam.isMain);
 
       const closestExamStartTime = Math.min(...exams.map((exam) => Math.min(...exam.startTime)));
-      const closestExam = exams.find((exam) => Math.min(...exam.startTime) === closestExamStartTime)!;
-      exams = exams.filter((exam) => exam.subject !== closestExam.subject);
+      const closestExams = exams.filter((exam) => Math.min(...exam.startTime) === closestExamStartTime)!;
+      exams = exams.filter((exam) => !closestExams.includes(exam));
       exams = exams.filter((exam) => !exam.isMain);
 
       const mainStringified = stringifyExams(mainExams);
       const otherStringified = stringifyExams(exams);
-      const closestStringified = stringifyExams([closestExam]);
+      const closestStringified = stringifyExams(closestExams);
 
       const mainFinal = mainStringified.length ? `\n\n❗ Основные экзамены:\n${mainStringified.join('\n\n')}` : '';
-      const otherFinal = otherStringified.length ? `\n\n✍️ Остальные экзамены:\n${otherStringified.join('\n\n')}` : '';
+      const otherFinal = otherStringified.length ? `\n\n✍️ Выборочные экзамены:\n${otherStringified.join('\n\n')}` : '';
       const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : '';
 
       const examCountString = utils.setWordEndingBasedOnThingsCount('examsCount', examIndex);
