@@ -18,5 +18,6 @@ export interface GetUserInformationResponse {
   schoolEndFeature: {
     survey9thClassStatus: IClass['survey9thClassStatus']
     surveyGIAExams: GIAExam[]
+    hasEverBoughtSubscription: boolean
   }
 }

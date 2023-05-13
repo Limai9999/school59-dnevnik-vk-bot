@@ -210,6 +210,12 @@ export default class SchoolEndFeature {
     };
   }
 
+  async setHasEverBoughtSubscription(peerId: number, hasEverBoughtSubscription: boolean) {
+    await this.classes.setHasEverBoughtSubscription(peerId, hasEverBoughtSubscription);
+
+    return true;
+  }
+
   async makeEndingMessage(peerId: number): Promise<EndingMessageResponse> {
     const user = await this.vk.getUser(peerId);
     if (!user) {

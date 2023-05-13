@@ -65,7 +65,10 @@ class Subscription {
 
     console.log(`Подписка в ${peerId} была обновлена. Теперь она ${subscription.active ? 'активна' : 'неактивна'}.`.yellow);
 
-    subscription.active ? await this.setupUserFeatures(peerId) : null;
+    if (subscription.active) {
+      await this.setupUserFeatures(peerId);
+      await this.classes.setHasEverBoughtSubscription(peerId, true);
+    }
 
     return subscription;
   }

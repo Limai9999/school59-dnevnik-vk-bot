@@ -56,6 +56,7 @@ router.post('/information', verifyKey, async (reqDef, res) => {
       schoolEndFeature: {
         survey9thClassStatus: classData.survey9thClassStatus,
         surveyGIAExams: classData.surveyGIAExams,
+        hasEverBoughtSubscription: classData.hasEverBoughtSubscription,
       },
     };
 

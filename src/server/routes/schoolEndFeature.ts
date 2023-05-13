@@ -101,4 +101,23 @@ router.post('/sendEndingMessage', verifyKey, async (reqDef, res) => {
   }
 });
 
+router.post('/setHasEverBoughtSubscription', verifyKey, async (reqDef, res) => {
+  try {
+    const req = reqDef as DefaultRequestData;
+    const { schoolEndFeature } = req.app.locals;
+
+    const { peerId, hasEverBoughtSubscription } = req.body as { peerId: number | null, hasEverBoughtSubscription: boolean | null | undefined };
+    if (!peerId || (typeof hasEverBoughtSubscription !== 'boolean')) {
+      return res.json({ status: false, message: 'Не передан peerId или hasEverBoughtSubscription' });
+    }
+
+    await schoolEndFeature.setHasEverBoughtSubscription(peerId, hasEverBoughtSubscription);
+
+    return res.json({ status: true, message: 'Статус изменен.' });
+  } catch (error) {
+    console.log(error);
+    return res.json({ status: false, message: 'Ошибка сервера' });
+  }
+});
+
 export default router;

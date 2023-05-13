@@ -202,4 +202,11 @@ export default class Classes {
       $set: { endingMessage },
     });
   }
+
+  async setHasEverBoughtSubscription(peerId: number, hasEverBoughtSubscription: boolean) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: { hasEverBoughtSubscription },
+    });
+  }
 }
