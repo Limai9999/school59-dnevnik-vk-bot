@@ -9,50 +9,51 @@ async function command({ message, vk, utils, chatGPT }: CommandInputData) {
   const payload = message.messagePayload as AskQuestionPayload;
   if (payload && payload.data.action !== 'startSession') return;
 
-  const { peerId, senderId } = message;
+  const { peerId } = message;
 
   const userData = await vk.getUser(peerId);
   const { sex } = userData!;
 
-  const askForClevernessKeyboard = Keyboard.builder()
-    .inline()
-    .textButton({
-      label: 'Умный',
-      color: Keyboard.POSITIVE_COLOR,
-      payload: { command: 'askQuestion', data: { action: 'chooseCleverness', cleverness: 'max' } } as AskQuestionPayload,
-    })
-    .textButton({
-      label: 'Неуверенный',
-      color: Keyboard.SECONDARY_COLOR,
-      payload: { command: 'askQuestion', data: { action: 'chooseCleverness', cleverness: 'min' } } as AskQuestionPayload,
-    });
+  // const askForClevernessKeyboard = Keyboard.builder()
+  //   .inline()
+  //   .textButton({
+  //     label: 'Умный',
+  //     color: Keyboard.POSITIVE_COLOR,
+  //     payload: { command: 'askQuestion', data: { action: 'chooseCleverness', cleverness: 'max' } } as AskQuestionPayload,
+  //   })
+  //   .textButton({
+  //     label: 'Неуверенный',
+  //     color: Keyboard.SECONDARY_COLOR,
+  //     payload: { command: 'askQuestion', data: { action: 'chooseCleverness', cleverness: 'min' } } as AskQuestionPayload,
+  //   });
 
-  const askForClevernessMsgId = await vk.sendMessage({
-    peerId,
-    message: 'Выберите тип сообразительности:',
-    keyboard: askForClevernessKeyboard,
-  });
+  // const askForClevernessMsgId = await vk.sendMessage({
+  //   peerId,
+  //   message: 'Выберите тип сообразительности:',
+  //   keyboard: askForClevernessKeyboard,
+  // });
 
-  const clevernessResponse = await vk.waitForMessage(peerId, senderId, askForClevernessMsgId);
-  if (!clevernessResponse || !clevernessResponse.messagePayload) {
-    await vk.sendMessage({
-      message: 'Вы не выбрали тип сообразительности. Попробуйте ещё раз.',
-      peerId,
-    });
-    return;
-  }
+  // const clevernessResponse = await vk.waitForMessage(peerId, senderId, askForClevernessMsgId);
+  // if (!clevernessResponse || !clevernessResponse.messagePayload) {
+  //   await vk.sendMessage({
+  //     message: 'Вы не выбрали тип сообразительности. Попробуйте ещё раз.',
+  //     peerId,
+  //   });
+  //   return;
+  // }
 
-  const clevernessPayload = clevernessResponse.messagePayload as AskQuestionPayload;
+  // const clevernessPayload = clevernessResponse.messagePayload as AskQuestionPayload;
 
-  if (clevernessPayload.command !== 'askQuestion' || clevernessPayload.data.action !== 'chooseCleverness') {
-    await vk.sendMessage({
-      message: 'Вы не выбрали тип сообразительности. Попробуйте ещё раз.',
-      peerId,
-    });
-    return;
-  }
+  // if (clevernessPayload.command !== 'askQuestion' || clevernessPayload.data.action !== 'chooseCleverness') {
+  //   await vk.sendMessage({
+  //     message: 'Вы не выбрали тип сообразительности. Попробуйте ещё раз.',
+  //     peerId,
+  //   });
+  //   return;
+  // }
 
-  const session = chatGPT.createChatSession(peerId, clevernessPayload.data.cleverness);
+  // const session = chatGPT.createChatSession(peerId, clevernessPayload.data.cleverness);
+  const session = chatGPT.createChatSession(peerId, 'max');
   const username = await vk.getRealUserName(peerId) || '* пользователь';
   const firstName = username.split(' ')[0];
 
