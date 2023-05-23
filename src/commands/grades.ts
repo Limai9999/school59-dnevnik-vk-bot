@@ -145,7 +145,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       }
 
       const marks: MarksObject = {
-        'unCertified': 0,
+        'uncertified': 0,
         'notSure': 0,
         '5': 0,
         '4': 0,
@@ -192,7 +192,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
         }
 
         const isCertified = lessonGrades.length >= 1;
-        if (!isCertified) marks['unCertified']++;
+        if (!isCertified) marks['uncertified']++;
 
         const lessonTotalGradesString = utils.setWordEndingBasedOnThingsCount('totalGrades', lessonGrades.length);
 
@@ -208,7 +208,8 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 
       const averageOfAverages = averages.reduce((a, b) => a + b, 0) / averages.length;
 
-      const summarizedData = `Общий средний балл: ${averageOfAverages.toFixed(2)}\n\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}, коллов: ${marks['1']}${marks['notSure'] ? `, нет точных данных: ${marks['notSure']}.` : '.'}\n\n${marks['unCertified'] > 0 ? `Не аттестован по ${marks['unCertified']} предметам ❌` : 'Аттестован по всем предметам ✅'}`;
+      const uncertifiedSubjectsCountFixedString = utils.setWordEndingBasedOnThingsCount('uncertifiedSubjectsCount', marks['uncertified']);
+      const summarizedData = `Общий средний балл: ${averageOfAverages.toFixed(2)}\n\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}, коллов: ${marks['1']}${marks['notSure'] ? `, нет точных данных: ${marks['notSure']}.` : '.'}\n\n${marks['uncertified'] > 0 ? `Не аттестован по ${marks['uncertified']} ${uncertifiedSubjectsCountFixedString} ❌` : 'Аттестован по всем предметам ✅'}`;
 
       const resultMessage = `Информация об оценках за четверть:\n\n${summarizedData}\n\n${lessonsAverages.join('\n\n')}`;
 

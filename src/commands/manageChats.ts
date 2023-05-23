@@ -261,7 +261,8 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
           return `${index + 1} - ${change}`;
         });
 
-        resultMessage += `\n\nИзменения:\n${changesStrings.join('\n')}`;
+        const changesFixedString = utils.setWordEndingBasedOnThingsCount('changes', changesStrings.length);
+        resultMessage += `\n\n${changesFixedString}:\n${changesStrings.join('\n')}`;
       }
     } else {
       resultMessage = `${first_name} ${last_name} ${genderifiedAction} файл с расписанием:\n${filename}`;

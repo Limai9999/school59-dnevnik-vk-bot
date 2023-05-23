@@ -318,7 +318,8 @@ export default class Schedule {
       let resultMessage = `Расписание на ${newSchedule.schedule!.date} изменилось.`;
 
       if (changesStrings.length) {
-        resultMessage += `\n\nИзменения:\n${changesStrings.join('\n')}`;
+        const changesFixedString = this.utils.setWordEndingBasedOnThingsCount('changes', changesStrings.length);
+        resultMessage += `\n\n${changesFixedString}:\n${changesStrings.join('\n')}`;
       }
 
       this.vk.sendMessage({

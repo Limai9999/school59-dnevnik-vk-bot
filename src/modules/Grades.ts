@@ -197,12 +197,13 @@ class Grades {
           const newGradesString = newLesson.grades.join(', ');
 
           if (oldGradesString !== newGradesString) {
-            const gradesCount = newLesson.grades.length;
+            const oldGradesCount = oldLesson.grades.length;
+            const newGradesCount = newLesson.grades.length;
             if (oldGradesString === '') {
-              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('ratedGrades', gradesCount);
+              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('ratedGrades', newGradesCount);
               changes.push(`По предмету "${newLesson.lesson}" ${correctedAnnouncementString}: "${newGradesString}".`);
             } else if (newGradesString === '') {
-              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('removedRatedGrades', gradesCount);
+              const correctedAnnouncementString = this.utils.setWordEndingBasedOnThingsCount('removedRatedGrades', oldGradesCount);
               changes.push(`${correctedAnnouncementString} "${oldGradesString}" по предмету "${newLesson.lesson}".`);
             } else {
               changes.push(`Оценки по предмету "${newLesson.lesson}" изменились.\nБыло: "${oldLesson.grades.length ? oldGradesString : 'без оценок'}", стало: "${newLesson.grades.length ? newGradesString : 'неизвестно'}".`);
