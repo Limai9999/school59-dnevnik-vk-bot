@@ -19,7 +19,6 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
   let exams: GIAExam[] = [];
 
   const nowDate = Date.now();
-  // const nowDate = 1685473200000;
 
   examsUnchecked.map((exam) => {
     let isPassed = false;
@@ -47,7 +46,7 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
       const { subject, startTime, isMain, duration } = exam;
 
       const startTimeStringified = startTime.map((time) => {
-        return moment(time).calendar();
+        return moment(time).format('L');
       });
       const indexString = useIndex ? `${examIndex}. ` : '';
       const emojiString = useEmoji ?
@@ -84,8 +83,11 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
       const examsStringified = stringifyExams(chosenOriginal);
       const closestStringified = stringifyExams(closestExams);
 
+      const closestStarting = moment(closestExamStartTime).fromNow();
+
       const examsFinal = examsStringified.length ? `\n\n${examsStringified.join('\n\n')}` : '';
-      const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : '';
+      const [closestString, startingString] = closestStringified.length > 1 ? ['Ближайшие экзамены', 'Начнутся'] : ['Ближайший экзамен', 'Начнётся'];
+      const closestFinal = closestStringified.length ? `\n\n🕒 ${closestString}:\n${startingString} ${closestStarting}:\n\n${closestStringified.join('\n\n')}` : '';
 
       const examCountString = utils.setWordEndingBasedOnThingsCount('examsCount', examIndex);
       const finalMessage = examsFinal.length || closestFinal.length ? `У вас ${examIndex} ${examCountString} впереди:${examsFinal}${closestFinal}` : 'Всё экзамены завершены.';
@@ -106,9 +108,12 @@ async function command({ message, vk, classes, payload, utils }: CommandInputDat
       const otherStringified = stringifyExams(exams);
       const closestStringified = stringifyExams(closestExams);
 
+      const closestStarting = moment(closestExamStartTime).fromNow();
+      const [closestString, startingString] = closestStringified.length > 1 ? ['Ближайшие экзамены', 'Начнутся'] : ['Ближайший экзамен', 'Начнётся'];
+
       const mainFinal = mainStringified.length ? `\n\n❗ Основные экзамены:\n${mainStringified.join('\n\n')}` : '';
       const otherFinal = otherStringified.length ? `\n\n✍️ Выборочные экзамены:\n${otherStringified.join('\n\n')}` : '';
-      const closestFinal = closestStringified.length ? `\n\n🕒 Ближайшие экзамены:\n${closestStringified.join('\n\n')}` : '';
+      const closestFinal = closestStringified.length ? `\n\n🕒 ${closestString}:\n${startingString} ${closestStarting}:\n\n${closestStringified.join('\n\n')}` : '';
 
       const examCountString = utils.setWordEndingBasedOnThingsCount('examsCount', examIndex);
       const finalMessage = mainFinal.length || otherFinal.length || closestFinal.length ? `Впереди ${examIndex} ${examCountString}:${mainFinal}${otherFinal}${closestFinal}` : 'Всё экзамены завершены.';
