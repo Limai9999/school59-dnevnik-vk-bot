@@ -16,6 +16,57 @@ type setWordEndingType =
 'uncertifiedSubjectsCount'
 
 export default class Utils {
+  isNowSummer() {
+    // Get the current date
+    const currentDate = new Date();
+
+    // Get the current month (0-11, where 0 represents January)
+    const currentMonth = currentDate.getMonth();
+
+    // Check if the current month is within the summer range
+    if (currentMonth >= 5 && currentMonth <= 7) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  summerStartTime() {
+    // Set the start date for summer (June 1st)
+    const summerStartDate = new Date();
+    // Set month to June (0-11, where 0 represents January)
+    summerStartDate.setMonth(5);
+    summerStartDate.setDate(1);
+    summerStartDate.setHours(0);
+    summerStartDate.setMinutes(0);
+    summerStartDate.setSeconds(0);
+
+    // Example: Thu Jun 01 2023 00:00:00
+
+    // Get the Unix timestamp in milliseconds
+    const timestamp = summerStartDate.getTime();
+
+    return timestamp;
+  }
+
+  summerEndTime() {
+    // Set the start date for the end of the summer (September 1st)
+    const summerEndDate = new Date();
+    // Set month to September (0-11, where 0 represents January)
+    summerEndDate.setMonth(8);
+    summerEndDate.setDate(1);
+    summerEndDate.setHours(0);
+    summerEndDate.setMinutes(0);
+    summerEndDate.setSeconds(0);
+
+    // Example: Thu Sep 01 2023 00:00:00
+
+    // Get the Unix timestamp in milliseconds
+    const timestamp = summerEndDate.getTime();
+
+    return timestamp;
+  }
+
   genderifyWord(word: string, sex: number) {
     switch (sex) {
       case 0:
