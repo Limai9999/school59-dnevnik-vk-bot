@@ -19,7 +19,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
 
   const isPreview = !!schedulePayload.data.isPreview;
 
-  await schedule.startAutoUpdate(peerId);
+  if (!isPreview) await schedule.startAutoUpdate(peerId);
 
   const removeLoadingMessage = () => {
     if (!loadingMessageID) return;
