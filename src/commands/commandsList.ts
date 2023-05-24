@@ -35,13 +35,13 @@ async function command({ message, vk, commands }: CommandInputData) {
     }
     if (dmOnly) {
       if (!meaningsShowed.dmOnly) {
-        addMeaningMessage('📥 - только в личных сообщениях');
+        addMeaningMessage('🔒 - только в личных сообщениях');
         meaningsShowed.dmOnly = true;
       }
 
-      emoji += '📥';
+      emoji += '🔒';
     }
-    if (paidSubscription && dmOnly) {
+    if (paidSubscription && isDMChat) {
       if (!meaningsShowed.paidSubscription) {
         addMeaningMessage('💸 - требуется активная подписка');
         meaningsShowed.paidSubscription = true;
