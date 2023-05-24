@@ -36,11 +36,12 @@ async function command({ message, vk, payload, commands }: CommandInputData) {
     });
 
     const applyCommands = (commands: CommandOutputData[]) => {
-      commands.map(({ name, payload, showInAdditionalMenu, requirements: { admin, dmOnly }, keyboardData }) => {
+      commands.map(({ name, payload, showInAdditionalMenu, requirements: { admin, dmOnly, chatOnly }, keyboardData }) => {
         if (!showInAdditionalMenu) return;
 
         if (dmOnly && !isDMChat) return;
         if (admin && !isAdminChat) return;
+        if (chatOnly && isDMChat) return;
 
         if (currentButtonsInRowCount >= 2 || (keyboardData && keyboardData.positionSeparatelyFromAllButton)) {
           keyboard.row();
@@ -86,6 +87,7 @@ const cmd: CommandOutputData = {
   requirements: {
     admin: false,
     dmOnly: false,
+    chatOnly: false,
     args: 0,
     paidSubscription: false,
     payloadOnly: true,

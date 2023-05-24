@@ -32,6 +32,13 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
     };
   }
 
+  if (requirements.chatOnly && isDMChat) {
+    return {
+      status: false,
+      errorMessage: 'Эта команда работает только в беседе.',
+    };
+  }
+
   if (requirements.dmOnly && !isDMChat) {
     return {
       status: false,

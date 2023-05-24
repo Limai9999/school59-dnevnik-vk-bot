@@ -48,6 +48,7 @@ export type CommandOutputData = {
   requirements: {
     admin: boolean
     dmOnly: boolean
+    chatOnly: boolean
     args: number
     paidSubscription: boolean
     payloadOnly: boolean

@@ -18,10 +18,11 @@ async function command({ message, vk, commands }: CommandInputData) {
 
   let cmdIndex = 0;
   const commandsFormatted = showCommandsList.map((cmd) => {
-    const { name, description, howToUse, requirements: { admin, dmOnly, paidSubscription, payloadOnly } } = cmd;
+    const { name, description, howToUse, requirements: { admin, dmOnly, chatOnly, paidSubscription, payloadOnly } } = cmd;
 
     if (dmOnly && !isDMChat) return;
     if (admin && !isAdminChat) return;
+    if (chatOnly && isDMChat) return;
 
     let emoji = '';
     if (admin || dmOnly || paidSubscription) emoji += ' ';
@@ -79,6 +80,7 @@ const cmd: CommandOutputData = {
   requirements: {
     admin: false,
     dmOnly: false,
+    chatOnly: false,
     args: 0,
     paidSubscription: false,
     payloadOnly: false,

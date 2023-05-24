@@ -45,6 +45,7 @@ const cmd: CommandOutputData = {
   requirements: {
     admin: false,
     dmOnly: false,
+    chatOnly: false,
     args: 0,
     paidSubscription: false,
     payloadOnly: false,
