@@ -29,11 +29,11 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
       }).row();
     }
 
-    // keyboard.textButton({
-    //   label: 'Зачем нужна подписка?',
-    //   color: Keyboard.PRIMARY_COLOR,
-    //   payload: { command: 'subscription', data: { action: 'whatCanItDo' } } as SubscriptionPayload,
-    // });
+    keyboard.textButton({
+      label: 'Зачем нужна подписка?',
+      color: Keyboard.PRIMARY_COLOR,
+      payload: { command: 'subscription', data: { action: 'whatCanItDo' } } as SubscriptionPayload,
+    });
 
     await vk.sendMessage({
       peerId,
@@ -48,14 +48,20 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
 С подпиской у вас появляется доступ ко всем функциям этого бота:
 
 • Вход и сохранение сессии Сетевого Города.
-Сохранение сессии означает, что вам не нужно постоянно вводить логин и пароль и ждать пока произойдет вход. Все делается автоматически.
+Сохранение сессии означает, что вам не нужно будет постоянно вводить логин и пароль и ждать пока произойдет вход. Все делается автоматически.
 
 • Получение расписания уроков и оповещение об изменениях в нём.
 
-• И самое главное - вы сможете получать точную информацию о всех ваших оценках:
+• И самое главное - вы сможете получать точную информацию о всех ваших оценках в четверти:
 ⠀⠀· Бот определяет, будете ли вы аттестованы в четверти.
 ⠀⠀· Определяет итоговую оценку в четверти по баллу.
 ⠀⠀· Оповещает о любых изменениях в ваших оценках, с самого первого дня четверти!
+
+Дополнительные функции:
+
+• Возможность использовать GPT-3.5 от OpenAI для получения ответов на различные вопросы.
+• Отображение домашнего задания.
+• Отображение просроченных заданий (точек).
 
 Взгляните сами!
 Выберите ниже, о чем бы вы хотели узнать поподробнее.
@@ -64,21 +70,34 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
     const keyboard = Keyboard.builder()
       .inline()
       .textButton({
-        label: 'Вход в Сетевой Город',
+        label: 'Как работает вход?',
         color: Keyboard.PRIMARY_COLOR,
         payload: { command: 'previewCommand', data: { action: 'netcityLoginExample' } } as PreviewCommandPayload,
       })
       .row()
       .textButton({
+        label: 'Расписание',
+        color: Keyboard.POSITIVE_COLOR,
+        payload: { command: 'previewCommand', data: { action: 'scheduleExample' } } as PreviewCommandPayload,
+      })
+      .textButton({
         label: 'Оценки',
         color: Keyboard.POSITIVE_COLOR,
         payload: { command: 'previewCommand', data: { action: 'gradesExample' } } as PreviewCommandPayload,
       })
+      .row()
       .textButton({
-        label: 'Расписание',
-        color: Keyboard.POSITIVE_COLOR,
-        payload: { command: 'previewCommand', data: { action: 'scheduleExample' } } as PreviewCommandPayload,
+        label: 'Изменения в расписании',
+        color: Keyboard.SECONDARY_COLOR,
+        payload: { command: 'previewCommand', data: { action: 'scheduleChangesExample' } } as PreviewCommandPayload,
+      })
+      .row()
+      .textButton({
+        label: 'Изменения в оценках',
+        color: Keyboard.SECONDARY_COLOR,
+        payload: { command: 'previewCommand', data: { action: 'gradesChangesExample' } } as PreviewCommandPayload,
       });
+
 
     return await vk.sendMessage({
       peerId,
@@ -88,7 +107,7 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
   } else if (action === 'subscribe') {
     await vk.sendMessage({
       peerId: message.peerId,
-      message: `Эта команда еще не реализована до конца, но если вы хотите оплатить подписку, обратитесь к ${vk.getAdminLinkString('администратору')}.\n\nСтоимость подписки: 40 рублей/месяц.`,
+      message: `Эта команда еще не реализована до конца, но если вы хотите оплатить подписку, обратитесь к ${vk.getAdminLinkString('администратору')}.\n\nСтоимость подписки: ${vk.mainConfig.subscriptionPrice} рублей/месяц.`,
     });
   }
 }

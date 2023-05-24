@@ -6,5 +6,6 @@ export interface SchedulePayload extends Payload {
     action: 'get' | 'update' | 'choose'
     filename?: string
     type?: 'netcity' | 'manual'
+    isPreview?: boolean
   }
 }

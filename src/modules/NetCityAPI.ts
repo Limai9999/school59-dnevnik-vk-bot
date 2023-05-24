@@ -184,7 +184,22 @@ class NetCityAPI {
     }
   }
 
-  async findOrCreateSession(peerId: number, forceCreate: boolean): Promise<Session | null> {
+  async findOrCreateSession(peerId: number, forceCreate: boolean, previewSession = false): Promise<Session | null> {
+    if (previewSession) {
+      return {
+        status: true,
+        cookies: [],
+        login: 'preview',
+        password: 'preview',
+        at: 'preview',
+        peerId,
+        session: {
+          endTime: Date.now() + 120000,
+          id: 1,
+        },
+      };
+    }
+
     const credentials = await this.getCredentials(peerId);
     if (!credentials) return null;
 

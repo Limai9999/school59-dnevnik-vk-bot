@@ -5,5 +5,6 @@ export interface GradesPayload extends Payload {
   data: {
     action: 'update' | 'quarter' | 'recently' | 'fullReport' | 'final'
     forceUpdate?: boolean
+    isPreview?: boolean
   }
 }

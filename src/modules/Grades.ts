@@ -9,7 +9,7 @@ import Subscription from './Subscription';
 
 import { GetTotalStudentReport } from '../types/Responses/API/grades/GetTotalStudentReport';
 
-import { getGradesDebugData } from '../utils/getConfig';
+import { getGradesDebugData, getPreviewGradesReport } from '../utils/getConfig';
 
 import { MainConfig } from '../types/Configs/MainConfig';
 
@@ -72,7 +72,7 @@ class Grades {
         return clearInterval(autoUpdateInterval!);
       }
 
-      const report = await this.getTotalStudentReport(peerId, true);
+      const report = await this.getTotalStudentReport(peerId, true, false);
 
       if (report.status) {
         console.log(`В ${peerId} успешно обновлен отчёт с оценками.`.magenta);
@@ -87,7 +87,7 @@ class Grades {
     this.autoUpdateCount++;
   }
 
-  async getTotalStudentReport(peerId: number, forceUpdate: boolean) {
+  async getTotalStudentReport(peerId: number, forceUpdate: boolean, isPreview: boolean) {
     const classData = await this.classes.getClass(peerId);
 
     const lastUpdatedDate = classData.lastUpdatedTotalStudentReport;
@@ -99,14 +99,14 @@ class Grades {
       const previousReport = classData.totalStudentReport! as unknown as GetTotalStudentReport;
       const report = this.isDebug ?
         getGradesDebugData() :
-        await this.netcityAPI.getTotalStudentReport(peerId);
+        isPreview ? getPreviewGradesReport() : await this.netcityAPI.getTotalStudentReport(peerId);
 
       if (report.status) {
         await this.classes.setTotalStudentReport(peerId, report);
         await this.classes.setLastUpdatedTotalStudentReportDate(peerId, Date.now());
       }
 
-      await this.compare(peerId, previousReport, report);
+      isPreview ? null : await this.compare(peerId, previousReport, report);
 
       return report;
     } else {

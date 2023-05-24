@@ -1,16 +1,20 @@
 import moment from 'moment';
 import { Attachment, Keyboard } from 'vk-io';
 
-import { GradesKeyboard } from '../keyboards/GradesKeyboard';
+import { createGradesKeyboard } from '../keyboards/GradesKeyboard';
 import { CommandInputData, CommandOutputData } from '../types/Commands';
 
 import { GradesPayload } from '../types/VK/Payloads/GradesPayload';
+
+// import Config from '../modules/Config';
 
 async function command({ message, classes, vk, payload, grades, utils }: CommandInputData) {
   const peerId = message.peerId;
 
   const gradesPayload = payload as GradesPayload;
   const action = gradesPayload.data.action;
+
+  const isPreview = !!gradesPayload.data.isPreview;
 
   let loadingMessageID = 0;
 
@@ -75,9 +79,9 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       message: 'Отчёт об итоговых оценках из Сетевого Города:',
     });
   } else {
-    await grades.startAutoUpdate(peerId);
+    if (!isPreview) await grades.startAutoUpdate(peerId);
 
-    const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate);
+    const report = await grades.getTotalStudentReport(peerId, !!gradesPayload.data.forceUpdate, isPreview);
     removeLoadingMessage();
 
     await classes.setLoading(peerId, false);
@@ -94,6 +98,12 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
 
       return grades;
     };
+
+    // if (isPreview) {
+    //   console.log('preview grades', report);
+    //   const config = new Config('previewGradesReport.json');
+    //   config.saveData(report);
+    // }
 
     if (action === 'update') {
       const classData = await classes.getClass(peerId);
@@ -132,7 +142,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
       const totalGradesString = `Всего оценок - ${totalGrades}:\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}`;
       const lastUpdatedString = `Обновлен: ${moment(classData.lastUpdatedTotalStudentReport).fromNow()}`;
 
-      const keyboard = GradesKeyboard;
+      const keyboard = createGradesKeyboard(isPreview);
 
       await vk.sendMessage({
         peerId,

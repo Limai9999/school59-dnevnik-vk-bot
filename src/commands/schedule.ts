@@ -14,6 +14,11 @@ export async function command({ message, vk, classes, payload, schedule, utils }
   const peerId = message.peerId;
   const classData = await classes.getClass(peerId);
 
+  const schedulePayload = payload as SchedulePayload;
+  const action = schedulePayload.data.action;
+
+  const isPreview = !!schedulePayload.data.isPreview;
+
   await schedule.startAutoUpdate(peerId);
 
   const removeLoadingMessage = () => {
@@ -33,7 +38,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
         color: Keyboard.NEGATIVE_COLOR,
         payload: {
           command: 'schedule',
-          data: { action: 'update' },
+          data: { action: 'update', isPreview },
         } as SchedulePayload,
       });
 
@@ -48,9 +53,6 @@ export async function command({ message, vk, classes, payload, schedule, utils }
   await classes.setLoading(peerId, true);
 
   try {
-    const schedulePayload = payload as SchedulePayload;
-    const action = schedulePayload.data.action;
-
     if (schedulePayload.data.filename === 'schoolEndFeature') {
       const endingMessage = classData.endingMessage;
       if (!endingMessage) return console.log('НЕ УДАЛОСЬ ОТПРАВИТЬ КОНЕЧНОЕ СООБЩЕНИЕ, Т.К ЕГО НЕТ.'.bgRed);
@@ -76,7 +78,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
         priority: 'low',
       });
 
-      const scheduleData = await schedule.get(peerId, isForceUpdate);
+      const scheduleData = await schedule.get(peerId, isForceUpdate, isPreview);
       const { manualSchedule, netcitySchedule } = scheduleData;
 
       const keyboard = Keyboard.builder()
@@ -103,7 +105,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
             color: file.status ? Keyboard.PRIMARY_COLOR : Keyboard.NEGATIVE_COLOR,
             payload: {
               command: 'schedule',
-              data: { action: 'choose', filename, type: 'netcity' },
+              data: { action: 'choose', filename, type: 'netcity', isPreview },
             } as SchedulePayload,
           });
 
@@ -146,7 +148,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
             color: Keyboard.SECONDARY_COLOR,
             payload: {
               command: 'schedule',
-              data: { action: 'choose', filename, type: 'manual' },
+              data: { action: 'choose', filename, type: 'manual', isPreview },
             } as SchedulePayload,
           });
 
@@ -173,7 +175,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
         color: Keyboard.NEGATIVE_COLOR,
         payload: {
           command: 'schedule',
-          data: { action: 'update' },
+          data: { action: 'update', isPreview },
         } as SchedulePayload,
       });
 
@@ -200,7 +202,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
 
         const creationTimeString = (schedulePayload.data.type === 'netcity' ? 'Скачано: ' : 'Добавлено: ') + moment(creationTime).fromNow();
         const totalLessonsAndStartTimeString = totalLessons === 1 ? `Всего 1 урок, начинающийся в ${startTime}.` : `Всего уроков: ${totalLessons}, начинаются в ${startTime}.`;
-        const dateString = date ? `Расписание на ${date}` : filename;
+        const dateString = (date ? `Расписание на ${date}` : filename) + ` (${classData.className})`;
 
         const note = classData.notes.find((notes) => notes.filename === filename);
         const noteString = note ? `⚠️ Заметка: ${note.noteText}\n\n` : '';

@@ -11,4 +11,6 @@ export type MainConfig = {
     schedule: number
     grades: number
   }
+  endingMessageScheduleDate: string
+  subscriptionPrice: number
 }

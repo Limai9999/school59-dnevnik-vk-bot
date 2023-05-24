@@ -13,8 +13,9 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
   args: string[],
   subscriptionData: SubscriptionData,
   hasMessagePayload: boolean,
+  isPreview: boolean
 }}) {
-  const { isUserAdmin, isAdminChat, isDMChat, args, subscriptionData, hasMessagePayload } = data;
+  const { isUserAdmin, isAdminChat, isDMChat, args, subscriptionData, hasMessagePayload, isPreview } = data;
   const { requirements, name, howToUse } = command;
 
   if (requirements.admin && !isAdminChat && !isUserAdmin) {
@@ -24,7 +25,7 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
     };
   }
 
-  if (requirements.paidSubscription && isDMChat && !subscriptionData.active) {
+  if (requirements.paidSubscription && isDMChat && !subscriptionData.active && !isPreview) {
     return {
       status: false,
       errorMessage: `Для использования этой команды необходимо иметь активную подписку.\n\nОбратитесь к ${vk.getAdminLinkString('администратору')}.`,
@@ -154,7 +155,22 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
     return;
   }
 
-  const { status, errorMessage } = checkCommand({ command, vk, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin, hasMessagePayload } });
+  if (mainConfig.testMode && (!isAdminChat && !isUserAdmin)) {
+    return vk.sendMessage({
+      message: 'Бот временно отключён, попробуйте позже.',
+      peerId: message.peerId,
+      priority: 'low',
+    });
+  }
+
+  let isPreview = false;
+  if (message.hasMessagePayload) {
+    const payload = message.messagePayload as Payload;
+
+    if (payload.data && payload.data.isPreview) isPreview = true;
+  }
+
+  const { status, errorMessage } = checkCommand({ command, vk, data: { isAdminChat, isDMChat, args, subscriptionData, isUserAdmin, hasMessagePayload, isPreview } });
 
   if (!status) {
     if (!errorMessage) return;
@@ -172,14 +188,6 @@ export default async function handleMessage({ message, classes, vk, vkUser, comm
   if (isLoading) {
     return vk.sendMessage({
       message: 'Прости, я не могу выполнить эту команду, пока не выполню предыдущую.',
-      peerId: message.peerId,
-      priority: 'low',
-    });
-  }
-
-  if (mainConfig.testMode && (!isAdminChat && !isUserAdmin)) {
-    return vk.sendMessage({
-      message: 'Бот временно отключён, попробуйте позже.',
       peerId: message.peerId,
       priority: 'low',
     });

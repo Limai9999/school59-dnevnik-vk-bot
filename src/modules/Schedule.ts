@@ -14,7 +14,7 @@ import { CompareResponse } from '../types/Schedule/CompareResponse';
 
 import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 
-import { getScheduleDebugData } from '../utils/getConfig';
+import { getPreviewScheduleData, getScheduleDebugData } from '../utils/getConfig';
 
 import { MainConfig } from '../types/Configs/MainConfig';
 
@@ -86,7 +86,7 @@ export default class Schedule {
         }
       }
 
-      const data = await this.getWithAPI(peerId);
+      const data = await this.getWithAPI(peerId, false);
 
       const peerType = isDM ? 'у пользователя' : 'в беседе';
 
@@ -105,11 +105,13 @@ export default class Schedule {
     return true;
   }
 
-  async getWithAPI(peerId: number): Promise<GetScheduleWithAPI> {
+  async getWithAPI(peerId: number, isPreview: boolean): Promise<GetScheduleWithAPI> {
     const classData = await this.classes.getClass(peerId);
-    const credentials = await this.netCity.getCredentials(peerId);
+    let credentials = await this.netCity.getCredentials(peerId);
 
-    const session = await this.netCity.findOrCreateSession(peerId, false);
+    isPreview ? credentials = { className: '9б', login: 'preview', password: 'preview' } : null;
+
+    const session = await this.netCity.findOrCreateSession(peerId, false, isPreview);
 
     if (!session || !credentials) {
       return {
@@ -129,10 +131,18 @@ export default class Schedule {
 
     const scheduleFiles: Attachment[] = [];
 
-    if (this.isDebug) {
-      const debugAttachments = getScheduleDebugData();
+    if (this.isDebug || isPreview) {
+      if (this.isDebug) {
+        const debugAttachments = getScheduleDebugData();
 
-      scheduleFiles.push(...debugAttachments);
+        scheduleFiles.push(...debugAttachments);
+      }
+
+      if (isPreview) {
+        const previewAttachments = getPreviewScheduleData();
+
+        scheduleFiles.push(...previewAttachments);
+      }
     } else {
       const announcementsResponse = await this.netCity.getAnnouncements(session.session.id);
 
@@ -168,7 +178,7 @@ export default class Schedule {
     }
 
     const parsedSchedule: ParseScheduleResponse[] = await Promise.all(scheduleFiles.map(async (file) => {
-      const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file, this.isDebug);
+      const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file, this.isDebug || isPreview);
 
       if (!downloadStatus.status) {
         return {
@@ -182,7 +192,7 @@ export default class Schedule {
 
       if (parsedSchedule.status) {
         const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === downloadStatus.filename) as ParseScheduleResponse | undefined;
-        this.compare(oldSchedule, parsedSchedule, peerId, true, false);
+        this.compare(oldSchedule, parsedSchedule, peerId, !isPreview, false);
       }
 
       return parsedSchedule;
@@ -223,7 +233,7 @@ export default class Schedule {
     return parseScheduleData;
   }
 
-  async get(peerId: number, forceUpdate: boolean) {
+  async get(peerId: number, forceUpdate: boolean, isPreview: boolean) {
     const classData = await this.classes.getClass(peerId);
     const lastUpdatedScheduleDate = classData.lastUpdatedScheduleDate!;
 
@@ -231,22 +241,22 @@ export default class Schedule {
 
     const lastUpdateDifference = Date.now() - lastUpdatedScheduleDate;
 
-    if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference) {
-      const schedule = await this.getWithAPI(peerId);
+    if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference || isPreview) {
+      const schedule = await this.getWithAPI(peerId, isPreview);
 
       return {
         netcitySchedule: schedule,
-        manualSchedule: classData.manualSchedule as ParseScheduleResponse[],
+        manualSchedule: classData.manualSchedule,
       };
     } else {
       const schedule: GetScheduleWithAPI = {
         status: true,
-        schedule: classData.schedule as ParseScheduleResponse[],
+        schedule: classData.schedule,
       };
 
       return {
         netcitySchedule: schedule,
-        manualSchedule: classData.manualSchedule as ParseScheduleResponse[],
+        manualSchedule: classData.manualSchedule,
       };
     }
   }

@@ -1,10 +1,12 @@
 import moment from 'moment';
+import { Keyboard } from 'vk-io';
 
 import Classes from './Classes';
 import Utils from './Utils';
 import VK from './VK';
 
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
+import { SubscriptionPayload } from '../types/VK/Payloads/SubscriptionPayload';
 
 class Subscription {
   vk: VK;
@@ -91,15 +93,61 @@ class Subscription {
 
   async remindForSubscription(peerId: number): Promise<boolean> {
     try {
+      const classData = await this.classes.getClass(peerId);
+      const [name] = (await this.vk.getRealUserName(peerId)).split(' ');
+
       const subscription = await this.checkSubscription(peerId);
+      const wasSubscribed = classData.hasEverBoughtSubscription;
 
       if (subscription.active) {
         // TODO: *
         return true;
       } else {
+        let msg = '';
+
+        if (wasSubscribed) {
+          msg =
+          `
+Привет, ${name}!
+
+Неужели ты забыл про меня и мои возможности?
+Ты и вправду стал пользоваться Сетевым Городом для получения расписания и оценок? Это же слишком долго и не удобно!
+
+К тому же, он не оповещает тебя об изменениях расписания или оценок.
+
+Подключи ежемесячную подписку всего за ${this.vk.mainConfig.subscriptionPrice} рублей и получай автоматически обновляемую информацию об оценках и расписании.
+          `;
+        } else {
+          msg =
+          `
+Привет, ${name}!
+
+Неужели ты пользуешься Сетевым Городом для получения расписания и оценок? Это же слишком долго и не удобно!
+
+К тому же, он не оповещает тебя об изменениях расписания или оценок.
+
+Узнай подробности и подключи ежемесячную подписку всего за ${this.vk.mainConfig.subscriptionPrice} рублей и получай автоматически обновляемую информацию об оценках и расписании.
+          `;
+        }
+
+        const keyboard = Keyboard.builder()
+          .inline()
+          .textButton({
+            label: 'Подписаться',
+            color: Keyboard.POSITIVE_COLOR,
+            payload: { command: 'subscription', data: { action: 'subscribe' } } as SubscriptionPayload,
+          })
+          .row()
+          .textButton({
+            label: 'Зачем нужна подписка?',
+            color: Keyboard.PRIMARY_COLOR,
+            payload: { command: 'subscription', data: { action: 'whatCanItDo' } } as SubscriptionPayload,
+          });
+
         await this.vk.sendMessage({
-          message: 'Привет! Не забыл про меня? Ты и вправду стал пользоваться Сетевым Городом для получения расписания и оценок? Это же слишком долго и не удобно!\n\nПодключи подписку за 40 рублей на месяц и получай автоматическую информацию об обновлениях в оценках и расписании.',
+          message: msg,
           peerId,
+          keyboard,
         });
 
         return true;

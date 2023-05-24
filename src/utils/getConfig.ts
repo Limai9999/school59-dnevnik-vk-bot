@@ -46,3 +46,11 @@ export function getServerConfig(): ServerConfig {
 export function getGIAExamsDataConfig(): GIAExamsDataConfig {
   return new Config('GIAExamsData.json').getData();
 }
+
+export function getPreviewGradesReport(): GetTotalStudentReport {
+  return new Config('previewGradesReport.json').getData();
+}
+
+export function getPreviewScheduleData(): Attachment[] {
+  return new Config('previewScheduleData.json').getData();
+}

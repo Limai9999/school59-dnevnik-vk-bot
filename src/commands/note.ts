@@ -25,7 +25,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
     peerId,
   });
 
-  const currentSchedule = await schedule.get(peerId, false);
+  const currentSchedule = await schedule.get(peerId, false, false);
   const { netcitySchedule } = currentSchedule;
   const netcityFiles = netcitySchedule.schedule!;
 
