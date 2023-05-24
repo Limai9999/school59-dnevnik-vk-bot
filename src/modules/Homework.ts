@@ -78,7 +78,7 @@
 
 //     this.autoUpdatePeerIds.push(peerId);
 
-//     console.log(`Настроено авто-обновление домашнего задания для ${peerId}. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.cyan);
+//     console.log(`Настроено автообновление домашнего задания для ${peerId}. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.cyan);
 //     this.autoUpdateCount++;
 
 //     return true;

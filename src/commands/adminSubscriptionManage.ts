@@ -43,7 +43,7 @@ async function command({ message, vk, args, payload, subscription }: CommandInpu
     });
 
   const { first_name, last_name, id, screen_name } = userData;
-  const userDataString = `${first_name} ${last_name} - @${screen_name}\nID: ${id}`;
+  const userDataString = `${first_name} ${last_name} — @${screen_name}\nID: ${id}`;
 
   const lastMessageId = await vk.sendMessage({
     peerId,

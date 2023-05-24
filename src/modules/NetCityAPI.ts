@@ -88,16 +88,16 @@ class NetCityAPI {
       }
 
       const session = await this.createSession(peerId, login, password);
-      if (!session.status) return console.log(`Не удалось обновить сессию Сетевого Города в классе ${peerId} - ${className}. Ошибка:`.bgRed.cyan, session.error!);
+      if (!session.status) return console.log(`Не удалось обновить сессию Сетевого Города в классе ${peerId} — ${className}. Ошибка:`.bgRed.cyan, session.error!);
 
       await this.classes.setNetCitySessionId(peerId, session.session.id);
 
-      console.log(`В классе ${peerId} - ${className} успешно обновлена сессия Сетевого Города.`.cyan);
+      console.log(`В классе ${peerId} — ${className} успешно обновлена сессия Сетевого Города.`.cyan);
     }, autoUpdateTime);
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`В классе ${peerId} - ${className} теперь авто-обновляется сессия Сетевого Города. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.cyan);
+    console.log(`В классе ${peerId} — ${className} теперь автообновляется сессия Сетевого Города. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.cyan);
     this.autoUpdateCount++;
 
     return true;

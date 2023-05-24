@@ -28,7 +28,7 @@ async function command({ message, vk, commands }: CommandInputData) {
     if (admin || dmOnly || paidSubscription) emoji += ' ';
     if (admin) {
       if (!meaningsShowed.admin) {
-        addMeaningMessage('🛠️ - только для администраторов');
+        addMeaningMessage('🛠️ — только для администраторов');
         meaningsShowed.admin = true;
       }
 
@@ -36,7 +36,7 @@ async function command({ message, vk, commands }: CommandInputData) {
     }
     if (dmOnly) {
       if (!meaningsShowed.dmOnly) {
-        addMeaningMessage('🔒 - только в личных сообщениях');
+        addMeaningMessage('🔒 — только в личных сообщениях');
         meaningsShowed.dmOnly = true;
       }
 
@@ -44,7 +44,7 @@ async function command({ message, vk, commands }: CommandInputData) {
     }
     if (paidSubscription && isDMChat) {
       if (!meaningsShowed.paidSubscription) {
-        addMeaningMessage('💸 - требуется активная подписка');
+        addMeaningMessage('💸 — требуется активная подписка');
         meaningsShowed.paidSubscription = true;
       }
 

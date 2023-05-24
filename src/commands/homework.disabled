@@ -55,7 +55,7 @@
 //           const lessonName = utils.abbreviateLessonTitle(lesson.subjectName);
 
 //           if (lesson.homework.length === 1) {
-//             return `${lessonName} - ${lesson.homework[0]}`;
+//             return `${lessonName} — ${lesson.homework[0]}`;
 //           } else {
 //             return `${lessonName}:\n${lesson.homework.join('\n')}`;
 //           }

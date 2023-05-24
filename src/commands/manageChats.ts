@@ -122,7 +122,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
     const announceMessage = await vk.waitForMessage(message.peerId, message.senderId, lastMessageId);
     if (!announceMessage) {
       return vk.sendMessage({
-        message: 'Я не дождался сообщения - отправка объявления отменена.',
+        message: 'Я не дождался сообщения — отправка объявления отменена.',
         peerId: message.peerId,
       });
     }
@@ -177,7 +177,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
 
     if (!attachmentMessage) {
       return vk.sendMessage({
-        message: 'Я не дождался сообщения - отправка расписания отменена.',
+        message: 'Я не дождался сообщения — отправка расписания отменена.',
         peerId: message.peerId,
       });
     }
@@ -200,7 +200,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
 
     if (attachments[0].type !== 'doc') {
       return vk.sendMessage({
-        message: 'Тип этого файла - не документ, повторите еще раз и прикрепите документ.',
+        message: 'Тип этого файла — не документ, повторите еще раз и прикрепите документ.',
         peerId: message.peerId,
       });
     }
@@ -209,7 +209,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
 
     if (attachment.extension !== 'xlsx') {
       return vk.sendMessage({
-        message: 'Расширение этого файла - не .xlsx (таблица Excel), повторите еще раз и прикрепите Excel документ.',
+        message: 'Расширение этого файла — не .xlsx (таблица Excel), повторите еще раз и прикрепите Excel документ.',
         peerId: message.peerId,
       });
     }
@@ -254,11 +254,11 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
     let resultMessage = '';
 
     if (isChanged) {
-      resultMessage = `${first_name} ${last_name} ${genderifiedAction} изменённый файл с расписанием:\n${filename}`;
+      resultMessage = `${first_name} ${last_name} ${genderifiedAction} файл с изменённым расписанием:\n${filename}`;
 
       if (changesList!.length) {
         const changesStrings = changesList!.map((change, index) => {
-          return `${index + 1} - ${change}`;
+          return `${index + 1}. ${change}`;
         });
 
         const changesFixedString = utils.setWordEndingBasedOnThingsCount('changes', changesStrings.length);

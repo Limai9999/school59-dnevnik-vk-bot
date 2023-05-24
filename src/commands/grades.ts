@@ -139,7 +139,7 @@ async function command({ message, classes, vk, payload, grades, utils }: Command
         });
       });
 
-      const totalGradesString = `Всего оценок - ${totalGrades}:\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}`;
+      const totalGradesString = `Всего оценок — ${totalGrades}:\nПятёрок: ${marks['5']}, четвёрок: ${marks['4']}, троек: ${marks['3']}, двоек: ${marks['2']}`;
       const lastUpdatedString = `Обновлен: ${moment(classData.lastUpdatedTotalStudentReport).fromNow()}`;
 
       const keyboard = createGradesKeyboard(isPreview);

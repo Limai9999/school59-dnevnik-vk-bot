@@ -109,7 +109,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
             } as SchedulePayload,
           });
 
-          returningString += `${index + 1} - ${filename}`;
+          returningString += `${index + 1}. ${filename}`;
 
           if (!file.status) {
             returningString += ' ❌';
@@ -152,7 +152,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
             } as SchedulePayload,
           });
 
-          return `${index + 1} - ${filename}`;
+          return `${index + 1}. ${filename}`;
         });
 
         totalManualFiles = newestManualFiles.length;

@@ -57,7 +57,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
           } as NotePayload,
         });
 
-        returningString += `${index + 1} - ${filename}`;
+        returningString += `${index + 1}. ${filename}`;
 
         if (!file.status) {
           returningString += ' ❌';

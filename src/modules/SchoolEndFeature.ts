@@ -178,7 +178,7 @@ export default class SchoolEndFeature {
           if (answerPayload.data.include) {
             if (chosenExams.length >= 4) {
               await this.vk.sendMessage({
-                message: 'Вы уже выбрали 4 предмета - максимально кол-во экзаменов.\nУберите лишнее, чтобы выбрать другие предметы.',
+                message: 'Вы уже выбрали 4 предмета — максимальное кол-во экзаменов.\nУберите лишние предметы, чтобы выбрать другие.',
                 peerId,
               });
               continue;

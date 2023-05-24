@@ -77,7 +77,7 @@ async function command({ message, vk, payload, utils, netcityAPI }: CommandInput
         const assignDataResponse = await netcityAPI.getAssignData(session.session.id, id);
         const assignWeight = assignDataResponse.status ? assignDataResponse.assignData!.weight : 'неизвестно';
 
-        return `${index + 1}. ${subjectName} - ${assignmentTypeString}. ${date}\n${assignmentName}\nВес оценки: ${assignWeight}`;
+        return `${index + 1}. ${subjectName} — ${assignmentTypeString}. ${date}\n${assignmentName}\nВес оценки: ${assignWeight}`;
       }));
 
       const fixedTasksCountString = utils.setWordEndingBasedOnThingsCount('pastMandatoryTasks', count);

@@ -83,7 +83,7 @@ class Grades {
 
     this.autoUpdatePeerIds.push(peerId);
 
-    console.log(`Настроено авто-обновление отчёта с оценками для пользователя ${peerId}. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.magenta);
+    console.log(`Настроено автообновление отчёта с оценками для пользователя ${peerId}. (${autoUpdateMinutes} + ${this.autoUpdateCount})`.magenta);
     this.autoUpdateCount++;
   }
 

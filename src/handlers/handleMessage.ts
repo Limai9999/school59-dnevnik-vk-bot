@@ -56,7 +56,7 @@ function checkCommand({ command, vk, data }: {command: CommandOutputData, vk: Vk
   if (requirements.args > args.length) {
     return {
       status: false,
-      errorMessage: `Недостаточно параметров для выполнения команды - требуется еще ${requirements.args - args.length}.\n\nВерное использование: ${name} ${howToUse}`,
+      errorMessage: `Недостаточно параметров для выполнения команды — требуется еще ${requirements.args - args.length}.\n\nВерное использование: ${name} ${howToUse}`,
     };
   }
 
