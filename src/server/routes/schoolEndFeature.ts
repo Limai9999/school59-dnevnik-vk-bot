@@ -71,28 +71,14 @@ router.post('/getEndingMessage', verifyKey, async (reqDef, res) => {
 router.post('/sendEndingMessage', verifyKey, async (reqDef, res) => {
   try {
     const req = reqDef as DefaultRequestData;
-    const { classes, vk } = req.app.locals;
+    const { schoolEndFeature } = req.app.locals;
 
     const { peerId, message } = req.body as { peerId: number | null, message: string | null };
     if (!peerId || !message) {
       return res.json({ status: false, message: 'Не передан peerId или message' });
     }
 
-    await classes.setEndingMessage(peerId, message);
-
-    const keyboard = Keyboard.builder()
-      .inline()
-      .textButton({
-        label: 'Открыть',
-        color: Keyboard.POSITIVE_COLOR,
-        payload: { command: 'schedule', data: { action: 'choose', filename: 'schoolEndFeature', type: 'manual' } } as SchedulePayload,
-      });
-
-    await vk.sendMessage({
-      message: 'Добавился новый файл с расписанием на 1 июня.',
-      peerId,
-      keyboard,
-    });
+    await schoolEndFeature.sendEndingMessage(peerId, message);
 
     return res.json({ status: true, message: 'Конечное сообщение успешно отправлено в виде нового файла с расписанием' });
   } catch (error) {

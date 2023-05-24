@@ -64,8 +64,6 @@ const vkUser = new VK({
   isUser: true,
 });
 
-const schoolEndFeature = new SchoolEndFeature(vkBot, classes, utils);
-
 const setupUserFeatures = async (peerId: number) => {
   if (mainConfig.onlyAPIMode) return console.log('setupUserFeatures не будет выполняться, т.к включён режим "только API"');
   await classes.setLoading(peerId, false);
@@ -84,6 +82,8 @@ const netcityAPI = new NetCityAPI(vkBot, classes, utils, api, subscription, main
 const schedule = new Schedule(vkBot, classes, netcityAPI, utils, api, subscription, mainConfig);
 const grades = new Grades(vkBot, classes, utils, netcityAPI, api, subscription, mainConfig);
 // const homework = new Homework(vkBot, classes, utils, netcityAPI, subscription, mainConfig);
+
+const schoolEndFeature = new SchoolEndFeature(vkBot, classes, utils, subscription);
 
 async function start() {
   await vkBot.init();

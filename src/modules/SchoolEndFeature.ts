@@ -3,12 +3,14 @@ import { Keyboard } from 'vk-io';
 import Classes from './Classes';
 import Utils from './Utils';
 import VK from './VK';
+import Subscription from './Subscription';
 
 import { ExamsSurveyPayload, SchoolEndFeature9thClassSurveyPayload } from '../types/VK/Payloads/SchoolEndFeaturePayload';
 import { SurveyResponse } from '../types/SchoolEndFeature/SurveyResponse';
 import { GIAExam } from '../types/SchoolEndFeature/GIASubjects';
 import { GIAExamsDataConfig } from '../types/Configs/GIAExamsDataConfig';
 import { EndingMessageResponse } from '../types/SchoolEndFeature/EndingMessageResponse';
+import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
 
 import { getGIAExamsDataConfig } from '../utils/getConfig';
 
@@ -18,13 +20,15 @@ export default class SchoolEndFeature {
   vk: VK;
   classes: Classes;
   utils: Utils;
+  subscription: Subscription;
 
   GIAExamsData: GIAExamsDataConfig;
 
-  constructor(vk: VK, classes: Classes, utils: Utils) {
+  constructor(vk: VK, classes: Classes, utils: Utils, subscription: Subscription) {
     this.vk = vk;
     this.classes = classes;
     this.utils = utils;
+    this.subscription = subscription;
 
     this.GIAExamsData = getGIAExamsDataConfig();
   }
@@ -225,15 +229,54 @@ export default class SchoolEndFeature {
       };
     }
 
+    const classData = await this.classes.getClass(peerId);
     const realName = await this.vk.getRealUserName(peerId);
     const firstName = realName.split(' ')[0];
 
+    const { active: isSubscribed } = await this.subscription.checkSubscription(peerId);
+    const wasSubscribed = classData.hasEverBoughtSubscription;
+    const schoolEndStatus = classData.survey9thClassStatus;
+
+    if (!schoolEndStatus) {
+      return {
+        status: false,
+        error: 'Нет ответа на опрос про 9 класс.',
+      };
+    }
+
     // TODO: придумать конечные сообщения
-    const message = firstName + ' Конечное сообщение';
+    let message = 'there is no message';
+
+    switch (schoolEndStatus) {
+      case 'leaving':
+        break;
+      case 'staying':
+        break;
+    }
 
     return {
       status: true,
       message,
     };
+  }
+
+  async sendEndingMessage(peerId: number, message: string) {
+    await this.classes.setEndingMessage(peerId, message);
+
+    const keyboard = Keyboard.builder()
+      .inline()
+      .textButton({
+        label: 'Открыть',
+        color: Keyboard.POSITIVE_COLOR,
+        payload: { command: 'schedule', data: { action: 'choose', filename: 'schoolEndFeature', type: 'manual' } } as SchedulePayload,
+      });
+
+    await this.vk.sendMessage({
+      message: `Добавился новый файл с расписанием на ${this.vk.mainConfig.endingMessageScheduleDate}.`,
+      peerId,
+      keyboard,
+    });
+
+    return true;
   }
 }
