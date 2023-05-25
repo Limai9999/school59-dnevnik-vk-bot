@@ -30,7 +30,7 @@ router.post('/add', verifyKey, async (reqDef, res) => {
   try {
     const req = reqDef as DefaultRequestData;
 
-    const { link, days } = req.body as { link: string, days: string };
+    const { link, days, isAddingDays } = req.body as { link: string, days: string, isAddingDays: boolean };
 
     if (!link || !days) {
       return res.json({ status: false, message: 'Не передан link или days' });
@@ -45,12 +45,18 @@ router.post('/add', verifyKey, async (reqDef, res) => {
       return res.json({ status: false, message: 'Такого пользователя не существует' });
     }
 
-    const endDate = Date.now() + 1000 * 60 * 60 * 24 * parseInt(days);
-    const subscriptionData: SubscriptionData = { peerId: user.id, active: true, endDate };
+    if (isAddingDays) {
+      const newSubscription = await subscription.addDays(user.id, days);
 
-    const newSubscription = await subscription.updateSubscription(user.id, subscriptionData, true);
+      return res.json({ status: true, message: `Вы успешно добавили ${days} дней к подписке пользователя ${user.first_name} ${user.last_name}.`, subscription: newSubscription, user });
+    } else {
+      const endDate = Date.now() + 1000 * 60 * 60 * 24 * parseInt(days);
+      const subscriptionData: SubscriptionData = { peerId: user.id, active: true, endDate };
 
-    return res.json({ status: true, message: 'Подписка успешно добавлена', subscription: newSubscription, user });
+      const newSubscription = await subscription.updateSubscription(user.id, subscriptionData, true);
+
+      return res.json({ status: true, message: `Вы успешно выдали подписку пользователю ${user.first_name} ${user.last_name} на ${days} дней`, subscription: newSubscription, user });
+    }
   } catch (error) {
     console.log(error);
     return res.json({ status: false, message: 'Ошибка сервера' });

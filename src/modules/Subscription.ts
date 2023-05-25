@@ -75,6 +75,19 @@ class Subscription {
     return subscription;
   }
 
+  async addDays(peerId: number, daysToAdd: number | string): Promise<SubscriptionData> {
+    const currentSubscription = await this.checkSubscription(peerId);
+
+    const oldEndDate = currentSubscription.endDate === 0 ? Date.now() : currentSubscription.endDate;
+    const newEndDate = moment(oldEndDate).add(daysToAdd, 'days').valueOf();
+
+    const newSubscription: SubscriptionData = { peerId, active: true, endDate: newEndDate };
+
+    await this.updateSubscription(peerId, newSubscription, true);
+
+    return newSubscription;
+  }
+
   async getSubscriptions(): Promise<SubscriptionData[]> {
     const classes = await this.classes.getAllClasses();
 
