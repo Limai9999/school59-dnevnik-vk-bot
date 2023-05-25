@@ -48,7 +48,7 @@ const api = new API();
 const chatGPT = new ChatGPT(mainConfig.chatGPTKey);
 
 const VKConfig = getVKConfig();
-const vkBotToken = VKConfig.testMode ? VKConfig.test_bot_token : VKConfig.user_token;
+const vkBotToken = VKConfig.testMode ? VKConfig.test_bot_token : VKConfig.bot_token;
 
 const vkBot = new VK({
   token: vkBotToken,
