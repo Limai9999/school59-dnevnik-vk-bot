@@ -82,7 +82,8 @@ class VkService extends VK {
       this.me = { name: name!, id: id!, isUser: this.me.isUser };
     }
 
-    console.log(`VK успешно запущено как ${this.me.name} - ${this.me.id}.`.blue);
+    const testModeNotification = this.config.testMode ? ' (ИСПОЛЬЗУЕТСЯ ТЕСТОВЫЙ БОТ)' : '.';
+    console.log(`VK успешно запущено как ${this.me.name} - ${this.me.id}${testModeNotification}`.blue);
 
     return this;
   }
@@ -121,8 +122,10 @@ class VkService extends VK {
   }
 
   async getMeGroup() {
+    const id = this.config.testMode ? this.config.test_id : this.config.id;
+
     const response = await this.api.groups.getById({
-      group_id: this.config.id,
+      group_id: id,
     });
 
     return response[0];
