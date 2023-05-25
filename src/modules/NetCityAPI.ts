@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 
-import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
+import { Session } from '../types/Responses/API/netCity/GetCookiesResponse';
 import { GetStudentDiaryResponse, GetStudentDiary } from '../types/Responses/API/netCity/GetStudentDiary';
 import { InitStudentDiaryResponse, InitStudentDiary } from '../types/Responses/API/netCity/InitStudentDiary';
 import { GetAnnouncementsResponse, Attachment } from '../types/Responses/API/netCity/GetAnnouncementsResponse';
@@ -12,6 +12,7 @@ import { GetPastMandatoryResponse, GetPastMandatory } from '../types/Responses/A
 import { GetAssignmentTypesResponse, GetAssignmentTypes } from '../types/Responses/API/netCity/GetAssignmentTypes';
 import { GetAssignDataResponse, GetAssignData } from '../types/Responses/API/netCity/GetAssignData';
 import { ReportStudentTotalMarks } from '../types/Responses/API/grades/ReportStudentTotalMarks';
+import { GetSessionListResponse } from '../types/Responses/API/netCity/GetSessionList';
 
 import Classes from './Classes';
 import Utils from './Utils';
@@ -22,12 +23,8 @@ import Subscription from './Subscription';
 
 import { MainConfig } from '../types/Configs/MainConfig';
 
-export interface Session extends GetCookiesResponse {
-  peerId: number
-}
-
 class NetCityAPI {
-  sessions: Session[];
+  // sessions: Session[];
 
   vk: VK;
   classes: Classes;
@@ -41,7 +38,7 @@ class NetCityAPI {
   autoUpdateCount: number;
 
   constructor(vk: VK, classes: Classes, utils: Utils, api: API, subscription: Subscription, mainConfig: MainConfig) {
-    this.sessions = [];
+    // this.sessions = [];
 
     this.vk = vk;
     this.classes = classes;
@@ -117,29 +114,26 @@ class NetCityAPI {
   }
 
   async createSession(peerId: number, login: string, password: string): Promise<Session> {
-    const existingSession = this.getSessionByPeerId(peerId);
+    const existingSession = await this.getSessionByPeerId(peerId);
     if (existingSession) await this.closeSession(existingSession.session.id);
 
     try {
       const request = await this.api.request({
         url: '/netcity/getCookies',
-        data: { login, password },
+        data: { peerId, login, password },
       });
       if (!request) throw new Error('Не удалось обратиться к API.');
 
-      const session: Session = {
-        peerId,
-        ...request.data as GetCookiesResponse,
-      };
+      const session = request.data as Session;
 
       if (session.status) {
-        this.sessions.push(session);
+        // this.sessions.push(session);
 
-        const endTime = session.session.endTime - Date.now();
+        // const endTime = session.session.endTime - Date.now();
 
-        setTimeout(() => {
-          this.closeSession(session.session.id);
-        }, endTime);
+        // setTimeout(() => {
+        //   this.closeSession(session.session.id);
+        // }, endTime);
 
         await this.initStudentDiary(session.session.id);
       }
@@ -171,7 +165,7 @@ class NetCityAPI {
 
       const data = request.data as CloseSessionResponse;
 
-      this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
+      // this.sessions = this.sessions.filter((session) => session.session.id !== sessionId);
 
       return data;
     } catch (error) {
@@ -205,7 +199,7 @@ class NetCityAPI {
 
     const { login, password } = credentials;
 
-    const existingSession = this.getSessionByPeerId(peerId);
+    const existingSession = await this.getSessionByPeerId(peerId);
     if (existingSession && existingSession.status && !forceCreate) {
       const isEnded = existingSession.session.endTime - Date.now() < 0;
 
@@ -224,18 +218,39 @@ class NetCityAPI {
     return await this.createSession(peerId, login, password);
   }
 
-  getSession(sessionId: number) {
-    const session = this.sessions.find(({ session }) => session.id === sessionId);
+  async getSession(sessionId: number) {
+    const sessions = await this.getSessions();
+
+    const session = sessions.find(({ session }) => session.id === sessionId);
     return session;
   }
 
-  getSessionByPeerId(peerId: number) {
-    const session = this.sessions.find((session) => session.peerId === peerId);
+  async getSessionByPeerId(peerId: number) {
+    const sessions = await this.getSessions();
+
+    const session = sessions.find((session) => session.peerId === peerId);
     return session;
+  }
+
+  async getSessions(): Promise<Session[]> {
+    try {
+      const request = await this.api.request({
+        url: '/netcity/getSessionList',
+      });
+      if (!request) return [];
+
+      const response = request.data as GetSessionListResponse;
+
+      // console.log('ALL SESSIONS:', response.sessions);
+
+      return response.sessions;
+    } catch (error) {
+      return [];
+    }
   }
 
   async initStudentDiary(sessionId: number): Promise<InitStudentDiary> {
-    const session = this.getSession(sessionId);
+    const session = await this.getSession(sessionId);
     if (!session) {
       return {
         status: false,
@@ -288,7 +303,7 @@ class NetCityAPI {
 
   async getStudentDiary(sessionId: number): Promise<GetStudentDiary> {
     try {
-      const session = this.getSession(sessionId);
+      const session = await this.getSession(sessionId);
       if (!session) {
         return {
           status: false,
@@ -345,7 +360,7 @@ class NetCityAPI {
 
   async getPastMandatory(sessionId: number, isOnlyCurrentQuarter: boolean): Promise<GetPastMandatory> {
     try {
-      const session = this.getSession(sessionId);
+      const session = await this.getSession(sessionId);
       if (!session) {
         return {
           status: false,
@@ -402,7 +417,7 @@ class NetCityAPI {
 
   async getAssignmentTypes(sessionId: number): Promise<GetAssignmentTypes> {
     try {
-      const session = this.getSession(sessionId);
+      const session = await this.getSession(sessionId);
       if (!session) {
         return {
           status: false,
@@ -442,7 +457,7 @@ class NetCityAPI {
 
   async getAssignData(sessionId: number, assignId: number): Promise<GetAssignData> {
     try {
-      const session = this.getSession(sessionId);
+      const session = await this.getSession(sessionId);
       if (!session) {
         return {
           status: false,
@@ -493,7 +508,7 @@ class NetCityAPI {
 
   async getAnnouncements(sessionId: number) {
     try {
-      const session = this.getSession(sessionId);
+      const session = await this.getSession(sessionId);
       if (!session) {
         return {
           status: false,

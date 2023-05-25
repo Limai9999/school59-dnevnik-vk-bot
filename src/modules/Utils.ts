@@ -1,4 +1,4 @@
-import { GetCookiesResponse } from '../types/Responses/API/netCity/GetCookiesResponse';
+import { Session } from '../types/Responses/API/netCity/GetCookiesResponse';
 
 type setWordEndingType =
 'scheduleFiles' |
@@ -78,7 +78,7 @@ export default class Utils {
     }
   }
 
-  cookieArrayToString(cookieArray: GetCookiesResponse['cookies']) {
+  cookieArrayToString(cookieArray: Session['cookies']) {
     const stringArray = cookieArray.map((cookie) => {
       const { name, value } = cookie;
 

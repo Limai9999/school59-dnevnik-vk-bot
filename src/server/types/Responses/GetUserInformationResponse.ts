@@ -1,5 +1,5 @@
 import { IClass } from '../../../models/Class';
-import { Session } from '../../../modules/NetCityAPI';
+import { Session } from '../../../types/Responses/API/netCity/GetCookiesResponse';
 
 import { SubscriptionData } from '../../../types/Subscription/SubscriptionData';
 import { GetUserResponse } from '../../../types/VK/Responses/GetUserResponse';

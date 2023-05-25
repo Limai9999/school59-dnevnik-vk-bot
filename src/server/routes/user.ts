@@ -40,7 +40,7 @@ router.post('/information', verifyKey, async (reqDef, res) => {
     }
 
     const subscriptionData = await subscription.checkSubscription(userId, false);
-    const netCitySession = netcityAPI.getSessionByPeerId(userId);
+    const netCitySession = await netcityAPI.getSessionByPeerId(userId);
     const realUserName = await vk.getRealUserName(userId);
 
     const information: GetUserInformationResponse = {

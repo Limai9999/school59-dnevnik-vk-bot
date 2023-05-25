@@ -1,7 +1,8 @@
 import { Protocol } from 'puppeteer';
 
-export type GetCookiesResponse = {
+export type Session = {
   status: boolean
+  peerId: number
   login: string
   password: string
   error?: string
