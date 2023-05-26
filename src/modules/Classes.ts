@@ -209,4 +209,11 @@ export default class Classes {
       $set: { hasEverBoughtSubscription },
     });
   }
+
+  async setUsedFreeTrial(peerId: number, usedFreeTrial: boolean) {
+    const classData = await this.getClass(peerId);
+    await classData.updateOne({
+      $set: { usedFreeTrial },
+    });
+  }
 }

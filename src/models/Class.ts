@@ -39,6 +39,7 @@ export interface IClass {
   surveyGIAExams: GIAExam[]
   endingMessage?: string
   hasEverBoughtSubscription: boolean
+  usedFreeTrial: boolean
 }
 
 const parsedSchedule = {
@@ -201,6 +202,10 @@ const classSchema = new Schema({
   },
   hasEverBoughtSubscription: {
     type: Boolean,
+  },
+  usedFreeTrial: {
+    type: Boolean,
+    default: false,
   },
 }, {
   timestamps: true,

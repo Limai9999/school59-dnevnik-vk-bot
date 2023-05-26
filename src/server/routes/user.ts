@@ -52,6 +52,7 @@ router.post('/information', verifyKey, async (reqDef, res) => {
       },
       className,
       subscription: subscriptionData,
+      usedFreeTrial: classData.usedFreeTrial,
       realUserName,
       schoolEndFeature: {
         survey9thClassStatus: classData.survey9thClassStatus,

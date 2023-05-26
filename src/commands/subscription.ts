@@ -6,16 +6,17 @@ import { CommandInputData, CommandOutputData } from '../types/Commands';
 import { SubscriptionPayload } from '../types/VK/Payloads/SubscriptionPayload';
 import { PreviewCommandPayload } from '../types/VK/Payloads/PreviewCommandPayload';
 
-async function command({ message, vk, subscription, payload }: CommandInputData) {
+async function command({ message, vk, classes, subscription, payload }: CommandInputData) {
   const { peerId } = message;
 
   const subscriptionPayload = payload as SubscriptionPayload;
   const action = subscriptionPayload.data.action;
 
   const subscriptionData = await subscription.checkSubscription(peerId);
+  const classData = await classes.getClass(peerId);
 
   const endDate = moment(subscriptionData.endDate).format('LLL');
-  const statusString = subscriptionData.active ? `Ваша подписка активна\n\nДействует до ${endDate}` : 'У вас нет активной подписки.';
+  const statusString = subscriptionData.active ? `✅ Ваша подписка активна.\n\nДействует до ${endDate}` : '❌ У вас нет активной подписки.';
 
   if (action === 'status') {
     const keyboard = Keyboard.builder()
@@ -107,8 +108,38 @@ async function command({ message, vk, subscription, payload }: CommandInputData)
   } else if (action === 'subscribe') {
     await vk.sendMessage({
       peerId: message.peerId,
-      message: `Эта команда еще не реализована до конца, но если вы хотите оплатить подписку, обратитесь к ${vk.getAdminLinkString('администратору')}.\n\nСтоимость подписки: ${vk.mainConfig.subscriptionPrice} рублей/месяц.`,
+      message: `Эта команда еще не реализована до конца, но если вы хотите оплатить подписку, обратитесь к ${vk.getAdminLinkString('администратору')}.\n\nСтоимость подписки: ${subscription.config.price} рублей/месяц.`,
     });
+
+    // TODO: SUBSCRIPTION FUNCTIONAL
+    // TODO: START AFTER SUBSCRIPTION GUIDE
+  } else if (action === 'activateFreeTrial') {
+    const usedFreeTrial = classData.usedFreeTrial;
+
+    if (usedFreeTrial) {
+      return await vk.sendMessage({
+        peerId: message.peerId,
+        message: `К сожалению, вы не можете активировать пробный период, т.к. уже использовали его.\n\nОбратись к ${vk.getAdminLinkString('администратору')}, если хотите оформить подписку.\n\nСтоимость подписки: ${subscription.config.price} рублей/месяц.`,
+      });
+    }
+
+    if (subscriptionData.active) {
+      return await vk.sendMessage({
+        peerId: message.peerId,
+        message: 'К сожалению, вы не можете активировать пробный период, т.к. у вас уже есть активная подписка.',
+      });
+    }
+
+    await subscription.addDays(peerId, 14);
+
+    await classes.setUsedFreeTrial(peerId, true);
+
+    return await vk.sendMessage({
+      peerId: message.peerId,
+      message: 'Вы успешно активировали пробный период подписки.',
+    });
+
+    // TODO: START AFTER SUBSCRIPTION GUIDE
   }
 }
 

@@ -14,6 +14,7 @@ export interface GetUserInformationResponse {
   }
   className: string
   subscription: SubscriptionData
+  usedFreeTrial: boolean
   realUserName: string | null
   schoolEndFeature: {
     survey9thClassStatus: IClass['survey9thClassStatus']

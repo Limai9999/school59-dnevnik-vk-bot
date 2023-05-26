@@ -7,11 +7,15 @@ import VK from './VK';
 
 import { SubscriptionData } from '../types/Subscription/SubscriptionData';
 import { SubscriptionPayload } from '../types/VK/Payloads/SubscriptionPayload';
+import { SubscriptionConfig } from '../types/Configs/SubscriptionConfig';
 
+import { getSubscriptionConfig } from '../utils/getConfig';
 class Subscription {
   vk: VK;
   classes: Classes;
   utils: Utils;
+
+  config: SubscriptionConfig;
 
   setupUserFeatures: (peerId: number) => Promise<void>;
 
@@ -19,6 +23,9 @@ class Subscription {
     this.vk = vk;
     this.classes = classes;
     this.utils = utils;
+
+    this.config = getSubscriptionConfig();
+
     this.setupUserFeatures = setupUserFeatures;
   }
 
@@ -111,12 +118,17 @@ class Subscription {
 
       const subscription = await this.checkSubscription(peerId);
       const wasSubscribed = classData.hasEverBoughtSubscription;
+      const usedFreeTrial = classData.usedFreeTrial;
 
       if (subscription.active) {
         // TODO: *
         return true;
       } else {
         let msg = '';
+
+        const endingMessage = usedFreeTrial
+          ? `Подключи ежемесячную подписку всего за ${this.config.price} рублей и получай автоматически обновляемую информацию об оценках и расписании.`
+          : 'Кстати, у тебя есть возможность получить бесплатный 14-дневный пробный период. Только не используй его просто так, это одноразовая возможность :)';
 
         if (wasSubscribed) {
           msg =
@@ -128,7 +140,7 @@ class Subscription {
 
 К тому же, он не оповещает тебя об изменениях расписания или оценок.
 
-Подключи ежемесячную подписку всего за ${this.vk.mainConfig.subscriptionPrice} рублей и получай автоматически обновляемую информацию об оценках и расписании.
+${endingMessage}
           `;
         } else {
           msg =
@@ -139,17 +151,28 @@ class Subscription {
 
 К тому же, он не оповещает тебя об изменениях расписания или оценок.
 
-Узнай подробности и подключи ежемесячную подписку всего за ${this.vk.mainConfig.subscriptionPrice} рублей и получай автоматически обновляемую информацию об оценках и расписании.
+${endingMessage}
           `;
         }
 
         const keyboard = Keyboard.builder()
-          .inline()
-          .textButton({
+          .inline();
+
+        if (usedFreeTrial) {
+          keyboard.textButton({
             label: 'Подписаться',
             color: Keyboard.POSITIVE_COLOR,
             payload: { command: 'subscription', data: { action: 'subscribe' } } as SubscriptionPayload,
-          })
+          });
+        } else {
+          keyboard.textButton({
+            label: 'Активировать пробный период',
+            color: Keyboard.POSITIVE_COLOR,
+            payload: { command: 'subscription', data: { action: 'activateFreeTrial' } } as SubscriptionPayload,
+          });
+        }
+
+        keyboard
           .row()
           .textButton({
             label: 'Зачем нужна подписка?',
