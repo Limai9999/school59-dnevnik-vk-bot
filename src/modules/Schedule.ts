@@ -210,7 +210,7 @@ export default class Schedule {
       newScheduleArray.push(newSchedule);
     });
 
-    if (newScheduleArray.length && !isPreview) await this.classes.setSchedule(peerId, newScheduleArray);
+    if (newScheduleArray.length) await this.classes.setSchedule(peerId, newScheduleArray);
 
     return {
       status: true,
