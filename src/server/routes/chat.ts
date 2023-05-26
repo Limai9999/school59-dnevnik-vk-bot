@@ -4,6 +4,7 @@ import { verifyKey } from '../middlewares/verifyKey';
 
 import { DefaultRequestData } from '../types/DefaultRequestData';
 import { GetChatInformationResponse } from '../types/Responses/GetChatInformationResponse';
+import { GetChatResponse } from '../../types/VK/Responses/GetChatResponse';
 
 import Password from '../../modules/Password';
 
@@ -71,14 +72,17 @@ router.get('/list', verifyKey, async (reqDef, res) => {
     const req = reqDef as DefaultRequestData;
     const { vk, classes, utils } = req.app.locals;
 
-    const chats = (await classes.getAllClasses()).filter((cls) => !utils.checkIfPeerIsDM(cls.id));
+    const classList = await classes.getAllClasses();
+    const chats = classList.filter((cls) => !utils.checkIfPeerIsDM(cls.id));
 
-    const chatList = await Promise.all(chats.map(async (chat) => {
+    const chatListUnfiltered = await Promise.all(chats.map(async (chat) => {
       const chatData = await vk.getChat(chat.id);
       if (!chatData) return;
 
       return chatData;
     }));
+
+    const chatList = chatListUnfiltered.filter((chat) => chat) as GetChatResponse[];
 
     return res.json({ status: true, message: 'Получение информации о чатах успешно', chatList });
   } catch (error) {
