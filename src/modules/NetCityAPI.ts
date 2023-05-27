@@ -580,6 +580,7 @@ class NetCityAPI {
           status: false,
           error: 'Вы не ввели данные для Сетевого Города.',
           info: [],
+          isPreview: false,
           result: { averageGrades: [], daysData: [] },
         };
       }
@@ -589,6 +590,7 @@ class NetCityAPI {
           status: false,
           error: `При входе в Сетевой Город произошла ошибка:\n${session.error}`,
           info: [],
+          isPreview: false,
           result: { averageGrades: [], daysData: [] },
         };
       }
@@ -607,6 +609,7 @@ class NetCityAPI {
         status: false,
         error: `${error}`,
         info: [],
+        isPreview: false,
         result: { averageGrades: [], daysData: [] },
       };
     }

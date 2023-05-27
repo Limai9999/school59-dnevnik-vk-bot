@@ -96,7 +96,7 @@ class Grades {
     const lastUpdateDifference = Date.now() - lastUpdatedDate;
 
     if (forceUpdate || lastUpdateDifference > maxLastUpdateDifference || !classData.totalStudentReport || !classData.totalStudentReport.status) {
-      const previousReport = classData.totalStudentReport! as unknown as GetTotalStudentReport;
+      const previousReport = classData.totalStudentReport;
       const report = this.isDebug ?
         getGradesDebugData() :
         isPreview ? getPreviewGradesReport() : await this.netcityAPI.getTotalStudentReport(peerId);
@@ -106,7 +106,7 @@ class Grades {
         await this.classes.setLastUpdatedTotalStudentReportDate(peerId, Date.now());
       }
 
-      isPreview ? null : await this.compare(peerId, previousReport, report);
+      isPreview || previousReport.isPreview || report.isPreview ? null : await this.compare(peerId, previousReport, report);
 
       return report;
     } else {

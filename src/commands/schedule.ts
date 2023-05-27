@@ -6,7 +6,6 @@ import moment from 'moment';
 moment.locale('ru');
 
 import { SchedulePayload } from '../types/VK/Payloads/SchedulePayload';
-import { ParseScheduleResponse } from '../types/Responses/API/schedule/ParseScheduleResponse';
 
 export async function command({ message, vk, classes, payload, schedule, utils }: CommandInputData) {
   let loadingMessageID = 0;
@@ -191,7 +190,7 @@ export async function command({ message, vk, classes, payload, schedule, utils }
       const classData = await classes.getClass(peerId);
 
       const arrayWithSchedule = schedulePayload.data.type === 'netcity' ? classData.schedule : classData.manualSchedule;
-      const scheduleData = arrayWithSchedule.find((schedule) => schedule.filename! === schedulePayload.data.filename!) as ParseScheduleResponse;
+      const scheduleData = arrayWithSchedule.find((schedule) => schedule.filename! === schedulePayload.data.filename!);
 
       if (!scheduleData) {
         return sendError('Произошла неизвестная ошибка, либо выбранного расписания больше нет.');

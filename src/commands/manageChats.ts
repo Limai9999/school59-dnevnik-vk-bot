@@ -225,7 +225,7 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
       });
     }
 
-    const parsedSchedule = await schedule.parse(filename, classData.className!);
+    const parsedSchedule = await schedule.parse(filename, classData.className!, false);
 
     if (!parsedSchedule.status) {
       return vk.sendMessage({
@@ -234,13 +234,13 @@ async function command({ message, vk, classes, payload, schedule, utils }: Comma
       });
     }
 
-    const alreadyExistingSchedule = classData.manualSchedule.find((existingSchedule) => existingSchedule.schedule!.filename === parsedSchedule.schedule!.filename) as ParseScheduleResponse;
+    const alreadyExistingSchedule = classData.manualSchedule.find((existingSchedule) => existingSchedule.schedule!.filename === parsedSchedule.schedule!.filename);
 
     if (alreadyExistingSchedule) {
       classData.manualSchedule = classData.manualSchedule.filter((existingSchedule) => existingSchedule.schedule!.filename !== parsedSchedule.schedule!.filename);
     }
 
-    const newManualSchedule = classData.manualSchedule.concat(parsedSchedule) as ParseScheduleResponse[];
+    const newManualSchedule: ParseScheduleResponse[] = classData.manualSchedule.concat(parsedSchedule);
     await classes.setManualSchedule(chosenChat, newManualSchedule);
 
     const ownerData = await vk.getUser(message.senderId);

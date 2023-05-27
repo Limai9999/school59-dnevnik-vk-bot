@@ -168,6 +168,8 @@ export default class Schedule {
       });
     }
 
+    console.log('scheduleFiles', scheduleFiles);
+
     if (!scheduleFiles.length) {
       return {
         status: true,
@@ -181,18 +183,21 @@ export default class Schedule {
       const downloadStatus = await this.netCity.downloadAttachment(session.session.id, file, this.isDebug || isPreview);
 
       if (!downloadStatus.status) {
-        return {
+        const data: ParseScheduleResponse = {
           status: false,
           error: downloadStatus.error,
           filename: downloadStatus.filename,
-        } as ParseScheduleResponse;
+          isPreview,
+        };
+
+        return data;
       }
 
-      const parsedSchedule = await this.parse(downloadStatus.filename, className);
+      const parsedSchedule = await this.parse(downloadStatus.filename, className, isPreview);
 
       if (parsedSchedule.status) {
-        const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === downloadStatus.filename) as ParseScheduleResponse | undefined;
-        this.compare(oldSchedule, parsedSchedule, peerId, !isPreview, false);
+        const oldSchedule = classData.schedule.find((schedule) => schedule.filename! === downloadStatus.filename);
+        this.compare(oldSchedule, parsedSchedule, peerId, true, false);
       }
 
       return parsedSchedule;
@@ -200,6 +205,8 @@ export default class Schedule {
 
     const oldSchedule = classData.schedule;
     const newScheduleArray: ParseScheduleResponse[] = [];
+
+    console.log('parsedSchedule', parsedSchedule);
 
     parsedSchedule.map((newSchedule) => {
       if (!newSchedule.filename) return;
@@ -212,18 +219,21 @@ export default class Schedule {
 
     if (newScheduleArray.length) await this.classes.setSchedule(peerId, newScheduleArray);
 
+    console.log('newScheduleArray', newScheduleArray);
+
     return {
       status: true,
       schedule: newScheduleArray,
     };
   }
 
-  async parse(filename: string, className: string) {
+  async parse(filename: string, className: string, isPreview: boolean) {
     const parseScheduleResponse = await this.api.request({
       url: '/schedule/parse',
       data: {
         filename,
         className,
+        isPreview,
       },
     });
     if (!parseScheduleResponse) throw new Error('Не удалось обратиться к API.');
@@ -267,6 +277,8 @@ export default class Schedule {
 
     if (!newSchedule.status) return { isChanged: false };
 
+    if (newSchedule.isPreview) return { isChanged: false };
+
     const keyboard = Keyboard.builder()
       .inline()
       .textButton({
@@ -293,6 +305,10 @@ export default class Schedule {
     }
 
     if (!oldSchedule.status) return { isChanged: false, keyboard };
+
+    if (oldSchedule.isPreview) {
+      return { isChanged: false, keyboard };
+    }
 
     const oldData = oldSchedule.schedule;
     const newData = newSchedule.schedule;

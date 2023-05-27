@@ -46,6 +46,7 @@ const parsedSchedule = {
   status: Boolean,
   filename: String,
   error: String,
+  isPreview: Boolean,
   schedule: {
     date: String,
     distant: Boolean,
@@ -67,6 +68,7 @@ const totalStudentReport = {
   status: Boolean,
   error: String,
   info: [String],
+  isPreview: Boolean,
   result: {
     daysData: [{
       month: String,
