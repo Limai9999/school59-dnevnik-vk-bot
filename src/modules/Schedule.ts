@@ -168,7 +168,7 @@ export default class Schedule {
       });
     }
 
-    console.log('scheduleFiles', scheduleFiles);
+    // console.log('scheduleFiles', scheduleFiles);
 
     if (!scheduleFiles.length) {
       return {
@@ -206,7 +206,7 @@ export default class Schedule {
     const oldSchedule = classData.schedule;
     const newScheduleArray: ParseScheduleResponse[] = [];
 
-    console.log('parsedSchedule', parsedSchedule);
+    // console.log('parsedSchedule', parsedSchedule);
 
     parsedSchedule.map((newSchedule) => {
       if (!newSchedule.filename) return;
@@ -219,7 +219,7 @@ export default class Schedule {
 
     if (newScheduleArray.length) await this.classes.setSchedule(peerId, newScheduleArray);
 
-    console.log('newScheduleArray', newScheduleArray);
+    // console.log('newScheduleArray', newScheduleArray);
 
     return {
       status: true,
