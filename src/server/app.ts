@@ -20,6 +20,7 @@ import subscriptionRoutes from './routes/subscription';
 import userRoutes from './routes/user';
 import schoolEndFeatureRoutes from './routes/schoolEndFeature';
 import utilsRoutes from './routes/utils';
+import sessionRoutes from './routes/session';
 
 import { AppLocals, ApplicationLocals } from './types/DefaultRequestData';
 
@@ -90,6 +91,7 @@ class Server {
     app.use('/api/user', userRoutes);
     app.use('/api/schoolEndFeature', schoolEndFeatureRoutes);
     app.use('/api/utils', utilsRoutes);
+    app.use('/api/session', sessionRoutes);
 
     // Start server
     app.listen(config.port, () => {
