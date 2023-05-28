@@ -1,4 +1,4 @@
-import { Protocol } from 'puppeteer';
+import { PuppeteerCookie } from '../../../Extra/PuppeteerCookie';
 
 export type Session = {
   status: boolean
@@ -11,5 +11,5 @@ export type Session = {
     endTime: number
   }
   at: string
-  cookies: Protocol.Network.Cookie[]
+  cookies: PuppeteerCookie[]
 }
