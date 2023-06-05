@@ -25,10 +25,8 @@ import Server from './server/app';
 import { getVKConfig, getMongoDBConfig, getMainConfig } from './utils/getConfig';
 import getCommands from './utils/getCommands';
 
-const { url, username, password } = getMongoDBConfig();
-mongoose.connect(url, {
-  auth: { username, password },
-}, (err) => {
+const { url } = getMongoDBConfig();
+mongoose.connect(url, {}, (err) => {
   if (err) {
     console.log('Ошибка при подключении к Mongo DB:'.red, err);
     return process.exit(1);
